@@ -1,6 +1,6 @@
 # ECC Stack
 
-ECC ist keine externe Bibliothek und kein Framework — es ist der Name für eine **persönliche Suite von Cursor-Skills**, die Engineering-Disziplin durchsetzen: deterministische Checks, Acceptance-Verträge, Code-Review-Gate, AgentShield, sicheres Ship. Die Skills referenzieren sich gegenseitig und teilen sich die Pipeline.
+ECC ist ein Agent-Framework / https://github.com/affaan-m/ecc — es ist eine Suite die Engineering-Disziplin durchsetzt: deterministische Checks, Acceptance-Verträge, Code-Review-Gate, AgentShield, sicheres Ship. Die Skills referenzieren sich gegenseitig und teilen sich die Pipeline.
 
 ## Was ECC bedeutet
 
