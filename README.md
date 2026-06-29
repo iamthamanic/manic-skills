@@ -1,21 +1,19 @@
 # Manic Skills
 
-Persönliche Agent-Skills für **Cursor** und **Windsurf**, maschinenlokal gespiegelt via Git. Portabel, account-unabhängig. Klone das Repo, führe `scripts/install.sh` aus, und alle Skills sind auf der neuen Maschine aktiv.
+Persönliche Agent-Skills für **Cursor**, **Windsurf**, **pi.dev** und **Claude Code** — maschinenlokal gespiegelt via Git. Portabel, account-unabhängig. Klone das Repo, führe `scripts/install.sh` aus, und alle Skills sind auf der neuen Maschine aktiv.
 
 ## Was sind Skills?
 
-Markdown-Dateien (`SKILL.md`) mit YAML-Frontmatter (`name`, `description`, optional `disable-model-invocation`, `argument-hint`, `license`). Der Skill-Body ist Markdown mit Anweisungen für den Agent. Beide Tools — Cursor und Windsurf — verwenden praktisch dasselbe Format:
+Skills folgen dem **Agent Skills Standard** (offen seit Dezember 2025 von Anthropic). Das Format ist für alle vier Tools identisch: `SKILL.md` mit YAML-Frontmatter (`name`, `description`) und Markdown-Body. Sie werden vom Model automatisch geladen, wenn die User-Anfrage zur `description` passt (progressive disclosure), oder manuell via `@skill-name` (Cursor/Windsurf) bzw. `/skill:name` (pi.dev/Claude Code) aufgerufen.
 
-| Aspekt | Cursor | Windsurf |
-|--------|--------|----------|
-| Skill-Datei | `SKILL.md` mit YAML-Frontmatter | `SKILL.md` mit YAML-Frontmatter |
-| Pflicht-Felder | `name`, `description` | `name`, `description` |
-| Invocation | Model entscheidet oder `@skill-name` | Model entscheidet oder `@skill-name` |
-| Progressive Disclosure | nur `name` + `description` bis Invocation | nur `name` + `description` bis Invocation |
-| Globaler Pffad | `~/.cursor/skills/<name>/` | `~/.codeium/windsurf/skills/<name>/` |
-| Workspace-Pfad | `<workspace>/.cursor/skills/` | `<workspace>/.windsurf/skills/` |
+| Tool | Global (maschinenlokal) | Workspace (projektlokal) | Invocation |
+|------|-------------------------|--------------------------|------------|
+| Cursor | `~/.cursor/skills/<name>/` | `<workspace>/.cursor/skills/` | `@skill-name` |
+| Windsurf | `~/.codeium/windsurf/skills/<name>/` | `<workspace>/.windsurf/skills/` | `@skill-name` |
+| pi.dev | `~/.pi/agent/skills/<name>/` oder `~/.agents/skills/` | `<workspace>/.pi/skills/` oder `<workspace>/.agents/skills/` | `/skill:name` |
+| Claude Code | `~/.claude/skills/<name>/` | `<workspace>/.claude/skills/` | `/skill-name` |
 
-Frontmatter-Felder, die nur Cursor kennt (`disable-model-invocation`, `argument-hint`), werden von Windsurf ignoriert — sie stören nicht, aber Windsurf auto-invoked dann auch Skills, die in Cursor bewusst manuell-only waren. Details dazu in [`docs/WINDSURF-COMPATIBILITY.md`](docs/WINDSURF-COMPATIBILITY.md).
+Frontmatter-Felder, die nur einzelne Tools kennen (`disable-model-invocation`, `argument-hint`, `context: fork`, `compatibility`), werden von den anderen Tools ignoriert — sie stören nicht. Details in [`docs/TOOL-COMPATIBILITY.md`](docs/TOOL-COMPATIBILITY.md).
 
 Dieses Repo enthält **nur** custom Skills aus `~/.cursor/skills/`. Offizielle Cursor-Skills (`~/.cursor/skills-cursor/`), Codex-Skills (`~/.codex/skills/`), Agent-Harness-Skills (`~/.agents/skills/`) und projektlokale Skills gehören nicht hierher — sie haben eigene Speicherorte und Sync-Mechanismen.
 
@@ -35,7 +33,21 @@ git clone https://github.com/iamthamanic/manic-skills ~/repos/manic-skills
 bash ~/repos/manic-skills/scripts/install.sh --windsurf
 ```
 
-**Beide Tools parallel:**
+**pi.dev:**
+
+```bash
+git clone https://github.com/iamthamanic/manic-skills ~/repos/manic-skills
+bash ~/repos/manic-skills/scripts/install.sh --pi
+```
+
+**Claude Code:**
+
+```bash
+git clone https://github.com/iamthamanic/manic-skills ~/repos/manic-skills
+bash ~/repos/manic-skills/scripts/install.sh --claude
+```
+
+**Alle vier Tools parallel:**
 
 ```bash
 git clone https://github.com/iamthamanic/manic-skills ~/repos/manic-skills
@@ -43,46 +55,46 @@ bash ~/repos/manic-skills/scripts/install.sh --all
 ```
 
 `install.sh` legt Symlinks von `<tool-skills-dir>/<name>` → `~/repos/manic-skills/skills/<name>`.
-Danach reicht `git pull`, um alle Skills in beiden Tools zu aktualisieren — ein Repo, zwei Tools, ein Update.
+Danach reicht `git pull`, um alle Skills in allen Tools zu aktualisieren — ein Repo, vier Tools, ein Update.
 
-Siehe [`INSTALL.md`](INSTALL.md) für alternative Installationsmethoden (copy, direkter Klon, Updates, Deinstallation) und [`docs/WINDSURF-COMPATIBILITY.md`](docs/WINDSURF-COMPATIBILITY.md) für detaillierte Kompatibilitäts-Hinweise.
+Siehe [`INSTALL.md`](INSTALL.md) für alternative Installationsmethoden (copy, direkter Klon, Updates, Deinstallation) und [`docs/TOOL-COMPATIBILITY.md`](docs/TOOL-COMPATIBILITY.md) für detaillierte Kompatibilitäts-Hinweise.
 
 ## Skill-Index
 
-Vollständige Tabelle aller Skills im Repo. **Basis** bedeutet das System, auf dem der Skill aufbaut: ECC (eigene Quality-Gate-Suite), Ponytail (YAGNI/Minimalismus-Werkzeuge) oder Standalone. **Wind** zeigt die Windsurf-Kompatibilität: ✅ voll, ⚠️ mit Einschränkung, ❌ nicht kompatibel.
+Vollständige Tabelle aller Skills. **Basis**: ECC (Quality-Gate-Suite), Ponytail (YAGNI), Standalone. **C** = Cursor, **W** = Windsurf, **P** = pi.dev, **CC** = Claude Code. ✅ voll · ⚠️ mit Einschränkung.
 
-| Skill | Zweck | Basis | Wind | Trigger | Abhängigkeiten |
-|-------|-------|-------|------|---------|----------------|
-| `@ecc-check` | Quality-Gate-Loop: verify + review + AgentShield bis READY | ECC | ⚠️ | `ecc-check`, `/ecc-check`, `merge-ready`, `quality gate` | `npm run verify`, `@review-ticket`, `npx ecc-agentshield` |
-| `@ecc-runner` | Autonomer GitHub-Issue-Queue-Runner | ECC | ⚠️ | `ecc-runner`, `/ecc-runner`, `issues abarbeiten`, `issue queue` | `@implement`, `@ecc-check`, `@commit-pr-safe`, `gh` CLI |
-| `@feature-intake` | Epic → Design → Issues, nur nach User-OK | ECC | ✅ | `feature-intake`, `/feature-intake`, `neues feature`, `PRD zerlegen`, `epic intake` | `.qa/design/`, `.qa/intake/`, `@ecc-runner` |
-| `@pingpong-solution` | Pre-Implementation Solution-Ping-Pong, `.qa/design` für `@implement` | ECC | ✅ | `pingpong-solution`, `how to integrate` | `@implement` |
-| `@implement` | Implementation Contract, Acceptance-Auto-Gen, Ponytail-Ladder, Security | ECC | ⚠️ | nach `@pingpong-solution` | `@foundations`, `@search-first`, `@security-review`, `@strategic-compact` |
-| `@foundations` | SE-Referenz (Parnas, Liskov, Hoare, Dijkstra, Brooks) | ECC | ✅ | `foundations`, `information hiding`, `leaky abstraction`, `distributed monolith` | — |
-| `@verify-ticket` | Technische Verifikation gegen Acceptance | ECC | ✅ | nach `@implement`, `verify ticket`, `validate implementation` | `.qa/acceptance/*.md` |
-| `@verify-ui` | UI/UX-Verifikation (Playwright, Screenshots, Edge Cases) | ECC | ✅ | `verify UI`, `smoke test`, `screenshot proof`, `e2e check` | Browser, AGENTS.md |
-| `@review-ticket` | Code-Quality-Review (Architektur, Security, Diff-Scope) | ECC | ⚠️ | `review ticket`, `code review ticket`, `pre-PR review` | `@review-bugbot`, `@review-security` (Cursor-subagents) |
-| `@commit-pr-safe` | Commit + Push + PR auf nicht-main, nach Quality Gate | ECC | ✅ | `commit-pr-safe`, `/commit-pr-safe`, `ship PR`, `open PR`, `merge-ready ship` | `@ecc-check` READY |
-| `@commit-push-safe` | Commit + Push (kein PR), README-Sync, Secret-Scan | ECC | ✅ | `commit-push-safe`, `push safely`, `ship without PR` | `@ecc-check` READY |
-| `@pr-merge-safe` | PR reviewen + mergen, wenn alle Gates green | ECC | ⚠️ | `pr-merge-safe`, `/pr-merge-safe`, `review and merge`, `merge PR if green` | offener PR, `@verify-ticket`, `@review-ticket`, `@ecc-check`, `@babysit` |
-| `@verification-loop` | Pre-PR Full Gate (build, typecheck, lint, tests, security) | ECC | ✅ | `verification-loop` | AGENTS.md checks command |
-| `@project-setup` | Repo-Bootstrap (PRD, AGENTS.md, README, `.qa/`, styleguide) | Standalone | ✅ | `project setup`, `bootstrap repo`, `scaffold project files` | — |
-| `@mine-stars` | GitHub-Stars durchsuchen für Patterns/Ideen | Standalone | ✅ | `mine-stars`, `check my stars`, `starred repos`, `prior art from stars` | GitHub API |
-| `@search-first` | Research-before-coding, invokes researcher agent | Standalone | ⚠️ | `search-first` | researcher subagent (Cursor-spezifisch) |
-| `@documentation-lookup` | Library-Docs via Context7 MCP statt Training-Data | Standalone | ✅ | `documentation-lookup`, Framework-Names | context7 MCP |
-| `@security-review` | Security-Checklist für Auth, Input, Secrets, Payments | Standalone | ✅ | `security-review` | — |
-| `@strategic-compact` | Kontext-Kompaktion an logischen Intervallen | Standalone | ✅ | `strategic-compact` | — |
-| `@save-prompts-inject` | Prompts in `~/.cursor/prompts/` speichern/injecten | Standalone | ⚠️ | `save prompt`, `use prompt`, `inject prompt`, `list prompts`, `delete prompt` | `~/.cursor/prompts/` (Cursor-Pfad) |
-| `@ponytail` | Lazy-senior-dev-Modus, YAGNI-Ladder, Intensitätslevel | Ponytail | ✅ | `ponytail`, `be lazy`, `yagni`, `do less`, `shortest path` | — |
-| `@ponytail-review` | Review nur auf Over-Engineering | Ponytail | ✅ | `review for over-engineering`, `what can we delete`, `/ponytail-review` | — |
-| `@ponytail-audit` | Whole-Repo-Audit auf Over-Engineering, ranked report | Ponytail | ✅ | `audit this codebase`, `find bloat`, `/ponytail-audit` | — |
-| `@ponytail-debt` | `ponytail:`-Kommentare im Code → Debt-Ledger | Ponytail | ✅ | `ponytail debt`, `what did ponytail defer`, `ponytail ledger` | — |
-| `@ponytail-gain` | Ponytail-Impact-Scoreboard (less code, less cost, more speed) | Ponytail | ✅ | `ponytail gain`, `what does ponytail save`, `/ponytail-gain` | — |
-| `@ponytail-help` | Quick-Reference-Card für alle Ponytail-Modi | Ponytail | ✅ | `ponytail help`, `how do I use ponytail`, `/ponytail-help` | — |
-| `@ecccheck` | **deprecated** → `@ecc-check` | ECC (legacy) | — | — | — |
-| `@prepare-deploy-pr` | **deprecated** → `@commit-pr-safe` | ECC (legacy) | — | — | — |
+| Skill | Zweck | How to use | C | W | P | CC |
+|-------|-------|------------|---|---|---|----|
+| `@ecc-check` | Quality-Gate-Loop bis READY/BLOCKED | **Situation:** Feature fertig, willst wissen ob ready zum Committen. **Was passiert:** 6 Phasen — `npm run verify`, Acceptance-Verifikation, Code-Review, AgentShield, UI-Check, Report. **Beispiel:** `@ecc-check` → Phase A `npm run verify` → Phase C `@review-ticket` → Phase D AgentShield → Output: `READY` oder `BLOCKED`. | ✅ | ⚠️ | ✅ | ✅ |
+| `@ecc-runner` | Autonomer GitHub-Issue-Queue-Runner | **Situation:** 5 offene Issues, automatisch abarbeiten. **Was passiert:** Bootstrapped Labels, baut Queue, arbeitet jedes Issue mit voller Pipeline (implement→verify→review→PR). **Beispiel:** `@ecc-runner` → Issue #42: implement→verify→review→PR #78 → Issue #43 → ... bis Queue leer. | ✅ | ⚠️ | ⚠️ | ⚠️ |
+| `@feature-intake` | Epic → Design → Issues, nur nach User-OK | **Situation:** Grobe Feature-Idee, in Issues zerlegen. **Was passiert:** Analysiert PRD gegen Repo, stellt Fragen, schreibt `.qa/design/`, zerlegt in Issue-Drafts. **Beispiel:** `@feature-intake` mit PRD → 3 Slices → User bestätigt → Issues erstellt → `@ecc-runner`. | ✅ | ✅ | ✅ | ✅ |
+| `@pingpong-solution` | Pre-Implementation Solution-Ping-Pong | **Situation:** Unsicher wie Feature sich integriert. **Was passiert:** Sokratische Discovery, Optionen mit Evidenz, Codebase-Fit, schreibt `.qa/design/`. **Beispiel:** "Wie baue ich Audio-Export?" → Skill bietet 2 Optionen → User wählt A → `.qa/design/audio-export.md` → `@implement`. | ✅ | ✅ | ✅ | ✅ |
+| `@implement` | Implementation Contract, Acceptance-Auto-Gen | **Situation:** Design steht, Code schreiben. **Was passiert:** Auto-generiert `.qa/acceptance/` vor Code, minimale Diffs, Ponytail-Ladder, Helper inline. **Beispiel:** `@implement` → `.qa/acceptance/audio-export.md` → sucht Patterns → implementiert minimalen Diff → `@verify-ticket`. | ✅ | ⚠️ | ⚠️ | ⚠️ |
+| `@foundations` | SE-Referenz (Parnas, Liskov, Hoare, Dijkstra, Brooks) | **Situation:** Designst Modul, unsicher über Boundary. **Was passiert:** Reference Skill mit Finding-Tags (`parnas:`, `liskov:`, `hoare:`). **Beispiel:** `@foundations` → § Parnas → "Audio-Modul leakt State" → Tag `parnas:` in Review. | ✅ | ✅ | ✅ | ✅ |
+| `@verify-ticket` | Technische Verifikation gegen Acceptance | **Situation:** Implementation fertig, gegen Kriterien validieren. **Was passiert:** Läuft `npm run verify`, validiert Diff gegen `.qa/acceptance/`. **Beispiel:** `@verify-ticket` → verify PASS → Acceptance "Waveform bei 44.1kHz" → Test existiert → PASS. | ✅ | ✅ | ✅ | ✅ |
+| `@verify-ui` | UI/UX-Verifikation (Playwright, Screenshots) | **Situation:** UI-Änderungen, visuell verifizieren. **Was passiert:** Bootstrapped Playwright, läuft e2e-Szenarien mit Screenshots. **Beispiel:** `@verify-ui` → "App lädt" Screenshot → "Dialog öffnet" Screenshot → Edge Cases → Report grün. | ✅ | ✅ | ✅ | ✅ |
+| `@review-ticket` | Code-Quality-Review, ACCEPT/CHANGES_REQUESTED | **Situation:** Code fertig, Review vor PR. **Was passiert:** Architektur, Security, Diff-Scope. Ruft Subagents bei Bedarf. **Beispiel:** `@review-ticket` → "Diff 50 Zeilen, Acceptance 200" → `CHANGES_REQUESTED` → fix → `ACCEPT`. | ✅ | ⚠️ | ⚠️ | ⚠️ |
+| `@commit-pr-safe` | Commit + Push + PR auf non-main | **Situation:** Quality Gate READY, commit+push+PR. **Was passiert:** Liest AGENTS.md, validiert non-main, Secret-Scan, AgentShield, README-Sync, PR. **Beispiel:** `@commit-pr-safe` → branch `feature/audio-export` → kein Secret → commit → push → PR #78. | ✅ | ✅ | ✅ | ✅ |
+| `@commit-push-safe` | Commit + Push ohne PR | **Situation:** WIP-Commit ohne PR. **Was passiert:** Wie commit-pr-safe, ohne PR. **Beispiel:** `@commit-push-safe` → `wip: scaffold` → push → fertig (kein PR). | ✅ | ✅ | ✅ | ✅ |
+| `@pr-merge-safe` | PR reviewen + mergen wenn green | **Situation:** PR offen, CI läuft, reviewen+mergen. **Was passiert:** verify-ticket, review-ticket, ecc-check, babysit. Merged bei User-OK. **Beispiel:** `@pr-merge-safe` → CI green → review ACCEPT → "Merge? y" → merged. | ✅ | ⚠️ | ⚠️ | ⚠️ |
+| `@verification-loop` | Pre-PR Full Gate | **Situation:** Vor PR alle Checks auf einmal. **Was passiert:** build+typecheck+lint+tests+security. **Beispiel:** `@verification-loop` → typecheck FAIL → fix → PASS → ready. | ✅ | ✅ | ✅ | ✅ |
+| `@project-setup` | Repo-Bootstrap | **Situation:** Neues Projekt, PRD/AGENTS/README anlegen. **Was passiert:** Generiert alle Dateien, entdeckt Stack. **Beispiel:** `@project-setup` → Next.js erkannt → PRD.md, AGENTS.md, README.md, .qa/. | ✅ | ✅ | ✅ | ✅ |
+| `@mine-stars` | GitHub-Stars durchsuchen | **Situation:** Ähnliche Patterns in Stars finden. **Was passiert:** Durchsucht Stars nach Patterns/Ideen, cross-domain. **Beispiel:** `@mine-stars` "audio waveform" → 3 starred Repos → d3-wave Pattern anwendbar. | ✅ | ✅ | ✅ | ✅ |
+| `@search-first` | Research-before-coding | **Situation:** Utility schreiben, erst prüfen ob existiert. **Was passiert:** Sucht existierende Tools/Libs/Patterns. **Beispiel:** `@search-first` "rate limiter" → `express-rate-limit` bereits installiert → keine custom Implementation. | ✅ | ⚠️ | ⚠️ | ⚠️ |
+| `@documentation-lookup` | Library-Docs via Context7 MCP | **Situation:** Aktuelle React-Docs statt Training-Data. **Was passiert:** Lädt up-to-date Docs via Context7. **Beispiel:** `@documentation-lookup` "Next.js 14 App Router" → aktuelle Docs → Server Components können async. | ✅ | ✅ | ✅ | ✅ |
+| `@security-review` | Security-Checklist | **Situation:** Auth-Endpoint, Security prüfen. **Was passiert:** Checklist für Auth, Input, Secrets, Payments. **Beispiel:** `@security-review` "login" → Input validation ✓, Password hashing ✓, Rate limiting ✗ → hinzufügen. | ✅ | ✅ | ✅ | ✅ |
+| `@strategic-compact` | Kontext-Kompaktion | **Situation:** Lange Session, Context groß. **Was passiert:** Kompakt an logischen Intervallen (nach acceptance, vor bulk coding). **Beispiel:** `@strategic-compact` nach Phase 2 → kompaktieren → schlank für Phase 3. | ✅ | ✅ | ✅ | ✅ |
+| `@save-prompts-inject` | Prompts speichern/injecten | **Situation:** Prompt wiederverwenden. **Was passiert:** Speichert in `~/.cursor/prompts/`, inject in jede Session. **Beispiel:** `save prompt review-checklist` → nächste Session: `use prompt review-checklist` → injected. | ✅ | ⚠️ | ⚠️ | ⚠️ |
+| `@ponytail` | Lazy-senior-dev-Modus, YAGNI-Ladder | **Situation:** Neigst zu Over-Engineering. **Was passiert:** Persistent: YAGNI-Ladder — braucht es das? stdlib? native? one-liner? **Beispiel:** `@ponytail` "Baue Cache" → "Meinst du `@lru_cache`?" → one-liner statt Custom-Klasse. | ✅ | ✅ | ✅ | ✅ |
+| `@ponytail-review` | Review nur auf Over-Engineering | **Situation:** Review fertig, zusätzlich auf Over-Engineering prüfen. **Was passiert:** Findet reinvented stdlib, unneeded deps, speculative abstractions. **Beispiel:** `@ponytail-review` → "Custom Cache 80 Zeilen → lru_cache 1 Zeile" → cutten. | ✅ | ✅ | ✅ | ✅ |
+| `@ponytail-audit` | Whole-Repo-Audit auf Over-Engineering | **Situation:** Codebase erben, was überflüssig? **Was passiert:** Scannt ganzes Repo, ranked Liste. **Beispiel:** `@ponytail-audit` → "1. Custom Cache → lru_cache (-79 Zeilen) / 2. Custom Modal → Radix (-120 Zeilen)". | ✅ | ✅ | ✅ | ✅ |
+| `@ponytail-debt` | `ponytail:`-Kommentare → Debt-Ledger | **Situation:** Ponytail hat Shortcuts hinterlassen, tracken. **Was passiert:** Erntet alle `ponytail:`-Kommentare. **Beispiel:** `@ponytail-debt` → 3 shortcuts: global lock, naive heuristic, ... → Ledger. | ✅ | ✅ | ✅ | ✅ |
+| `@ponytail-gain` | Ponytail-Impact-Scoreboard | **Situation:** Sehen was Ponytail spart. **Was passiert:** Scoreboard: less code, less cost, more speed. **Beispiel:** `@ponytail-gain` → "Code: -2,400 Zeilen / Deps: -4 / Build: -18s". | ✅ | ✅ | ✅ | ✅ |
+| `@ponytail-help` | Quick-Reference für Ponytail-Modi | **Situation:** Alle Ponytail-Kommandos sehen. **Was passiert:** One-shot Card aller Modi/Skills/Commands. **Beispiel:** `@ponytail-help` → Card: lite/full/ultra, review, audit, debt, gain. | ✅ | ✅ | ✅ | ✅ |
+| `@ecccheck` ⚠️ | **deprecated** → `@ecc-check` | Nicht verwenden. | — | — | — | — |
+| `@prepare-deploy-pr` ⚠️ | **deprecated** → `@commit-pr-safe` | Nicht verwenden. | — | — | — | — |
 
-**Legende Wind:** ✅ voll kompatibel (pure Markdown-Logik, keine Cursor-spezifischen Abhängigkeiten) · ⚠️ funktionsfähig, aber mit Einschränkung (Subagent-Abhängigkeit, Cursor-spezifischer Pfad, oder `disable-model-invocation` wird ignoriert) · ❌ nicht kompatibel. Siehe [`docs/WINDSURF-COMPATIBILITY.md`](docs/WINDSURF-COMPATIBILITY.md) für Details.
+**Legende:** ✅ voll kompatibel · ⚠️ funktionsfähig mit Einschränkung (Subagent-Abhängigkeit, Cursor-Pfad, oder `disable-model-invocation` ignoriert) — siehe [`docs/TOOL-COMPATIBILITY.md`](docs/TOOL-COMPATIBILITY.md).
 
 ## Pipeline
 
@@ -100,7 +112,7 @@ Siehe [`docs/PIPELINE.md`](docs/PIPELINE.md) für die detaillierte Phasen-Beschr
 
 | Basis | Skills | Beschreibung |
 |-------|--------|--------------|
-| **ECC** | `ecc-check`, `ecc-runner`, `feature-intake`, `pingpong-solution`, `implement`, `foundations`, `verify-ticket`, `verify-ui`, `review-ticket`, `commit-pr-safe`, `commit-push-safe`, `pr-merge-safe`, `verification-loop`, `ecccheck` (deprecated), `prepare-deploy-pr` (deprecated) | Eigene Engineering-Disziplin-Suite: deterministische Checks, Acceptance-Verträge, Code-Review-Gate, AgentShield, sicheres Ship. Pro-Projekt-Konfiguration in `.qa/project.yaml`, `.qa/runner-profile.yaml`, `AGENTS.md`. |
+| **ECC** | `ecc-check`, `ecc-runner`, `feature-intake`, `pingpong-solution`, `implement`, `foundations`, `verify-ticket`, `verify-ui`, `review-ticket`, `commit-pr-safe`, `commit-push-safe`, `pr-merge-safe`, `verification-loop`, `ecccheck` (deprecated), `prepare-deploy-pr` (deprecated) | Engineering-Disziplin-Suite: deterministische Checks, Acceptance-Verträge, Code-Review-Gate, AgentShield, sicheres Ship. Pro-Projekt-Konfiguration in `.qa/project.yaml`, `.qa/runner-profile.yaml`, `AGENTS.md`. |
 | **Ponytail** | `ponytail`, `ponytail-review`, `ponytail-audit`, `ponytail-debt`, `ponytail-gain`, `ponytail-help` | YAGNI/Minimalismus-Werkzeuge: lazy-senior-dev-Modus, Over-Engineering-Review, Repo-Audit, Debt-Tracking, Impact-Scoreboard. |
 | **Standalone** | `project-setup`, `mine-stars`, `search-first`, `documentation-lookup`, `security-review`, `strategic-compact`, `save-prompts-inject` | Unabhängige Einzel-Skills ohne Pipeline-Abhängigkeit. |
 
@@ -123,17 +135,17 @@ git add -A && git commit -m "update foo skill" && git push
 
 # Neue Maschine / anderer Account:
 git clone https://github.com/iamthamanic/manic-skills ~/repos/manic-skills
-bash ~/repos/manic-skills/scripts/install.sh --all   # Cursor + Windsurf
+bash ~/repos/manic-skills/scripts/install.sh --all   # alle vier Tools
 ```
 
-Weil `install.sh` Symlinks anlegt, editierst du automatisch die Repo-Dateien, wenn du Skills in `~/.cursor/skills/` oder `~/.codeium/windsurf/skills/` änderst. Ein `git status` im Repo zeigt dir dann sofort, was sich geändert hat.
+Weil `install.sh` Symlinks anlegt, editierst du automatisch die Repo-Dateien, wenn du Skills in einem Tool-Verzeichnis änderst. Ein `git status` im Repo zeigt dir dann sofort, was sich geändert hat.
 
 ## Was NICHT ins Repo gehört
 
-- `~/.cursor/skills-cursor/` — offizielle Cursor-Skills (synced von Cursor selbst via `.sync-manifest.json`)
+- `~/.cursor/skills-cursor/` — offizielle Cursor-Skills (synced von Cursor selbst)
 - `~/.codex/skills/` — Codex-CLI, anderes Tool
-- `~/.agents/skills/` — anderes Agent-Harness
-- projektlokale Skills in `<workspace>/.cursor/skills/`, `<workspace>/.windsurf/skills/`, `<workspace>/.agents/skills/`, `<workspace>/.claude/skills/` (reisen mit dem jeweiligen Projekt-Repo)
+- `~/.agents/skills/` — anderes Agent-Harness (pi.dev lädt diese aber auch)
+- projektlokale Skills in `<workspace>/.cursor/skills/`, `<workspace>/.windsurf/skills/`, `<workspace>/.pi/skills/`, `<workspace>/.claude/skills/`, `<workspace>/.agents/skills/` (reisen mit dem jeweiligen Projekt-Repo)
 
 ## Lizenz
 

@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 # verify.sh — prüft, dass jeder Skill eine gültige SKILL.md mit Frontmatter hat
-# und (wenn via install.sh installiert) die Symlinks in Cursor und/oder Windsurf funktionieren.
+# und die Symlinks in allen Tool-Verzeichnissen funktionieren.
+# Supports: Cursor, Windsurf, pi.dev, Claude Code
 set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Tool skill directories
 CURSOR_DIR="$HOME/.cursor/skills"
 WINDSURF_DIR="$HOME/.codeium/windsurf/skills"
+PI_DIR="$HOME/.pi/agent/skills"
+CLAUDE_DIR="$HOME/.claude/skills"
 
 errors=0
 warnings=0
@@ -88,8 +93,10 @@ verify_tool() {
   echo "$tool_name installed: $installed, broken symlinks: $broken"
 }
 
-verify_tool "cursor" "$CURSOR_DIR"
-verify_tool "windsurf" "$WINDSURF_DIR"
+verify_tool "cursor"   "$CURSOR_DIR"
+verify_tool "windsurf"  "$WINDSURF_DIR"
+verify_tool "pi"        "$PI_DIR"
+verify_tool "claude"    "$CLAUDE_DIR"
 
 echo
 echo "Summary: $ok OK, $warnings warnings, $errors errors"
