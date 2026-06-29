@@ -1,0 +1,34 @@
+# Project config for verify-ui (copy to .qa/project.yaml in repo root)
+
+appRoot: Letzfetzprototype
+
+# Dev server (Playwright webServer)
+devCommand: npm run dev
+devUrl: http://localhost:4789
+
+# Validation before browser tests (run from workspace root)
+checksCommand: npm run checks
+e2eCommand: npm run test:e2e
+
+# Context files
+styleguide: Letzfetzprototype/docs/UI_STYLEGUIDE.md
+roadmap: .qa/design/product-roadmap.md
+designDir: .qa/design
+acceptanceDir: .qa/acceptance
+evidenceDir: .qa/evidence
+
+locale: de
+
+viewports:
+  - name: mobile
+    width: 390
+    height: 844
+  - name: desktop
+    width: 1280
+    height: 720
+
+# Main navigation labels (for smoke tests) — adjust per project
+navigation:
+  - Spielen
+  - Bearbeiten
+  - Sandbox

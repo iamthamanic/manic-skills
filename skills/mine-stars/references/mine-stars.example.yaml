@@ -1,0 +1,15 @@
+# Optional config for @mine-stars
+# Copy to ~/.cursor/mine-stars.yaml
+
+cacheTtlHours: 48
+
+localCloneRoots:
+  - ~/Desktop/arsvivai/2-DEV-PROJEKTE
+  - ~/Projects
+
+maxL2Repos: 25
+maxL3Repos: 8
+
+outputDir: ~/.cursor/prior-art
+
+# forceRefresh: true   # ignore cache for one run

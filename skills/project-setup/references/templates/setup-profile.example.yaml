@@ -1,0 +1,12 @@
+# Optional per-repo overrides for @project-setup
+# Copy to .qa/setup-profile.yaml in workspace root
+
+# locale: de
+# appRoot: ./frontend
+# prdPath: docs/PRD.md
+# styleguidePath: docs/UI_STYLEGUIDE.md
+
+# skipShimwrappercheck: false
+# enableFallow: false
+# enableStubtree: false
+# enableMcpSetup: false

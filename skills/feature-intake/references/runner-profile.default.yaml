@@ -1,0 +1,23 @@
+# Default runner profile — copy to .qa/runner-profile.yaml per repo
+
+issueBackend: github
+
+github:
+  defaultLabels: []
+  milestone: null
+
+stackProfile: generic
+
+locale: en
+
+runtimeAxes:
+  - local
+  - cloud
+
+checksSnippet: "CHECK_MODE=snippet npm run checks"
+
+helperSkills: {}
+
+epicPrdSearch:
+  - docs/PRD.md
+  - docs/**/*.md

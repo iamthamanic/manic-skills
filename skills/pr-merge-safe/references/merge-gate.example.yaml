@@ -1,0 +1,19 @@
+# Optional per-repo merge policy for @pr-merge-safe
+# Copy to .qa/merge-gate.yaml and adjust
+
+# squash | merge | rebase
+mergeStrategy: squash
+
+deleteBranchAfterMerge: true
+
+# When true: stop at READY even if CI green (branch protection / team policy)
+requireHumanApproval: false
+
+# When false: draft PRs block merge until marked ready for review
+allowDraftMerge: false
+
+# This skill does not deploy; flag for post-merge manual steps only
+cloudDeployAfterMerge: false
+
+# Required review verdict from @review-ticket before merge
+minReviewVerdict: ACCEPT

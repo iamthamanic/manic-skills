@@ -1,0 +1,32 @@
+# Manic Skills — .gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temp
+*.tmp
+*.bak
+*.log
+
+# Lock files (skills are pure markdown, no lockfile needed)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Node (falls jemand versehentlich npm im Repo ausführt)
+node_modules/
+
+# Lokale Sync-Artefakte
+.sync-manifest.json
+.cursor-managed-skills-manifest.json
+
+# Verify-Output (falls verify.sh mal logs schreibt)
+*.verify.log
