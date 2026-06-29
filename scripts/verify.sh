@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # verify.sh — prüft, dass jeder Skill eine gültige SKILL.md mit Frontmatter hat
-# und (wenn via install.sh installiert) die Symlinks funktionieren.
+# und (wenn via install.sh installiert) die Symlinks in Cursor und/oder Windsurf funktionieren.
 set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-TARGET="$HOME/.cursor/skills"
+CURSOR_DIR="$HOME/.cursor/skills"
+WINDSURF_DIR="$HOME/.codeium/windsurf/skills"
 
 errors=0
 warnings=0
@@ -21,7 +22,7 @@ for skill_dir in "$REPO"/skills/*/; do
     continue
   fi
 
-  # Check frontmatter
+  # Check frontmatter start
   if ! head -1 "$skill_file" | grep -q '^---$'; then
     echo "FAIL  $name — SKILL.md does not start with frontmatter (---)"
     ((errors++))
@@ -53,14 +54,22 @@ for skill_dir in "$REPO"/skills/*/; do
   ((ok++))
 done
 
-echo
-echo "=== Verifying installation (~/.cursor/skills/) ==="
-if [[ -d "$TARGET" ]]; then
-  installed=0
-  broken=0
+# Helper to verify one tool's installation directory
+verify_tool() {
+  local tool_name="$1"
+  local target_dir="$2"
+  echo
+  echo "=== Verifying installation ($tool_name: $target_dir) ==="
+  if [[ ! -d "$target_dir" ]]; then
+    echo "$target_dir does not exist — skills not installed for $tool_name."
+    echo "Run: bash $REPO/scripts/install.sh --$tool_name"
+    return
+  fi
+  local installed=0
+  local broken=0
   for skill_dir in "$REPO"/skills/*/; do
     name="$(basename "$skill_dir")"
-    dest="$TARGET/$name"
+    dest="$target_dir/$name"
     if [[ -L "$dest" ]]; then
       if [[ -d "$dest" ]]; then
         ((installed++))
@@ -69,18 +78,18 @@ if [[ -d "$TARGET" ]]; then
         ((broken++))
       fi
     elif [[ -d "$dest" ]]; then
-      echo "non-symlink      $name (Methode B/C — copy install)"
+      echo "non-symlink      $name (copy install)"
       ((installed++))
     else
-      echo "missing          $name (nicht installiert — run install.sh)"
+      echo "missing          $name (nicht installiert — run install.sh --$tool_name)"
     fi
   done
   echo
-  echo "Installed: $installed, broken symlinks: $broken"
-else
-  echo "$TARGET does not exist — skills not installed."
-  echo "Run: bash $REPO/scripts/install.sh"
-fi
+  echo "$tool_name installed: $installed, broken symlinks: $broken"
+}
+
+verify_tool "cursor" "$CURSOR_DIR"
+verify_tool "windsurf" "$WINDSURF_DIR"
 
 echo
 echo "Summary: $ok OK, $warnings warnings, $errors errors"

@@ -1,14 +1,25 @@
 #!/usr/bin/env bash
-# sync.sh — bidirektionaler Sync zwischen ~/.cursor/skills/ und dem Repo
+# sync.sh — bidirektionaler Sync zwischen Tool-Skill-Verzeichnissen und dem Repo
 # Usage:
-#   bash scripts/sync.sh pull      # ~/.cursor/skills/ → repo (lokale Änderungen ins Repo holen)
-#   bash scripts/sync.sh push      # repo → ~/.cursor/skills/ (Repo-Stand in Skills kopieren)
-# Default: pull
+#   bash scripts/sync.sh pull                # ~/.cursor/skills/ → repo (default, Cursor)
+#   bash scripts/sync.sh pull --cursor        # ~/.cursor/skills/ → repo
+#   bash scripts/sync.sh pull --windsurf      # ~/.codeium/windsurf/skills/ → repo
+#   bash scripts/sync.sh push                 # repo → ~/.cursor/skills/ (default, Cursor)
+#   bash scripts/sync.sh push --cursor        # repo → ~/.cursor/skills/
+#   bash scripts/sync.sh push --windsurf      # repo → ~/.codeium/windsurf/skills/
+# Default tool: cursor
 set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-SOURCE="$HOME/.cursor/skills"
+
 DIRECTION="${1:-pull}"
+TOOL="${2:---cursor}"
+
+case "$TOOL" in
+  --cursor)  SOURCE="$HOME/.cursor/skills" ;;
+  --windsurf) SOURCE="$HOME/.codeium/windsurf/skills" ;;
+  *) echo "Unknown tool: $TOOL"; echo "Usage: bash scripts/sync.sh [pull|push] [--cursor|--windsurf]"; exit 1 ;;
+esac
 
 if [[ ! -d "$SOURCE" ]]; then
   echo "Error: $SOURCE does not exist. Run install.sh first."
@@ -18,7 +29,7 @@ fi
 count=0
 
 if [[ "$DIRECTION" == "pull" ]]; then
-  # Kopiere alle Änderungen aus ~/.cursor/skills/ ins Repo
+  # Kopiere alle Änderungen aus $SOURCE ins Repo
   for skill_dir in "$REPO"/skills/*/; do
     name="$(basename "$skill_dir")"
     src="$SOURCE/$name"
@@ -27,7 +38,7 @@ if [[ "$DIRECTION" == "pull" ]]; then
       echo "pulled $name"
       ((count++))
     else
-      echo "skip $name (not in ~/.cursor/skills/)"
+      echo "skip $name (not in $SOURCE)"
     fi
   done
   echo
@@ -36,7 +47,7 @@ if [[ "$DIRECTION" == "pull" ]]; then
   echo "Then: git add -A && git commit -m 'sync skills' && git push"
 
 elif [[ "$DIRECTION" == "push" ]]; then
-  # Kopiere alle Änderungen aus dem Repo nach ~/.cursor/skills/
+  # Kopiere alle Änderungen aus dem Repo nach $SOURCE
   for skill_dir in "$REPO"/skills/*/; do
     name="$(basename "$skill_dir")"
     dest="$SOURCE/$name"
@@ -53,8 +64,10 @@ elif [[ "$DIRECTION" == "push" ]]; then
   echo "Done. Pushed $count skills from $REPO/skills/ → $SOURCE"
 
 else
-  echo "Usage: bash scripts/sync.sh [pull|push]"
-  echo "  pull (default): ~/.cursor/skills/ → repo"
-  echo "  push:           repo → ~/.cursor/skills/"
+  echo "Usage: bash scripts/sync.sh [pull|push] [--cursor|--windsurf]"
+  echo "  pull (default): tool skills dir → repo"
+  echo "  push:           repo → tool skills dir"
+  echo "  --cursor (default): ~/.cursor/skills/"
+  echo "  --windsurf:         ~/.codeium/windsurf/skills/"
   exit 1
 fi
