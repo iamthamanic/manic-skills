@@ -10,6 +10,18 @@ Die ECC-Skills bilden eine zusammenhängende Pipeline von Feature-Idee bis gemer
                                           @ecc-runner orchestriert das ganze pro Issue (batch mode)
 ```
 
+## Fast Lane (ohne volle Pipeline)
+
+Wenn du schnell codest und `@verify-ticket` / `@review-ticket` überspringst:
+
+```
+@audit-changes (quick | standard)  →  weiter coden
+@audit-changes (standard)          →  optional vor Commit
+@ecc-check                         →  Pflicht vor PR / Ship
+```
+
+`@audit-changes` ist **kein** Ersatz für `@ecc-check`. Exit: `CLEAN` / `WARN` / `BLOCK` (weiterarbeiten bei WARN erlaubt). Scope: uncommitted, since-commit, PR, oder Pfad/Keyword (z. B. „time management“).
+
 Nach PR-Erstellung:
 
 ```
@@ -67,6 +79,16 @@ Trigger: `verify UI`, `smoke test`, `screenshot proof`, `e2e check`. Wird empfoh
 Statische Code-Quality-Review nach `@verify-ticket` und `@verify-ui`: Architektur-Fit, Maintainability, Security-Hotspots, Diff-Scope vs Acceptance. Nutzt `@review-bugbot` und `@review-security` subagents bei Bedarf. Verdict: `ACCEPT` oder `CHANGES_REQUESTED`.
 
 Trigger: `review ticket`, `code review ticket`, `pre-PR review`.
+
+### Fast Lane — Audit: `@audit-changes`
+
+Diff-scoped Fast-Lane-Audit für Security, Wartbarkeit, SOLID/KISS/DRY — ohne Playwright-Pflicht.
+
+Trigger: `audit changes`, `quick audit`, `check changes`, `audit since commit`, `audit time management`.
+
+Depth: `quick` (default, diff-scoped tsc/lint) · `standard` (volle Package-Checks + Review lite) · `full` (+ optional UI/Acceptance).
+
+Exit: `CLEAN` / `WARN` / `BLOCK`. Vor PR trotzdem `@ecc-check`.
 
 ### Phase 7 — ECC Check: `@ecc-check`
 

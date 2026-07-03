@@ -23,6 +23,12 @@ ECC steht für eine Sammlung zusammenhängender Skills unter `~/.cursor/skills/`
 | `@commit-push-safe` | Commit + Push ohne PR |
 | `@pr-merge-safe` | PR reviewen + mergen wenn green |
 
+### Fast Lane
+
+| Skill | Rolle |
+|-------|-------|
+| `@audit-changes` | Diff-scoped Audit (Security, SOLID, KISS, DRY) — `CLEAN`/`WARN`/`BLOCK`, kein Ship-Gate |
+
 ### Orchestrierung
 
 | Skill | Rolle |

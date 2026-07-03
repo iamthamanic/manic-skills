@@ -29,6 +29,7 @@ Replaces `npm run checks` + Shim `VERDICT: ACCEPT` for normal desktop/frontend t
 
 ## When **not** to use alone
 
+- Fast mid-session sanity check → `@audit-changes` (not a ship gate)
 - Full issue queue → `@ecc-runner` (orchestrator; calls this skill per issue)
 - Browser UX → `@verify-ui` (run inside loop if UI files changed)
 - Appwrite deploy / release → `npm run checks` (legacy shim) + cloud verify scripts

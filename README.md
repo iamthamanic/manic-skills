@@ -66,6 +66,7 @@ Vollständige Tabelle aller Skills. **Basis**: ECC (Quality-Gate-Suite), Ponytai
 | Skill | Zweck | How to use | C | W | P | CC |
 |-------|-------|------------|---|---|---|----|
 | `@ecc-check` | Quality-Gate-Loop bis READY/BLOCKED | **Situation:** Feature fertig, willst wissen ob ready zum Committen. **Was passiert:** 6 Phasen — `npm run verify`, Acceptance-Verifikation, Code-Review, AgentShield, UI-Check, Report. **Beispiel:** `@ecc-check` → Phase A `npm run verify` → Phase C `@review-ticket` → Phase D AgentShield → Output: `READY` oder `BLOCKED`. | ✅ | ⚠️ | ✅ | ✅ |
+| `@audit-changes` | Fast-Lane-Audit (Security, SOLID, KISS, DRY) | **Situation:** Schnell codiert ohne volle Pipeline, willst Sicherheits-/Qualitäts-Sanity. **Was passiert:** Scope (uncommitted/PR/Keyword), diff-scoped Checks, Security-Scan, Review lite. **Beispiel:** `@audit-changes scope: time management depth: quick` → tsc/lint auf TM-Pfade → keine Secrets → `CLEAN` → vor PR trotzdem `@ecc-check`. | ✅ | ✅ | ✅ | ✅ |
 | `@ecc-runner` | Autonomer GitHub-Issue-Queue-Runner | **Situation:** 5 offene Issues, automatisch abarbeiten. **Was passiert:** Bootstrapped Labels, baut Queue, arbeitet jedes Issue mit voller Pipeline (implement→verify→review→PR). **Beispiel:** `@ecc-runner` → Issue #42: implement→verify→review→PR #78 → Issue #43 → ... bis Queue leer. | ✅ | ⚠️ | ⚠️ | ⚠️ |
 | `@feature-intake` | Epic → Design → Issues, nur nach User-OK | **Situation:** Grobe Feature-Idee, in Issues zerlegen. **Was passiert:** Analysiert PRD gegen Repo, stellt Fragen, schreibt `.qa/design/`, zerlegt in Issue-Drafts. **Beispiel:** `@feature-intake` mit PRD → 3 Slices → User bestätigt → Issues erstellt → `@ecc-runner`. | ✅ | ✅ | ✅ | ✅ |
 | `@pingpong-solution` | Pre-Implementation Solution-Ping-Pong | **Situation:** Unsicher wie Feature sich integriert. **Was passiert:** Sokratische Discovery, Optionen mit Evidenz, Codebase-Fit, schreibt `.qa/design/`. **Beispiel:** "Wie baue ich Audio-Export?" → Skill bietet 2 Optionen → User wählt A → `.qa/design/audio-export.md` → `@implement`. | ✅ | ✅ | ✅ | ✅ |
@@ -106,13 +107,15 @@ Die ECC-Skills bilden eine zusammenhängende Pipeline. `@ecc-runner` orchestrier
                                           @ecc-runner orchestriert das ganze pro Issue (batch mode)
 ```
 
+**Fast Lane** (wenn du die Pipeline überspringst): `@audit-changes` während der Arbeit → `@ecc-check` vor PR/Ship.
+
 Siehe [`docs/PIPELINE.md`](docs/PIPELINE.md) für die detaillierte Phasen-Beschreibung und [`docs/ECC-STACK.md`](docs/ECC-STACK.md) für die Erklärung des ECC-Systems.
 
 ## Systeme / Basen
 
 | Basis | Skills | Beschreibung |
 |-------|--------|--------------|
-| **ECC** | `ecc-check`, `ecc-runner`, `feature-intake`, `pingpong-solution`, `implement`, `foundations`, `verify-ticket`, `verify-ui`, `review-ticket`, `commit-pr-safe`, `commit-push-safe`, `pr-merge-safe`, `verification-loop`, `ecccheck` (deprecated), `prepare-deploy-pr` (deprecated) | Engineering-Disziplin-Suite: deterministische Checks, Acceptance-Verträge, Code-Review-Gate, AgentShield, sicheres Ship. Pro-Projekt-Konfiguration in `.qa/project.yaml`, `.qa/runner-profile.yaml`, `AGENTS.md`. |
+| **ECC** | `audit-changes`, `ecc-check`, `ecc-runner`, `feature-intake`, `pingpong-solution`, `implement`, `foundations`, `verify-ticket`, `verify-ui`, `review-ticket`, `commit-pr-safe`, `commit-push-safe`, `pr-merge-safe`, `verification-loop`, `ecccheck` (deprecated), `prepare-deploy-pr` (deprecated) | Engineering-Disziplin-Suite: Fast-Lane-Audit, deterministische Checks, Acceptance-Verträge, Code-Review-Gate, AgentShield, sicheres Ship. Pro-Projekt-Konfiguration in `.qa/project.yaml`, `.qa/runner-profile.yaml`, `AGENTS.md`. |
 | **Ponytail** | `ponytail`, `ponytail-review`, `ponytail-audit`, `ponytail-debt`, `ponytail-gain`, `ponytail-help` | YAGNI/Minimalismus-Werkzeuge: lazy-senior-dev-Modus, Over-Engineering-Review, Repo-Audit, Debt-Tracking, Impact-Scoreboard. |
 | **Standalone** | `project-setup`, `mine-stars`, `search-first`, `documentation-lookup`, `security-review`, `strategic-compact`, `save-prompts-inject` | Unabhängige Einzel-Skills ohne Pipeline-Abhängigkeit. |
 
