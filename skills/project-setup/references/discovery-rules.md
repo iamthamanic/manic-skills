@@ -72,10 +72,12 @@ Format: `http://localhost:<port>`
 
 Priority:
 
-1. `.qa/project.yaml` → `checksCommand`
-2. `package.json` → `"checks"`
+1. `.qa/project.yaml` → `checksCommand` / `testGate`
+2. `package.json` → `"checks"` / `"verify"`
 3. `scripts/run-checks.sh` exists → `npm run checks` or `./scripts/run-checks.sh`
 4. Fallback: `npm run build && npm test` (document in report)
+
+Agents run these via **`@test-gate`** (not ad-hoc). On init, write `testGate` defaults from `~/.cursor/skills/test-gate/references/config-schema.md`. Stack profile: `bash ~/.cursor/skills/test-gate/scripts/detect-stack.sh <root>`.
 
 ## 8. PRD search paths
 
@@ -103,9 +105,42 @@ In audit mode, build a table:
 | AGENTS.md | … | … |
 | README.md | … | … |
 | .qa/project.yaml | … | … |
+| `.qa/project.yaml` → `typedStrict` | missing / partial / ok | auto-detect & write (see §11) |
 | .qa/edge-cases.md | … | … |
 | UI styleguide | … | … |
-| shimwrappercheck | … | … |
 | package checks script | … | … |
 
 Only act on rows that need work unless user asked for full regenerate.
+
+## 11. typedStrict languages (auto-detect)
+
+Programming languages for `@typed-strict` — **not** UI `locale` / `language: de`.
+
+1. Prefer existing `.qa/project.yaml` → `typedStrict.languages`
+2. Else (and always on audit if missing) run:
+
+```bash
+bash "$HOME/.cursor/skills/typed-strict/scripts/detect-languages.sh" <workspace-or-repo-root>
+```
+
+3. Merge with stack profile defaults (`~/.cursor/skills/typed-strict/references/stack-detect.md`)
+4. **Audit:** append newly detected languages; never remove without user OK
+5. Write into `project.yaml`:
+
+```yaml
+typedStrict:
+  languages:
+    - typescript
+    - python
+```
+
+6. Include `typedStrict languages` in Discovery Summary and setup report
+
+| Stack hint | Default languages |
+|------------|-------------------|
+| `vite-react` / `next` / `cra` | `typescript` |
+| `api-only` (Node/TS) | `typescript` |
+| `monorepo` | union of all apps (run detect on repo root) |
+| Python files / pyproject | add `python` |
+| `go.mod` | add `go` |
+| etc. | see detect script + language-matrix |

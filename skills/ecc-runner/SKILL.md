@@ -42,8 +42,9 @@ Read `.qa/runner-profile.yaml` for stack-specific helper routing when present.
 
 ```
 setup → research? → design? → grill? → seed acceptance
-→ @implement → @verify-ticket → @verify-ui? → @review-ticket
-→ @ecc-check → security-scan? → commit → pr → babysit?
+→ @implement → @verify-ticket → @web-design-guidelines? → @verify-ui? → @review-ticket
+→ @ecc-check (includes @memory-live-doc mode=apply for material issues)
+→ security-scan? → commit → pr → babysit?
 → agent-done → next issue
 ```
 
@@ -60,7 +61,7 @@ When user invokes **`@ecc-runner`** without `step`:
    - Self-correct on verify/review failures (retries in `state.json`)
    - On phase success: advance `state.json` phase, append run log
    - On issue complete: commit + open PR (`Closes #N`), `agent-done`, `sync-queue-to-state.sh`, **pick next**
-3. **`@strategic-compact`:** suggest between issues if queue length > 3 or context is large (do not stop batch for this — compact and continue).
+3. **`@strategic-compact`:** between issues if queue length > 3 or context is large — **do not stop the batch** (compact and continue). Never set `paused: true` for context; if the session must end, `@handoff` with `paused: false`.
 4. **Single user report** only when batch ends (see Reporting).
 
 **Do not** stop after auto-pick. **Do not** stop after one phase in batch mode.
@@ -165,17 +166,18 @@ bash "${ECC_RUNNER_ROOT:-$HOME/.cursor/skills/ecc-runner}/scripts/seed-acceptanc
 
 Execute **all applicable phases in one session** in this order:
 
-`setup` → `research`? → `design`? → `grill`? → `implement` → `verify-ticket` → `verify-ui`? → `review` → `ecc-check` → `security-scan`? → `commit` → `pr` → `babysit`? → `done`
+`setup` → `research`? → `design`? → `grill`? → `implement` → `verify-ticket` → `web-design-guidelines`? → `verify-ui`? → `review` → `ecc-check` → `security-scan`? → `commit` → `pr` → `babysit`? → `done`
 
-Skip `verify-ui` if no UI files in diff. Skip `security-scan` unless API/auth/secrets touched.
+Skip `web-design-guidelines` / `verify-ui` if no UI files in diff. Skip `security-scan` unless API/auth/secrets touched.
 
 | Phase | Skill | Exit |
 |-------|-------|------|
-| `implement` | `@implement` | Code + acceptance notes |
+| `implement` | `@implement` (incl. `@frontend-design` / `@design-taste-frontend` when UI) | Code + acceptance notes |
 | `verify-ticket` | `@verify-ticket` | PASS |
+| `web-design-guidelines` | `@web-design-guidelines` | Findings fixed or accepted; skip if no UI |
 | `verify-ui` | `@verify-ui` | PASS or skipped |
 | `review` | `@review-ticket` | ACCEPT |
-| `ecc-check` | `@ecc-check` | READY |
+| `ecc-check` | `@ecc-check` (ensure `@memory-live-doc` apply for material diffs) | READY |
 | `security-scan` | `npx ecc-agentshield scan` | No critical |
 | `commit` | `@commit-push-safe` | Committed on branch |
 | `pr` | `@commit-pr-safe` | PR URL, `Closes #N` |
@@ -214,6 +216,10 @@ See [references/reporting.md](references/reporting.md). **Batch = minimal chat; 
 - Lean ECC only
 - UI/errors Deutsch; commits English
 - `ecc-runner step` for interactive/debug
+
+## Full ship loop (merge included)
+
+For **verify → merge → next issue** without manual merge pauses, use **`@ecc-runner-loop`** (`~/.cursor/skills/ecc-runner-loop`). This skill stops at PR open; the loop skill adds mandatory babysit + `@pr-merge-safe merge`.
 
 ## Additional resources
 

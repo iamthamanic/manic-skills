@@ -33,22 +33,21 @@ src/
 └── main.tsx
 ```
 
-## shimwrappercheck preset
-
-- Frontend checks: ESLint, TypeScript, Vitest, Vite build
-- Supabase: off unless `supabase/` exists
-- Git wrapper: on if `.git`
-
 ## package.json scripts to ensure
 
 ```json
 "dev": "vite",
 "build": "vite build",
 "preview": "vite preview",
-"test": "vitest"
+"test": "vitest",
+"checks": "npm run lint && npm run build && npm test"
 ```
 
-## Fallow notes
+## typedStrict defaults
 
-- Run from **app root** after `npm install`
-- Ignore `src/components/ui/*` if shadcn-style unused components kept intentionally
+```yaml
+typedStrict:
+  languages: [typescript]
+```
+
+Run `~/.cursor/skills/typed-strict/scripts/detect-languages.sh` on repo root and **union** results (e.g. add `python` if scripts exist).

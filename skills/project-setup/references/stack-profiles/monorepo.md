@@ -25,13 +25,13 @@ devCommand: npm run dev --prefix packages/web
 |----------|----------|
 | PRD, AGENTS, .qa/ | Usually **workspace root** (product level) |
 | Styleguide | Often `<appRoot>/docs/UI_STYLEGUIDE.md` |
-| shimwrappercheck | Workspace root OR app root — match where `run-checks.sh` lives |
+| checks script | Workspace root OR app root — match where `run-checks.sh` lives |
 
-## shimwrappercheck
+## Quality checks
 
-- One shim config per repo root is typical
-- Document which package owns checks in AGENTS.md
-- Fallow/stubtree: run against **app root**, not monorepo root
+- Document which package owns `checks` in AGENTS.md
+- Stubtree: run against **app root**, not monorepo root
+- **typedStrict:** run `detect-languages.sh` on **workspace root** (union of all packages); store on root `.qa/project.yaml`
 
 ## README
 

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "focus": [
+    { "de": "Living Docs Bootstrap absichern", "en": "Harden living docs bootstrap" }
+  ],
+  "recently_completed": [
+    { "de": "Viewer-Smoke-Daten hinterlegt", "en": "Viewer smoke data added" }
+  ],
+  "incomplete": [
+    { "de": "Overlay-HUD Screenshots fehlen", "en": "Overlay HUD screenshots missing" }
+  ],
+  "risks": [
+    { "de": "Viele Claims noch needs-review", "en": "Many claims still needs-review" }
+  ],
+  "updated_at": "2026-07-19T08:00:00Z"
+}

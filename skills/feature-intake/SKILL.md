@@ -25,10 +25,15 @@ Inline helpers (do not replace this skill):
 | Helper | When |
 |--------|------|
 | `@search-first` | Step 2 — map existing code before claiming greenfield |
+| `@zoom-out` | Step 2 — unfamiliar area: one-layer module/caller map before claiming greenfield |
 | `@pingpong-solution` | Epic design phase — same rigor, embedded here |
 | `@documentation-lookup` | New deps, external APIs |
 | `@security-review` | Auth, storage, voice consent, uploads |
+| `@typed-strict` | Step 4–5 — epic/slices must require typed-strict Boy Scout; no issues that introduce type escape hatches |
+| `@system-design-reference` | Epic infra/data flow/APIs, queues, cache, scale — pattern evidence before slicing |
 | `@project-setup audit` | Missing `.qa/project.yaml` |
+| `@frontend-design` / `@design-taste-frontend` | Step 3–4 — UI-heavy epics only: clarify aesthetic direction (no code, no audit) |
+| `@handoff` | After draft ready if session ends / new agent continues — OS-temp handoff (suggested skills: `@ecc-runner`) |
 
 ## Modes
 
@@ -90,7 +95,7 @@ End with: **„Stimmt das so? Was würdest du ergänzen?“** unless user said s
 
 Output **„Was im Repo schon da ist“** (3–8 bullets with paths).
 
-Before claiming nothing exists: `@search-first`.
+Before claiming nothing exists: `@search-first`. If the area is unfamiliar, `@zoom-out` first (one-layer map), then `@search-first`.
 
 Record reuse targets (adapters, types, UI shells, functions).
 
@@ -101,6 +106,7 @@ Record reuse targets (adapters, types, UI shells, functions).
 Ask **3–5 questions** with **why you ask**. Focus:
 
 - UI: where in nav / which view / empty-loading-error states
+- UI (when visual): vibe / audience / existing brand vs greenfield (see `@frontend-design`; landing/portfolio → `@design-taste-frontend`) — direction only, do not write UI code here
 - Runtime: local vs cloud-session vs hybrid (see stack profile)
 - Data: SQLite `.scriptony` vs Appwrite collections
 - MVP: what is explicitly deferred to later issues
@@ -117,6 +123,7 @@ Write `.qa/design/<epic-slug>.md` using structure from `@pingpong-solution` desi
 - Options (include **YAGNI / defer** option)
 - Decision, Cross-domain sign-off, Implementation sketch (paths only)
 - **Runtime matrix** (local / cloud / Tauri) per slice area
+- **UI direction** (UI-heavy epics only): one-line aesthetic read for implementers — not a full `@frontend-design` run; `@web-design-guidelines` belongs in implement/audit, not intake
 
 Slug: kebab-case, max 48 chars, from epic name.
 

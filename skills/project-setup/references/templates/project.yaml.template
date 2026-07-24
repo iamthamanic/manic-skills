@@ -16,6 +16,32 @@ evidenceDir: .qa/evidence
 
 locale: {{LOCALE}}
 
+# Secure-by-Default — written by @project-setup into AGENTS.md + .qa/edge-cases.md.
+# @ecc-check / @audit-changes / @review-ticket / @test-gate read this to know the checklist is active.
+security:
+  checklist: secure-by-default   # "secure-by-default" | "disabled" (legacy projects)
+
+# @typed-strict — programming languages (NOT UI locale). Auto-filled by project-setup.
+# Override or extend; audit appends newly detected languages, never shrinks silently.
+typedStrict:
+  languages: {{TYPED_STRICT_LANGUAGES}}
+
+# @test-gate — deterministic tools/scripts (no AI review). See ~/.cursor/skills/test-gate/
+testGate:
+  profile: auto                  # auto | next | vite-react | express-prisma | monorepo | …
+  depthDefault: standard         # quick | standard | full
+  runner: scripts                # scripts | shim (shim => noAiReview only)
+  always:
+    - typedStrict
+    - secureByDefault
+    - rgSecretsDiff
+  never:
+    - aiReview
+    - explanationCheck
+    - fallow
+    - updateReadme
+    - mutation
+
 viewports:
   - name: mobile
     width: 390

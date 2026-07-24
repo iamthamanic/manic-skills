@@ -15,10 +15,11 @@ ECC steht für eine Sammlung zusammenhängender Skills unter `~/.cursor/skills/`
 | `@feature-intake` | Epic → Design → Issues, nur nach User-OK |
 | `@pingpong-solution` | Pre-Implementation Solution-Ping-Pong, `.qa/design` |
 | `@implement` | Implementation Contract, Acceptance-Auto-Gen, wendet Helper inline an |
-| `@verify-ticket` | Technische Verifikation gegen Acceptance |
+| `@verify-ticket` | Technische Verifikation gegen Acceptance (`@test-gate` + AC) |
 | `@verify-ui` | UI/UX-Verifikation (Playwright, Screenshots) |
 | `@review-ticket` | Code-Quality-Review, `ACCEPT` / `CHANGES_REQUESTED` |
-| `@ecc-check` | Quality-Gate-Loop (A–F), `READY` / `BLOCKED` |
+| `@test-gate` | Deterministische Tools/Scripts (Exit-Code) — Phase A von `@ecc-check` |
+| `@ecc-check` | Quality-Gate-Loop (A–F), `READY` / `BLOCKED` (A = `@test-gate`) |
 | `@commit-pr-safe` | Commit + Push + PR auf non-main |
 | `@commit-push-safe` | Commit + Push ohne PR |
 | `@pr-merge-safe` | PR reviewen + mergen wenn green |
@@ -34,9 +35,12 @@ ECC steht für eine Sammlung zusammenhängender Skills unter `~/.cursor/skills/`
 | Skill | Rolle |
 |-------|-------|
 | `@ecc-runner` | Autonomer Issue-Queue-Runner, batch mode |
+| `@ecc-runner-loop` | Queue + Merge-Loop (composed) |
 | `@babysit` | Hält PR merge-ready, triaged Comments/CI |
 | `@foundations` | SE-Referenz (Parnas, Liskov, Hoare, Dijkstra, Brooks) — Reference Skill, kein Pipeline-Step |
-| `@verification-loop` | Pre-PR Full Gate (build, typecheck, lint, tests, security) |
+| `@test-gate` | Shared deterministic runner (prefer over ad-hoc verify) |
+| `@verification-loop` | Legacy Pre-PR checklist → prefer `@test-gate` / `@ecc-check` |
+| `@typed-strict` | No type escape hatches; invoked by `@test-gate` |
 
 ### Helper (inline in `@implement`)
 
@@ -59,7 +63,8 @@ ECC steht für eine Sammlung zusammenhängender Skills unter `~/.cursor/skills/`
 
 ECC-Skills orchestrieren externe Tools, die im Projekt vorhanden sein müssen:
 
-- **`npm run verify`** (oder projektdefinierter `checksCommand` aus `.qa/project.yaml`) — deterministische Checks (lint, typecheck, test, build)
+- **`@test-gate`** — führt projektbezogene Scripts aus (`checksCommand`, lint, tsc, prisma, RG-Probes); Exit-Code = Wahrheit
+- **`npm run verify`** / `checksCommand` in `.qa/project.yaml` — oft vom test-gate aufgerufen
 - **`npx ecc-agentshield`** — scannt `.cursor/`-Agenten-Konfiguration auf Security/Quality
 - **`gh` (GitHub CLI)** — für `@ecc-runner`, `@commit-pr-safe`, `@pr-merge-safe`, `@babysit`
 - **`@review-bugbot` / `@review-security`** — subagents (offizielle Cursor-Skills aus `~/.cursor/skills-cursor/`)
@@ -74,7 +79,7 @@ ECC-Skills sind maschinenlokal (`~/.cursor/skills/`), aber ihr Verhalten wird **
 
 | Datei | Inhalt |
 |-------|--------|
-| `.qa/project.yaml` | `checksCommand`, `checksSnippet`, `acceptanceDir` |
+| `.qa/project.yaml` | `testGate`, `checksCommand`, `checksSnippet`, `acceptanceDir`, `typedStrict`, `security` |
 | `.qa/runner-profile.yaml` | `checksSnippet`, Retry-Hints, stack-spezifische Helper-Routing |
 | `AGENTS.md` | Branch-Rules, Stack-Defaults, Repo-Hygiene |
 | `.qa/acceptance/<slug>.md` | Acceptance-Vertrag (von `@implement` auto-generiert) |
@@ -82,7 +87,7 @@ ECC-Skills sind maschinenlokal (`~/.cursor/skills/`), aber ihr Verhalten wird **
 | `.qa/queue/state.json` | Queue-State für `@ecc-runner` |
 | `.qa/runs/*.md` | Run-Logs (optional) |
 
-Default `checksCommand` wenn unset: `npm run verify`.
+Default: `@test-gate` mit `checksCommand` oder Auto-Detect; oft `npm run verify`.
 
 ## Was ECC nicht ist
 

@@ -36,6 +36,12 @@ Every intake must document what **does not** become an issue yet.
 
 Reference PRD roadmap sections (e.g. MVP 0.1 only) explicitly in epic design.
 
+## Typed-strict (mandatory in every slice)
+
+- Acceptance must include Boy Scout: no type-system escape hatches on touched files
+- Do **not** create issues whose Solution is “use `any` / `Any` / `# type: ignore` to unblock”
+- Language patterns: `@typed-strict` + `.qa/project.yaml` → `typedStrict.languages`
+
 ## JSON draft shape
 
 ```json

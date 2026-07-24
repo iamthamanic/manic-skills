@@ -2,7 +2,7 @@
 name: audit-changes
 description: >-
   Fast-lane audit of scoped changes (uncommitted, since commit, PR, or path/keyword):
-  diff-scoped checks, security scan, SOLID/KISS/DRY review lite. Not a ship gate —
+  @test-gate (deterministic), security scan, SOLID/KISS/DRY review lite. Not a ship gate —
   use @ecc-check before commit/PR. Triggers: audit changes, quick audit, check
   changes, audit since commit, audit time management.
 ---
@@ -40,10 +40,10 @@ description: >-
 Audit Changes Progress:
 - [ ] Step 1: Resolve scope (uncommitted | since-commit | pr | path/keyword)
 - [ ] Step 2: Load project context (project.yaml, AGENTS.md)
-- [ ] Step 3: Phase A — deterministic checks (depth-dependent)
-- [ ] Step 4: Phase B — security diff scan
+- [ ] Step 3: Phase A — @test-gate (depth-dependent)
+- [ ] Step 4: Phase B — security diff scan (extra narrative; RGs already in test-gate)
 - [ ] Step 5: Phase C — review lite (SOLID, KISS, DRY, maintainability)
-- [ ] Step 6: Phase D — optional tooling (snyk, agentshield, verify-ui)
+- [ ] Step 6: Phase D — optional tooling (snyk, agentshield, web-design-guidelines, verify-ui)
 - [ ] Step 7: Report CLEAN | WARN | BLOCK
 ```
 
@@ -67,7 +67,7 @@ Record in report: scope mode, base ref, file count, approximate LOC.
 
 Load in order:
 
-1. `.qa/project.yaml` → `checksCommand`, `appRoot`, `language`
+1. `.qa/project.yaml` → `testGate`, `checksCommand`, `appRoot`, `typedStrict`, `security`
 2. `AGENTS.md` → validation commands, non-negotiables, security checklist
 3. `package.json` scripts → `checks`, `verify`, `lint`, `test`, `build`
 4. Git diff file list → infer backend / frontend / both
@@ -78,46 +78,33 @@ User may say `depth: quick` (default), `depth: standard`, or `depth: full`.
 
 ### `quick` (default)
 
-- Phase A: **diff-scoped** — tsc/lint only for packages touched; skip full frontend `build` unless only frontend changed and no `tsc` script
-- Phase B: secrets + `.env` + project RG gates on changed paths ([references/project-rg-gates.md](references/project-rg-gates.md))
+- Phase A: **`@test-gate` depth=quick** (diff-scoped tools + typed-strict + critical RGs)
+- Phase B: extra security narrative if auth/API in diff (test-gate already ran secureByDefault RGs)
 - Phase C: static diff read + findings table; invoke `@review-ticket` **lite** (no subagent unless auth/API in diff)
 - Phase D: skipped unless `.cursor/` in diff
 
 ### `standard`
 
-- Phase A: full package checks per touched area (AGENTS.md / `checksCommand`)
+- Phase A: **`@test-gate` depth=standard**
 - Phase B: full security diff scan + `@security-review` checklist if auth/UGC/API/upload
 - Phase C: `@review-ticket` on diff; `@ponytail-review` if diff > 150 lines or new abstractions
-- Phase D: AgentShield if `.cursor/` exists **and** changed; `npm audit --audit-level=high` if no snyk
+- Phase D: AgentShield if `.cursor/` exists **and** changed
 
 ### `full`
 
+- Phase A: **`@test-gate` depth=full**
 - Same as `standard` plus:
-- Optional `@verify-ui` if UI paths in diff and user did not skip
+- Optional `@web-design-guidelines` then `@verify-ui` if UI paths in diff and user did not skip
 - Optional `@verify-ticket` if `.qa/acceptance/*.md` matches scope
 - Does **not** replace `@ecc-check` — report must say "run @ecc-check before ship"
 
-## Phase A — Deterministic checks
+## Phase A — Deterministic checks (`@test-gate`)
 
-Discover command (priority):
+Invoke **`@test-gate`** with the resolved depth. Do not duplicate lint/tsc/catalog logic here — see `~/.cursor/skills/test-gate/SKILL.md`.
 
-1. `.qa/project.yaml` → `checksCommand`
-2. `package.json` → `checks` or `verify`
-3. `AGENTS.md` § validation
-4. Fallback: `npm run build && npm test`
+**Never claim CLEAN if Phase A / test-gate failed** on standard/full. On quick: test-gate FAIL → **BLOCK**.
 
-**Diff-scoped execution** (quick mode):
-
-| Changed paths | Run |
-|---------------|-----|
-| `backend/**` only | backend checks from AGENTS.md |
-| `frontend/**` only | `tsc --noEmit` (+ lint if fast) |
-| both | both, parallel when possible |
-| `.qa/**`, docs only | skip build; RG gates only |
-
-**Never claim CLEAN if Phase A failed** on standard/full. On quick: tsc/lint failure → **BLOCK**.
-
-Run project RG gates from [references/project-rg-gates.md](references/project-rg-gates.md) on changed paths only.
+Embed the Test Gate matrix in the audit report.
 
 ## Phase B — Security diff scan
 
@@ -129,6 +116,35 @@ Always on scoped files:
 - [ ] Tenant guards if project uses multi-tenancy (e.g. `organizationId` in AGENTS.md)
 - [ ] No `dangerouslySetInnerHTML` with user data (frontend)
 - [ ] Upload/document paths: authenticated + scoped access
+
+**Secure-by-Default Probe (if `AGENTS.md` has a Security Checklist block or `.qa/project.yaml` → `security.checklist: secure-by-default`):**
+
+Run the RG-Probes from `~/.cursor/skills/security-review/references/secure-by-default-checklist.md` against changed paths. Apply only the zutreffende Sektion:
+
+| Diff scope | Sektion(en) prüfen |
+|------------|--------------------|
+| Frontend-only | Frontend F-01…F-05 |
+| Backend-only | Backend B-01…B-06 |
+| Fullstack | Frontend + Backend + Practical Habits P-01…P-05 |
+
+Probes (diff-scoped):
+
+```bash
+# F-03: Secrets in localStorage
+rg "localStorage\.(set|get)Item\(['\"](token|secret|password|api[_-]?key)" frontend/src
+# F-05: API keys in client bundle
+rg "NEXT_PUBLIC_.*(SECRET|KEY|PASSWORD|TOKEN)" frontend/ --type ts
+# B-04: SQL injection patterns
+rg "query\(\`.*\$\{" backend --type ts
+# P-02: Sensitive data in logs/errors
+rg "console\.(log|error)\(.*(password|secret|token|api[_-]?key)" backend --type ts
+# P-03: Insecure cookies
+rg "Set-Cookie" backend --type ts | rg -v "HttpOnly|Secure|SameSite"
+# P-05: Rate limiting disabled
+rg "rateLimit.*disable|skipRateLimit|@ts-ignore.*rate" backend --type ts
+```
+
+Each probe with a match → Critical/Important finding (per Severity-Mapping in the checklist). Critical matches (F-03, B-01, B-04, P-04) → **BLOCK**. Missing applicable items → at least **WARN**.
 
 **AgentShield** (not app code):
 
@@ -146,7 +162,7 @@ npx snyk test --severity-threshold=high  # if snyk in devDependencies
 npm audit --audit-level=high             # fallback
 ```
 
-Do **not** run `npx shimwrappercheck` by default — use project `checks`/`verify` + `@review-ticket`. Shim remains for legacy projects only.
+Do **not** run shimwrappercheck AI review. Prefer `@test-gate` (scripts runner). Optional: shim MCP `run_checks` with `noAiReview: true` only if `testGate.runner: shim`.
 
 ## Phase C — Review lite
 
@@ -180,10 +196,12 @@ Verdict mapping:
 
 | Flag / condition | Action |
 |------------------|--------|
-| `--ui` or `depth: full` + UI in diff | `@verify-ui` |
+| `--ui` or `depth: full` + UI in diff | `@web-design-guidelines` on touched UI files, then `@verify-ui` |
 | `.qa/acceptance/<slug>.md` in scope | `@verify-ticket` (acceptance section only) |
 | `.cursor/` changed | AgentShield (required) |
 | `snyk` configured | dependency scan |
+
+Do **not** invoke `@frontend-design` / `@design-taste-frontend` here — those are create-time skills (`@implement`).
 
 ## Exit states
 
@@ -221,7 +239,10 @@ Before PR/merge:   @ecc-check (required ship gate)
 |--------|------|
 | `@foundations` | Architecture findings in Phase C |
 | `@security-review` | Auth, UGC, storage, env in diff |
+| `@test-gate` | Phase A — deterministic tools/scripts (required) |
+| `@typed-strict` | Invoked inside `@test-gate`; also boy-scout reminder |
 | `@ponytail-review` | Large diff, over-engineering |
 | `@review-ticket` | standard/full depth Phase C |
-| `@verify-ui` | `--ui` or full + UI paths |
+| `@web-design-guidelines` | `--ui` or full + UI paths — static a11y/UX audit before browser proof |
+| `@verify-ui` | `--ui` or full + UI paths — after guidelines when both run |
 | `@ecc-check` | Recommended in report when WARN or before ship |

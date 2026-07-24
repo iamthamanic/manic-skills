@@ -29,8 +29,10 @@ Use for every slice. German for user-facing examples when `locale: de`.
 - …
 
 ## Acceptance
+
 - [ ] …
 - [ ] …
+- [ ] Touched files: zero type escape hatches (`@typed-strict` / Boy Scout; language from project)
 
 ## Design
 Epic: `.qa/design/<epic-slug>.md`

@@ -35,17 +35,18 @@ fi
 count=0
 
 if [[ "$DIRECTION" == "pull" ]]; then
-  # Kopiere alle Änderungen aus $SOURCE ins Repo
-  for skill_dir in "$REPO"/skills/*/; do
-    name="$(basename "$skill_dir")"
-    src="$SOURCE/$name"
-    if [[ -d "$src" ]]; then
-      rsync -a --delete "$src/" "$skill_dir"
-      echo "pulled $name"
-      ((count++))
-    else
-      echo "skip $name (not in $SOURCE)"
-    fi
+  # Alle Skills aus $SOURCE ins Repo (inkl. neu hinzugekommene)
+  shopt -s nullglob
+  for src in "$SOURCE"/*/; do
+    name="$(basename "$src")"
+    # Skip non-skill noise
+    [[ "$name" == .* ]] && continue
+    [[ -f "$src/SKILL.md" ]] || { echo "skip $name (no SKILL.md)"; continue; }
+    dest="$REPO/skills/$name"
+    mkdir -p "$dest"
+    rsync -a --delete --exclude '.DS_Store' "$src" "$dest/"
+    echo "pulled $name"
+    ((count++)) || true
   done
   echo
   echo "Done. Pulled $count skills from $SOURCE → $REPO/skills/"

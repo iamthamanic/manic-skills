@@ -1,0 +1,30 @@
+{
+  "items": [
+    {
+      "id": "play-session",
+      "title": { "de": "Play-Session", "en": "Play session" },
+      "summary": {
+        "de": "Orchestriert Scan, Compile und Lauf.",
+        "en": "Orchestrates scan, compile, and run."
+      },
+      "status": "active",
+      "packages": ["game-runtime"],
+      "paths": ["packages/game-runtime/src/play-session.ts"],
+      "review_status": "needs-review",
+      "confidence": 0.5
+    },
+    {
+      "id": "overlay-hud",
+      "title": { "de": "Overlay-HUD", "en": "Overlay HUD" },
+      "summary": {
+        "de": "Steuert Overlay-UI während der Session.",
+        "en": "Controls overlay UI during the session."
+      },
+      "status": "incomplete",
+      "packages": ["overlay"],
+      "paths": ["packages/overlay/src/"],
+      "review_status": "needs-review",
+      "confidence": 0.45
+    }
+  ]
+}

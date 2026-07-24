@@ -1,0 +1,22 @@
+{
+  "id": "play-session",
+  "title": {
+    "de": "Play-Session",
+    "en": "Play session"
+  },
+  "summary": {
+    "de": "Orchestriert Scan, Compile und Lauf einer Spielsitzung.",
+    "en": "Orchestrates scan, compile, and run of a play session."
+  },
+  "status": "active",
+  "packages": ["game-runtime"],
+  "paths": ["packages/game-runtime/src/play-session.ts"],
+  "user_impact": {
+    "de": ["Nutzer starten und beenden eine Spielsitzung auf der Seite."],
+    "en": ["Users start and end a play session on the page."]
+  },
+  "related_changes": ["2026-07-19-bootstrap"],
+  "review_status": "needs-review",
+  "confidence": 0.5,
+  "locked": false
+}

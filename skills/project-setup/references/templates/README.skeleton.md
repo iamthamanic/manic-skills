@@ -34,7 +34,7 @@ Open [{{DEV_URL}}]({{DEV_URL}})
 npm run checks
 ```
 
-Uses [shimwrappercheck](https://www.npmjs.com/package/shimwrappercheck) when configured.
+Runs lint, typecheck, build, and/or tests — see [AGENTS.md](AGENTS.md) for project-specific commands.
 
 ## Tests
 

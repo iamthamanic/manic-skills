@@ -50,7 +50,7 @@ Starting **Merge** mode = user approves `gh pr merge` for this PR in this sessio
 Discovery order: [references/project-discovery.md](references/project-discovery.md)
 
 1. `AGENTS.md`, `README.md`, `CONTRIBUTING.md` — branch rules, checks, PR base
-2. `.qa/project.yaml` — `checksCommand`, `checksSnippet`, `acceptanceDir`
+2. `.qa/project.yaml` — `testGate`, `checksCommand`, `checksSnippet`, `acceptanceDir`
 3. `.qa/runner-profile.yaml` — `checksSnippet`, stack profile
 4. `.qa/merge-gate.yaml` — optional merge policy (create in repo if missing; skill uses defaults)
 5. PR body / `Closes #N` → acceptance slug under `.qa/acceptance/`

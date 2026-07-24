@@ -10,7 +10,7 @@ description: >-
 
 Commit, push to an approved non-main branch, and open a pull request.
 
-**Prerequisite:** Run `@ecc-check` until READY (or equivalent `npm run verify` + `@review-ticket` ACCEPT).
+**Prerequisite:** Run `@ecc-check` until READY (includes `@test-gate` + `@review-ticket` ACCEPT). Equivalent: `@test-gate` depth=standard PASS + `@review-ticket` ACCEPT.
 
 Follow this workflow strictly.
 
@@ -71,11 +71,11 @@ If unrelated user changes exist, stop and explain which files are unrelated befo
 
 ## 4. Validate before commit/PR
 
-If `@ecc-check` was not run in this session, run it now (or `npm run verify` + `@review-ticket`).
+If `@ecc-check` was not run in this session, run it now (or `@test-gate` depth=standard + `@review-ticket`).
 
-Detect validation commands from `.qa/project.yaml` → `checksCommand` (default: `npm run verify`).
+Detect validation from `.qa/project.yaml` → `testGate` / `checksCommand` via **`@test-gate`**.
 
-Do not push or open a PR while relevant checks are failing.
+Do not push or open a PR while `@test-gate` / relevant checks are failing.
 
 If checks cannot be run because dependencies, secrets, services, or environment variables are missing, stop and report the exact blocker.
 
@@ -97,6 +97,8 @@ Before pushing, inspect the diff for:
 - unrelated formatting churn or refactors
 
 If a secret appears in the diff, stop and report it.
+
+**PR-split / infra guard (`AGENTS.md` §5.6):** If the diff touches deploy/infra paths (`deployment/**/docker-compose*.yml`, `.github/workflows/**`, `example.env`, `scripts/deploy-*.sh`) and the PR title/scope is **not** a deploy/CI ticket, stop and ask — or remove those files from the commit. Review for accidental removal of runtime mounts (e.g. `docs/permissions.catalog.yaml` in Docker).
 
 ## 5b. README finalize (before commit / in PR)
 
@@ -123,8 +125,9 @@ The PR must include:
 - concise title
 - summary of changes
 - **Documentation** — README sections touched, `Recent changes` entry, linked docs
-- validation/checks run (`@ecc-check` / `npm run verify`)
+- validation/checks run (`@ecc-check` / `@test-gate`)
 - test results
+- **Deploy** — migrations, backfill scripts, infra file changes (or "none")
 - deployment relevance
 - risks or assumptions
 
@@ -140,7 +143,7 @@ Suggest next step when PR is open: `@pr-merge-safe` (review only) or `@pr-merge-
 
 - Git/PR commands: [commands.md](commands.md)
 - Push only (no PR): `@commit-push-safe`
-- Quality gate: `@ecc-check`
+- Quality gate: `@ecc-check` (Phase A = `@test-gate`)
 
 ## Legacy alias
 

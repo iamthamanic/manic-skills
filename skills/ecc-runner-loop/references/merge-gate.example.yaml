@@ -1,0 +1,13 @@
+# Optional per-repo merge policy for @ecc-runner-loop / @pr-merge-safe
+# Copy to .qa/merge-gate.yaml
+
+mergeStrategy: squash
+deleteBranchAfterMerge: true
+requireHumanApproval: false
+allowDraftMerge: false
+cloudDeployAfterMerge: false
+minReviewVerdict: ACCEPT
+
+# Loop skill: when true, ecc-runner-loop may merge without a second user prompt
+# (invoke @ecc-runner-loop already implies merge approval)
+autoMergeInLoop: true

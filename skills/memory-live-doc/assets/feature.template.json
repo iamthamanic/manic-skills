@@ -1,0 +1,13 @@
+{
+  "id": "",
+  "title": { "de": "", "en": "" },
+  "summary": { "de": "", "en": "" },
+  "status": "planned",
+  "packages": [],
+  "paths": [],
+  "user_impact": { "de": [], "en": [] },
+  "related_changes": [],
+  "review_status": "needs-review",
+  "confidence": 0.5,
+  "locked": false
+}

@@ -1,0 +1,96 @@
+{
+  "items": [
+    {
+      "id": "2026-07-19-bootstrap",
+      "date": "2026-07-19",
+      "type": "bootstrap",
+      "status": "recorded",
+      "title": {
+        "de": "Projektgedächtnis initialisiert",
+        "en": "Project memory initialized"
+      },
+      "summary": {
+        "de": "Deep-Bootstrap aus Docs und Git.",
+        "en": "Deep bootstrap from docs and git."
+      },
+      "user_impact": {
+        "de": ["Living Docs verfügbar (needs-review)."],
+        "en": ["Living docs available (needs-review)."]
+      },
+      "developer_impact": {
+        "de": [".project-memory/ und docs/ angelegt."],
+        "en": [".project-memory/ and docs/ created."]
+      },
+      "operational_impact": {
+        "de": ["Viewer unter docs/memory-live-doc/viewer/."],
+        "en": ["Viewer under docs/memory-live-doc/viewer/."]
+      },
+      "git": {
+        "base": "0000000000000000000000000000000000000000",
+        "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "branch": "main",
+        "pull_request": null
+      },
+      "packages": ["game-runtime", "overlay"],
+      "affected_features": ["play-session"],
+      "affected_components": ["docs/"],
+      "breaking_changes": [],
+      "migration_required": false,
+      "security_relevant": false,
+      "evidence": [
+        { "kind": "file", "path": "README.md", "url": null }
+      ],
+      "screenshots": [
+        {
+          "id": "shot-hud",
+          "path": "docs/memory-live-doc/assets/2026-07-19-bootstrap/hud.png",
+          "status": "missing",
+          "caption": { "de": "HUD Übersicht", "en": "HUD overview" }
+        }
+      ],
+      "confidence": 0.4,
+      "review_status": "needs-review"
+    },
+    {
+      "id": "2026-07-18-architecture-pages",
+      "date": "2026-07-18",
+      "type": "architecture",
+      "status": "recorded",
+      "title": {
+        "de": "Pages-Viewer als Dokumentationssurface",
+        "en": "Pages viewer as documentation surface"
+      },
+      "summary": {
+        "de": "Entscheidung: vanilla GitHub Pages statt Framework-Dashboard.",
+        "en": "Decision: vanilla GitHub Pages instead of a framework dashboard."
+      },
+      "user_impact": { "de": [], "en": [] },
+      "developer_impact": {
+        "de": ["Statischer Snapshot unter viewer/data/."],
+        "en": ["Static snapshot under viewer/data/."]
+      },
+      "operational_impact": {
+        "de": ["Pages aus /docs deployen."],
+        "en": ["Deploy Pages from /docs."]
+      },
+      "git": {
+        "base": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "head": "cccccccccccccccccccccccccccccccccccccccc",
+        "branch": "docs/viewer",
+        "pull_request": null
+      },
+      "packages": [],
+      "affected_features": [],
+      "affected_components": ["docs/memory-live-doc/viewer"],
+      "breaking_changes": [],
+      "migration_required": false,
+      "security_relevant": false,
+      "evidence": [
+        { "kind": "file", "path": "docs/memory-live-doc/viewer/index.html", "url": null }
+      ],
+      "screenshots": [],
+      "confidence": 0.7,
+      "review_status": "needs-review"
+    }
+  ]
+}

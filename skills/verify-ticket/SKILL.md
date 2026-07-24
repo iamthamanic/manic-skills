@@ -23,9 +23,11 @@ This skill **implements** the project-specific subset of `@verification-loop` (b
 
 | Helper | Trigger in verify-ticket |
 |--------|--------------------------|
+| `@test-gate` | **Required** — deterministic lint/tsc/build/RG (depth=standard); never claim PASS without it |
 | `@foundations` | Hoare pass — map acceptance Preconditions/Happy Path/Edge Cases to diff + tests; flag `hoare:` gaps |
-| `@verification-loop` | Superset checklist — suggest after PASS if user prepares PR |
+| `@verification-loop` | Legacy alias — prefer `@test-gate` + `@ecc-check` for ship |
 | `@security-review` | Diff touches auth, UGC, storage, env, or user input — extend § Security scan |
+| `@typed-strict` | Covered by `@test-gate`; FAIL if Boy Scout incomplete |
 
 ## Checklist
 
@@ -33,11 +35,11 @@ This skill **implements** the project-specific subset of `@verification-loop` (b
 - [ ] Load .qa/acceptance/<slug>.md from current implement run
 - [ ] Load AGENTS.md, README, .qa/project.yaml
 - [ ] Identify changed files (git diff)
-- [ ] Run checks command (npm run checks or project equivalent)
-- [ ] Confirm unit tests cover behavior changes
+- [ ] Run @test-gate depth=standard (PASS required)
+- [ ] Confirm unit tests cover behavior changes (if testRun ran / acceptance needs it)
 - [ ] Match diff to acceptance checkboxes (Happy Path + Edge Cases)
 - [ ] Preconditions in acceptance satisfied or N/A for tests run
-- [ ] No secrets in diff
+- [ ] No secrets in diff (also covered by test-gate rgSecretsDiff)
 - [ ] Report PASS / FAIL
 ```
 
@@ -53,24 +55,17 @@ If acceptance file is missing but `/implement` was expected, report **FAIL** on 
 
 Flag **scope creep** (unrelated files) and **gaps** (AC checkbox not implemented).
 
-## Checks command
+## Checks (`@test-gate`)
 
-Priority:
+Invoke **`@test-gate`** with **`depth: standard`**. Do not hand-roll tsc/lint lists — see `~/.cursor/skills/test-gate/SKILL.md`.
 
-1. `.qa/project.yaml` → `checksCommand`
-2. `package.json` → `checks`
-3. `AGENTS.md` validation section
-4. `npm run build && npm test`
-
-Run from workspace root if scripts use `--prefix`.
-
-**Never claim PASS without running checks successfully.**
+**Never claim PASS without `@test-gate` PASS.**
 
 ## Security scan (diff)
 
-- No `.env`, keys, tokens committed
-- No hardcoded secrets
-- User input paths validated if touched
+- Covered primarily by `@test-gate` (secureByDefault + secrets RG)
+- Extra: no `.env` staged; user input validated if touched
+- Narrative OWASP depth → `@security-review` when auth/UGC/upload in scope
 
 ## Report format
 
@@ -78,9 +73,10 @@ Run from workspace root if scripts use `--prefix`.
 ## Ergebnis
 PASS | FAIL
 
-## Checks
-- Command: `…`
-- Exit: 0 | non-zero
+## Checks (@test-gate)
+- Depth: standard
+- Result: PASS | FAIL
+- (embed test-gate matrix)
 
 ## Acceptance
 | Criterion | Status |

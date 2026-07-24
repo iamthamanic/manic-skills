@@ -1,0 +1,48 @@
+{
+  "id": "2026-07-19-bootstrap",
+  "date": "2026-07-19",
+  "type": "bootstrap",
+  "status": "recorded",
+  "title": {
+    "de": "Projektgedächtnis initialisiert",
+    "en": "Project memory initialized"
+  },
+  "summary": {
+    "de": "Deep-Bootstrap von .project-memory aus README, Docs und Git-Historie.",
+    "en": "Deep bootstrap of .project-memory from README, docs, and git history."
+  },
+  "user_impact": {
+    "de": ["Living Docs und Chronik sind verfügbar (noch needs-review)."],
+    "en": ["Living docs and chronicle are available (still needs-review)."]
+  },
+  "developer_impact": {
+    "de": ["Struktur unter .project-memory/; Docs unter docs/ und docs/en/."],
+    "en": ["Layout under .project-memory/; docs under docs/ and docs/en/."]
+  },
+  "operational_impact": {
+    "de": ["GitHub Pages Viewer unter docs/memory-live-doc/viewer/."],
+    "en": ["GitHub Pages viewer under docs/memory-live-doc/viewer/."]
+  },
+  "git": {
+    "base": "0000000000000000000000000000000000000000",
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "branch": "main",
+    "pull_request": null
+  },
+  "packages": ["game-runtime", "overlay"],
+  "affected_features": ["play-session"],
+  "affected_components": ["docs/", ".project-memory/"],
+  "breaking_changes": [],
+  "migration_required": false,
+  "security_relevant": false,
+  "evidence": [
+    {
+      "kind": "file",
+      "path": "README.md",
+      "url": null
+    }
+  ],
+  "screenshots": [],
+  "confidence": 0.4,
+  "review_status": "needs-review"
+}

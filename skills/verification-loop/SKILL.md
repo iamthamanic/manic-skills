@@ -1,19 +1,30 @@
 ---
 name: verification-loop
 description: >-
-  Run build, typecheck, lint, tests, and security checks before PRs. Read AGENTS.md
-  first when the repo defines a single validation command (e.g. npm run checks).
+  DEPRECATED prefer @test-gate (deterministic tools) then @ecc-check for ship.
+  Legacy: run build, typecheck, lint, tests, and security checks before PRs.
 metadata:
   origin: ECC
 ---
 
 # Verification Loop Skill
 
+> **Prefer `@test-gate`.** This skill remains as a readable phase checklist.
+> Agents should invoke `~/.cursor/skills/test-gate/SKILL.md` instead of
+> re-running ad-hoc npm phases below. For ship readiness use `@ecc-check`
+> (Phase A = `@test-gate`).
+
 Quality gate for agent sessions (Cursor, Claude Code, and similar harnesses).
+
+## Preferred path
+
+```
+@test-gate depth=standard   →   (optional) @review-ticket   →   @ecc-check before PR
+```
 
 ## Project override (read first)
 
-If the repo's **AGENTS.md** or README defines one canonical check command, run that **instead of** re-inventing phases below.
+If the repo's **AGENTS.md** or README defines one canonical check command, run that **via `@test-gate`** (honors `checksCommand`) **instead of** re-inventing phases below.
 
 Example (Letz Fetz): `cd Letzfetzprototype && npm run checks` (build + unit tests).
 

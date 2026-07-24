@@ -1,0 +1,27 @@
+{
+  "id": "",
+  "date": "",
+  "type": "feature",
+  "status": "draft",
+  "title": { "de": "", "en": "" },
+  "summary": { "de": "", "en": "" },
+  "user_impact": { "de": [], "en": [] },
+  "developer_impact": { "de": [], "en": [] },
+  "operational_impact": { "de": [], "en": [] },
+  "git": {
+    "base": "",
+    "head": "",
+    "branch": "",
+    "pull_request": null
+  },
+  "packages": [],
+  "affected_features": [],
+  "affected_components": [],
+  "breaking_changes": [],
+  "migration_required": false,
+  "security_relevant": false,
+  "evidence": [],
+  "screenshots": [],
+  "confidence": 0.5,
+  "review_status": "needs-review"
+}

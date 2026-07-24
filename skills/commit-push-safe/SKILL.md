@@ -68,13 +68,15 @@ If unrelated changes exist, stage only the files directly related to this task.
 
 If it is unclear whether a file belongs to this task, stop and ask.
 
+**Deploy/infra scope (`AGENTS.md` §5.6):** Do not stage `deployment/**/docker-compose*.yml`, `.github/workflows/**`, `example.env`, or `scripts/deploy-*.sh` unless this task is explicitly deploy/CI. After a PR-split, diff infra files for accidental regressions (e.g. Docker volume for `docs/permissions.catalog.yaml`).
+
 ## 4. Validate before commit
 
-Detect the correct validation commands from the codebase. Do not assume a specific stack.
+Prefer **`@test-gate` depth=standard** (stack-agnostic tools/scripts). Falls back to project `checksCommand` / AGENTS validation if the skill is unavailable.
 
-Use existing project commands from package scripts, Makefile, task runner, CI config, pyproject, requirements, lockfiles, framework config, or documentation.
+Detect config from `.qa/project.yaml` → `testGate` / `checksCommand`. Do not assume a specific stack — `@test-gate` auto-detects.
 
-Run relevant available checks before committing, such as:
+Run relevant available checks before committing (via test-gate or manually), such as:
 
 * type checks
 * lint checks
@@ -148,12 +150,13 @@ After staging task-related files and **before** `git commit`:
    - Repo override: `.cursor/readme-contract.md` (if present)
    - Else: [readme-contract.md](readme-contract.md) in this skill folder
 2. Inspect `git diff --staged` and decide if **user-facing behavior** changed (UI, API, scripts, env, deploy, agent workflow).
-3. **If yes:** update only **living sections** from the contract:
+3. **Living memory:** Prefer sourcing the `## Recent changes` line from the latest `.project-memory/changes/*` event when present (DE short summary + link to `docs/CHANGELOG.md`). If `.project-memory/` is missing and the change is material user-facing → invoke `@memory-live-doc apply` (or draft if mid-chat) before commit; then stage `.project-memory/**` + `docs/**` with the **same** commit.
+4. **If yes (user-facing):** update only **living sections** from the contract:
    - Adjust feature tables or dev-command blocks as needed
    - Append **one line** under `README.md` → `## Recent changes` (newest first; keep max 10 lines)
    - Update linked `docs/…` when behavior or checks changed
-4. Stage doc updates in the **same commit**: `git add README.md docs/…`
-5. **If no user-facing change:** do not touch README. Record in the final report: `README: skipped — <reason>`.
+5. Stage doc updates in the **same commit**: `git add README.md docs/…` (and `.project-memory/**` when updated)
+6. **If no user-facing change:** do not touch README. Record in the final report: `README: skipped — <reason>`.
 
 Rules:
 

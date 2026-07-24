@@ -28,8 +28,12 @@ Do **not** duplicate static code review (`@review-ticket`). Focus on browser beh
 
 | Helper | Trigger in verify-ui |
 |--------|----------------------|
+| `@web-design-guidelines` | Prefer **before** browser runs when UI files changed — static a11y/UX checklist (also run by `@ecc-check` Phase E / `@audit-changes`) |
+| `@debug` | Step 6/8 FAIL or flaky — root cause (console, network, Playwright trace) before another `@implement` |
 | `@security-review` | Auth flows, forms, user-generated content in UI — after Step 6 if relevant |
 | `@verification-loop` | Only if Step 4 checks failed — fix via `@implement`, do not claim UI PASS |
+
+**Prerequisite order when UI in scope:** `@web-design-guidelines` (static) → this skill (browser). Do not invent aesthetics here (`@frontend-design` is create-time).
 
 ## Workflow checklist
 

@@ -32,23 +32,20 @@ src/app/
 components/          # prefer /components at root per project convention
 ```
 
-## shimwrappercheck preset
-
-- Frontend: ESLint, TypeScript, Next build
-- Enable backend checks if `supabase/functions` or Deno edge routes exist
-
 ## package.json scripts
 
 ```json
 "dev": "next dev",
 "build": "next build",
-"start": "next start"
+"start": "next start",
+"checks": "npm run lint && npm run build"
 ```
 
 ## .qa/project.yaml
 
 - `appRoot: .` when Next app is at workspace root
 - `devCommand: npm run dev`
+- `typedStrict.languages: [typescript]` (+ detect-script union)
 
 ## Notes
 

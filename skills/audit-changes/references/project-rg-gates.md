@@ -6,7 +6,8 @@ Run these **only on changed paths** when `AGENTS.md` or project rules define the
 
 1. Read `AGENTS.md` § Pre-Commit / Non-Negotiables
 2. Read `.cursor/rules/*.mdc` if present
-3. If nothing found, skip section and note in report
+3. Apply **`@typed-strict`** language matrix for extensions in the diff (`~/.cursor/skills/typed-strict/references/language-matrix.md`)
+4. If nothing found, skip section and note in report
 
 ## Common gates (examples)
 
@@ -20,8 +21,10 @@ rg '\bclass[Nn]ame=.*\b[a-z-]+-\[[^\]]+\]' frontend/src --glob '<changed-files>'
 rg "from '\.\./\.\./" backend/app/modules --glob '<changed-files>'
 rg "from '.*common.*'" backend/app/modules --glob '<changed-files>'
 
-# any types
-rg ': any|as any' --glob '<changed-files>' --type ts
+# Loose typing — prefer @typed-strict matrix (not TS-only). Examples:
+rg ': any\b|as any\b' --glob '<changed-ts-files>'
+rg '\bAny\b|type:\s*ignore' --glob '<changed-py-files>'
+rg '@ts-ignore|@ts-nocheck|eslint-disable.*no-explicit-any' --glob '<changed-files>'
 
 # console.log in services
 rg 'console\.(log|error|warn)' --glob '<changed-files>' --type ts
@@ -47,3 +50,5 @@ rg 'findUnique\(\s*\{\s*where:\s*\{\s*id' --glob '<changed-service-files>'
 | >0 in diff | FAIL | BLOCK unless documented exception |
 
 List exact file:line in report findings table.
+
+**Typed-strict:** any match of the language-matrix escape hatches on touched paths is **BLOCK** (Boy Scout). Legacy debt outside the scoped paths is ignored for this audit.

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "id": "example-project",
+  "title": {
+    "de": "Beispielprojekt",
+    "en": "Example project"
+  },
+  "summary": {
+    "de": "Smoke-Daten für den memory-live-doc Viewer.",
+    "en": "Smoke data for the memory-live-doc viewer."
+  },
+  "packages": ["game-runtime", "overlay"],
+  "repository": {
+    "url": "https://github.com/example/cloudrunner",
+    "default_branch": "main"
+  },
+  "review_status": "needs-review",
+  "confidence": 0.4
+}

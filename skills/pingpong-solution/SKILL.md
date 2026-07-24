@@ -34,6 +34,7 @@ Apply **inline** during this skill — do not replace pingpong output with a sep
 | `@documentation-lookup` | **Step 4** — SOTA / API evidence (Context7, library docs); cite sources in options |
 | `@mine-stars` | **Optional** — suggest when user may have starred relevant prior art; user must attach; never auto-run |
 | `@security-review` | **Step 5** — when Security domain is ⚠️ or ❌, or feature touches auth, UGC, storage, P2P |
+| `@system-design-reference` | **Step 4–5** — scaling, APIs, caching, messaging, DB, reliability; cite page evidence + trade-offs |
 | `@strategic-compact` | Long exploration (2+ rounds) — suggest compact before Step 7 sketch |
 
 Record in design artifact under **Research** which helpers informed the recommendation.

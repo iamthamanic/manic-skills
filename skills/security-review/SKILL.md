@@ -19,6 +19,17 @@ This skill ensures all code follows security best practices and identifies poten
 - Storing or transmitting sensitive data
 - Integrating third-party APIs
 
+## Secure-by-Default Checklist (kanonische Quelle)
+
+Die **Secure-by-Default-Checkliste** (Frontend / Backend / Practical Habits) ist vollständig in [references/secure-by-default-checklist.md](references/secure-by-default-checklist.md) dokumentiert — Inhalte eingebettet, keine externen Links. Sie ist die Single Source of Truth für alle Skills (`@project-setup` schreibt sie in `AGENTS.md`, `@implement`, `@audit-changes`, `@ecc-check`, `@review-ticket` referenzieren sie).
+
+Die detaillierten OWASP-Muster unten sind die **konkrete Ausprägung** der groben Checklist-Items. Mapping-Beispiele:
+- OWASP „SQL Injection Prevention" → Backend-Item **B-04**
+- OWASP „Authentication & Authorization" → **B-01**, **B-02**, **B-03**
+- OWASP „Sensitive Data Exposure" → Practical Habits **P-02**, Frontend **F-03**
+
+Bei jedem Review: zuerst zutreffende Tabellen-Sektionen der Secure-by-Default-Checkliste gegen den Diff prüfen, dann die detaillierten OWASP-Muster als Vertiefung anwenden.
+
 ## Security Checklist
 
 ### 1. Secrets Management

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "id": "example-project",
+  "title": {
+    "de": "Beispielprojekt",
+    "en": "Example project"
+  },
+  "summary": {
+    "de": "Kurzbeschreibung des Produkts für Status und Viewer.",
+    "en": "Short product description for status and viewer."
+  },
+  "packages": ["game-runtime", "overlay", "extension"],
+  "repository": {
+    "url": "https://github.com/example/cloudrunner",
+    "default_branch": "main"
+  },
+  "review_status": "needs-review",
+  "confidence": 0.4
+}

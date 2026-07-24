@@ -2,9 +2,10 @@
 name: project-setup
 description: >-
   Bootstraps new or existing repos with PRD, AGENTS.md, README, .qa/ config,
-  UI styleguide, shimwrappercheck, and optional fallow/stubtree. Discovers stack
-  and app root generically. Use when creating a new project, initializing a repo,
-  or when the user says project setup, bootstrap repo, or scaffold project files.
+  UI styleguide, living docs via @memory-live-doc, and optional stubtree.
+  Discovers stack and app root generically. Use when creating a new project,
+  initializing a repo, or when the user says project setup, bootstrap repo,
+  or scaffold project files.
 disable-model-invocation: true
 ---
 
@@ -17,7 +18,7 @@ Orchestrates project bootstrap so repos are ready for `@pingpong-solution` → `
 ## Pipeline position
 
 ```
-/project-setup  →  @pingpong-solution  →  @implement  →  @verify-ui
+/project-setup  →  (@memory-live-doc bootstrap if needed)  →  @pingpong-solution  →  @implement  →  @verify-ui
 ```
 
 ## Modes
@@ -38,13 +39,13 @@ Project Setup Progress:
 - [ ] Step 0: Resolve mode (init | audit) + load overrides
 - [ ] Step 1: Discovery (workspace root, app root, stack, locale)
 - [ ] Step 2: PRD check or scaffold
-- [ ] Step 3: AGENTS.md
+- [ ] Step 3: AGENTS.md (include Living documentation section)
 - [ ] Step 4: README.md
 - [ ] Step 5: .qa/ (project.yaml, edge-cases, templates)
 - [ ] Step 6: UI styleguide (frontend only)
-- [ ] Step 7: shimwrappercheck setup
-- [ ] Step 8: package.json scripts (checks, test:e2e placeholder)
-- [ ] Step 9: Optional (fallow stub, stubtree, mcp-setup)
+- [ ] Step 7: package.json scripts (checks, test:e2e placeholder)
+- [ ] Step 8: Optional (stubtree, ponytail)
+- [ ] Step 9: Living docs (@memory-live-doc bootstrap if missing)
 - [ ] Step 10: Setup report
 ```
 
@@ -59,10 +60,7 @@ locale: de
 appRoot: ./frontend
 prdPath: docs/PRD.md
 styleguidePath: docs/UI_STYLEGUIDE.md
-skipShimwrappercheck: false
-enableFallow: false
 enableStubtree: false
-enableMcpSetup: false
 enablePonytail: false
 ```
 
@@ -82,10 +80,15 @@ Output a short **Discovery Summary** before creating files:
 - has frontend (yes/no)
 - default dev port / devUrl
 - locale guess (`de` if UI strings or user rules suggest German, else `en`)
+- **typedStrict languages** (auto-detect via `~/.cursor/skills/typed-strict/scripts/detect-languages.sh` — see discovery-rules §11)
 
 Load stack hints from [references/stack-profiles/](references/stack-profiles/) matching the detected profile.
 
 **Monorepo rule:** Run quality tools from app root when paths differ. Set `appRoot` in `.qa/project.yaml` accordingly.
+
+**typedStrict:** Always set or refresh `typedStrict.languages` in `.qa/project.yaml` from detection (init: write; audit: create if missing, append if incomplete). Do not confuse with UI `locale` / `language: de`. Details: `~/.cursor/skills/typed-strict/references/stack-detect.md`.
+
+**testGate:** Write/refresh `.qa/project.yaml` → `testGate` per `~/.cursor/skills/test-gate/references/config-schema.md` so `@test-gate` / `@ecc-check` Phase A know profile and exclusions (never AI review).
 
 ---
 
@@ -105,12 +108,13 @@ Do not invent detailed product requirements without user input.
 
 ## Step 3: AGENTS.md
 
-1. If `AGENTS.md` exists → validate has: project summary, stack, architecture boundaries, language rules, validation commands; report gaps
-2. If missing → use [references/templates/AGENTS.skeleton.md](references/templates/AGENTS.skeleton.md)
+1. If `AGENTS.md` exists → validate has: project summary, stack, architecture boundaries, language rules, validation commands, **Security Checklist block**; report gaps
+2. If missing → use [references/templates/AGENTS.skeleton.md](references/templates/AGENTS.skeleton.md) (includes the **Security Checklist (Secure by Default)** block — full embedded tables, no external links)
 3. Fill placeholders from Discovery Summary + PRD + stack profile
-4. If shimwrappercheck will run (Step 7): append or merge shim sections from `node_modules/shimwrappercheck/templates/AGENTS.md` **after** project-specific sections — project identity first, shim workflow second
-5. If `enablePonytail: true` (profile or user request): append **„Ponytail (lazy senior dev)“** subsection from [references/templates/AGENTS.skeleton.md](references/templates/AGENTS.skeleton.md) under QA Pipeline — link [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail); do not paste the full upstream skill
-6. Never replace a rich existing AGENTS.md wholesale in audit mode
+4. Ensure a **Living documentation** section exists (from skeleton). If `AGENTS.md` already exists without it → **append** the section from the skeleton (do not overwrite other content). In audit mode, ask before appending if the file is rich and the user might prefer a different wording.
+5. Ensure the **Security Checklist (Secure by Default)** section exists. If `AGENTS.md` already exists without it → **append** the block from [references/templates/AGENTS.skeleton.md](references/templates/AGENTS.skeleton.md) (Frontend / Backend / Practical Habits tables). Never link to external sources — contents stay embedded in `AGENTS.md`. In audit mode, ask before appending if the file is rich.
+6. If `enablePonytail: true` (profile or user request): append **„Ponytail (lazy senior dev)“** subsection from [references/templates/AGENTS.skeleton.md](references/templates/AGENTS.skeleton.md) under QA Pipeline — link [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail); do not paste the full upstream skill
+7. Never replace a rich existing AGENTS.md wholesale in audit mode
 
 ---
 
@@ -134,9 +138,21 @@ Create if missing (workspace root):
 | `.qa/acceptance/_template.md` | [references/templates/acceptance-template.md](references/templates/acceptance-template.md) |
 | `.qa/.gitignore` | `evidence/\ntest-results/\n` |
 
-Fill `project.yaml` with discovered `appRoot`, `devUrl`, `checksCommand`, `styleguide` path, `locale`, placeholder `navigation` (empty list OK for API-only).
+Fill `project.yaml` with discovered `appRoot`, `devUrl`, `checksCommand`, `styleguide` path, `locale`, **`typedStrict.languages`** (from detect script / discovery-rules §11), **`security.checklist: secure-by-default`** (written by default so `@ecc-check`/`@audit-changes`/`@review-ticket`/`@test-gate` know the checklist is active; set to `disabled` only for explicit legacy opt-out), **`testGate`** defaults (see `~/.cursor/skills/test-gate/references/config-schema.md` — `profile: auto`, `always`/`never` lists, no AI checks), placeholder `navigation` (empty list OK for API-only).
+
+Run stack detect for test-gate hints:
+
+```bash
+bash "$HOME/.cursor/skills/test-gate/scripts/detect-stack.sh" "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+```
+
+Set `testGate.profile` to the detected `PROFILE` when confident (e.g. `monorepo`, `next`); otherwise leave `auto`.
+
+Template placeholder `{{TYPED_STRICT_LANGUAGES}}` → YAML list, e.g. `[typescript]` or multi-line `- typescript\n  - python`.
 
 Do not copy acceptance/design feature files — only `_template.md` stubs.
+
+The `.qa/edge-cases.md` template ships a **Security** seed section (S-01…S-08) derived from the Secure-by-Default Checklist — agents extend it per feature as security-sensitive areas are touched.
 
 ---
 
@@ -147,51 +163,66 @@ Skip when stack is `api-only` or no frontend detected.
 1. Search: path from `project.yaml` `styleguide`, then `docs/UI_STYLEGUIDE.md`, `STYLEGUIDE.md`
 2. If missing → [references/templates/UI_STYLEGUIDE.skeleton.md](references/templates/UI_STYLEGUIDE.skeleton.md) at `docs/UI_STYLEGUIDE.md` (or profile path)
 3. Pre-fill stack-appropriate notes (Tailwind vs CSS modules) from stack profile
+4. In the styleguide (or setup report), note design quality refs for later pipeline use — do **not** run these skills here:
+   - Create: `@frontend-design` (general UI); `@design-taste-frontend` (landing/portfolio)
+   - Audit: `@web-design-guidelines` (a11y/UX checklist); browser proof via `@verify-ui`
 
 This is the **style tree** — design tokens, component hierarchy, states — not `@zapier/stubtree`.
 
 ---
 
-## Step 7: shimwrappercheck
-
-Skip if `.qa/setup-profile.yaml` has `skipShimwrappercheck: true`.
-
-1. If no `package.json` at workspace root → note in report; suggest adding one or run global init only
-2. If `shimwrappercheck` not in devDependencies → `npm i -D shimwrappercheck` (from workspace root)
-3. If no `.shimwrappercheckrc` and no `scripts/run-checks.sh`:
-   - Run `npx shimwrappercheck setup` when interactive OK, else `npx shimwrappercheck init` with defaults aligned to discovery (Supabase if `supabase/` exists, git wrapper if `.git` exists)
-4. Do **not** reimplement init wizard logic
-5. **Fallow:** leave disabled by default (`SHIM_RUN_FALLOW=0`). Document enabling in report
-
----
-
-## Step 8: package.json scripts
+## Step 7: package.json scripts
 
 At workspace root or app root (where `checks` should run):
 
-Add if missing:
+Add if missing, aligned with stack profile and discovery (see [references/discovery-rules.md](references/discovery-rules.md) §7):
 
 ```json
-"checks": "shimwrappercheck run || scripts/run-checks.sh",
+"checks": "scripts/run-checks.sh",
 "test:e2e": "echo 'Add Playwright — see verify-ui skill'"
 ```
+
+If `scripts/run-checks.sh` does not exist, use stack-appropriate commands (e.g. `npm run lint && npm run build && npm test`) or document the gap in the setup report.
+
+Recommend adding `npm audit --audit-level=high` (or equivalent for the stack) to the checks script — covers Practical Security Habit **P-01** (Dependencies aktuell) from the Secure-by-Default Checklist.
 
 Prefer existing project conventions. In monorepos, use `--prefix` or document app-root path in README.
 
 ---
 
-## Step 9: Optional
+## Step 8: Optional
 
 Only when requested or enabled in `.qa/setup-profile.yaml`:
 
 | Option | Action |
 |--------|--------|
-| **Fallow** | After `npm install` in app root: add `.fallow.jsonc` stub with common ignores; note `SHIM_RUN_FALLOW=1` |
 | **Stubtree** | `npx @zapier/stubtree --root <appRoot> --lang ts,tsx,js,jsx --json > .qa/code-structure.json` |
-| **MCP** | `npx shimwrappercheck mcp-setup --client cursor` (ask before writing user config) |
-| **Ponytail** | When `enablePonytail: true`: add AGENTS.md subsection (Step 3.5); note `@implement` + optional `@ponytail` skill from upstream repo |
+| **Ponytail** | When `enablePonytail: true`: add AGENTS.md subsection (Step 3); note `@implement` + optional `@ponytail` skill from upstream repo |
 
-Run Fallow only when `node_modules` exists and app root is confirmed.
+---
+
+## Step 9: Living documentation (`@memory-live-doc`)
+
+Ensure the repo has living project memory. Skill: `~/.cursor/skills/memory-live-doc/`.
+
+1. If `.project-memory/checkpoint.json` **exists and validates** → skip; note in setup report
+2. If missing or broken:
+   - **`init` mode:** run `@memory-live-doc bootstrap` then **`apply`** after showing a short summary (user already approved project-setup; do not wait for a second OK unless they said draft-only)
+   - **`audit` mode:** run `@memory-live-doc bootstrap` as **draft** first; apply only after user OK (or `@memory-live-doc apply`)
+3. Confirm `AGENTS.md` still has the **Living documentation** section (Step 3); `@memory-live-doc` bootstrap apply also ensures this section on first run
+4. Run Pages ownership check (never overwrite other sites):
+
+   ```bash
+   bash ~/.cursor/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
+   bash ~/.cursor/skills/memory-live-doc/scripts/github-pages-memory.sh status --write-config
+   ```
+
+   - `not_enabled` → after first push of `docs/`, optionally `…/github-pages-memory.sh enable --write-config`
+   - `memory_viewer_active` / `pages_compatible_docs` → only ensure viewer files exist; do not change Pages
+   - `pages_other` → report reason; leave Pages untouched; local viewer still works
+5. Report: created/skipped `.project-memory/`, viewer path, Pages `status`, theme id, Architecture tab, `needs-review` count
+
+Do not invent features as verified. Storage root is `.project-memory/` (never `.autoguide/`). See memory-live-doc [github-pages-policy.md](../memory-live-doc/references/github-pages-policy.md) and [theme-resolution.md](../memory-live-doc/references/theme-resolution.md).
 
 ---
 
@@ -204,7 +235,8 @@ Include:
 - Discovery Summary
 - Created / updated / skipped files
 - PRD validation result
-- Next steps: edit PRD + AGENTS, then `@pingpong-solution` for first feature
+- Living docs / `@memory-live-doc` result
+- Next steps: edit PRD + AGENTS, review `.project-memory` `needs-review` items, then `@pingpong-solution` for first feature
 
 ---
 
@@ -215,7 +247,6 @@ Include:
 - **No blind overwrite** of PRD, AGENTS, or README in audit mode
 - **No secrets** in generated files
 - **German UI copy** in examples when `locale: de`
-- Ask before modifying `~/.cursor/mcp.json` or shimwrappercheck user-level config
 
 ## Additional resources
 

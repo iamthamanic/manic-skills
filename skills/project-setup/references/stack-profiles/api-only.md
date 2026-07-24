@@ -26,13 +26,9 @@ checksCommand: npm run checks
 # omit devUrl or set to API health endpoint if documented
 locale: en   # unless API messages are localized
 navigation: []
+typedStrict:
+  languages: [typescript]  # or python/go/… from detect-languages.sh
 ```
-
-## shimwrappercheck preset
-
-- Frontend checks: off or minimal (lint on `src/` if TS)
-- Backend checks: on if Supabase/Deno
-- Git wrapper: on
 
 ## README focus
 
