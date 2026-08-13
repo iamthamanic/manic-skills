@@ -80,15 +80,15 @@ Output a short **Discovery Summary** before creating files:
 - has frontend (yes/no)
 - default dev port / devUrl
 - locale guess (`de` if UI strings or user rules suggest German, else `en`)
-- **typedStrict languages** (auto-detect via `~/.cursor/skills/typed-strict/scripts/detect-languages.sh` — see discovery-rules §11)
+- **typedStrict languages** (auto-detect via `~/.claude/skills/typed-strict/scripts/detect-languages.sh` — see discovery-rules §11)
 
 Load stack hints from [references/stack-profiles/](references/stack-profiles/) matching the detected profile.
 
 **Monorepo rule:** Run quality tools from app root when paths differ. Set `appRoot` in `.qa/project.yaml` accordingly.
 
-**typedStrict:** Always set or refresh `typedStrict.languages` in `.qa/project.yaml` from detection (init: write; audit: create if missing, append if incomplete). Do not confuse with UI `locale` / `language: de`. Details: `~/.cursor/skills/typed-strict/references/stack-detect.md`.
+**typedStrict:** Always set or refresh `typedStrict.languages` in `.qa/project.yaml` from detection (init: write; audit: create if missing, append if incomplete). Do not confuse with UI `locale` / `language: de`. Details: `~/.claude/skills/typed-strict/references/stack-detect.md`.
 
-**testGate:** Write/refresh `.qa/project.yaml` → `testGate` per `~/.cursor/skills/test-gate/references/config-schema.md` so `@test-gate` / `@ecc-check` Phase A know profile and exclusions (never AI review).
+**testGate:** Write/refresh `.qa/project.yaml` → `testGate` per `~/.claude/skills/test-gate/references/config-schema.md` so `@test-gate` / `@ecc-check` Phase A know profile and exclusions (never AI review).
 
 ---
 
@@ -138,12 +138,17 @@ Create if missing (workspace root):
 | `.qa/acceptance/_template.md` | [references/templates/acceptance-template.md](references/templates/acceptance-template.md) |
 | `.qa/.gitignore` | `evidence/\ntest-results/\n` |
 
-Fill `project.yaml` with discovered `appRoot`, `devUrl`, `checksCommand`, `styleguide` path, `locale`, **`typedStrict.languages`** (from detect script / discovery-rules §11), **`security.checklist: secure-by-default`** (written by default so `@ecc-check`/`@audit-changes`/`@review-ticket`/`@test-gate` know the checklist is active; set to `disabled` only for explicit legacy opt-out), **`testGate`** defaults (see `~/.cursor/skills/test-gate/references/config-schema.md` — `profile: auto`, `always`/`never` lists, no AI checks), placeholder `navigation` (empty list OK for API-only).
+Fill `project.yaml` with discovered `appRoot`, `devUrl`, `checksCommand`, `styleguide` path, `locale`, **`typedStrict.languages`** (from detect script / discovery-rules §11), **`security.checklist: secure-by-default`** (written by default so `@ecc-check`/`@audit-changes`/`@review-ticket`/`@test-gate` know the checklist is active; set to `disabled` only for explicit legacy opt-out), **`testGate`** defaults (see `~/.claude/skills/test-gate/references/config-schema.md` — `profile: auto`, `always`/`never` lists, no AI checks), **`issueContract`** defaults (`template: global`, `labels`, `maxAcceptanceBullets: 5`, `securitySection: true`, `locale` from discovery; `runtimeAxes` only when the stack has multiple runtimes), placeholder `navigation` (empty list OK for API-only).
+
+**Issue template (`@issue-contract`):** projects use the global canonical issue template at
+`~/.claude/skills/issue-contract/references/issue-template.md` by default. Only create
+`.qa/issue-template.md` when the project explicitly needs a full override (init mode: never;
+audit mode: only if user asks). All issue-creating skills resolve project override first, then global.
 
 Run stack detect for test-gate hints:
 
 ```bash
-bash "$HOME/.cursor/skills/test-gate/scripts/detect-stack.sh" "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+bash "$HOME/.claude/skills/test-gate/scripts/detect-stack.sh" "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 ```
 
 Set `testGate.profile` to the detected `PROFILE` when confident (e.g. `monorepo`, `next`); otherwise leave `auto`.
@@ -164,7 +169,7 @@ Skip when stack is `api-only` or no frontend detected.
 2. If missing → [references/templates/UI_STYLEGUIDE.skeleton.md](references/templates/UI_STYLEGUIDE.skeleton.md) at `docs/UI_STYLEGUIDE.md` (or profile path)
 3. Pre-fill stack-appropriate notes (Tailwind vs CSS modules) from stack profile
 4. In the styleguide (or setup report), note design quality refs for later pipeline use — do **not** run these skills here:
-   - Create: `@frontend-design` (general UI); `@design-taste-frontend` (landing/portfolio)
+   - Create: `@frontend-design` (general UI); `@design-taste-frontend` (landing/portfolio); `@imagegen-frontend-mobile` (mobile app screens/flows — images only)
    - Audit: `@web-design-guidelines` (a11y/UX checklist); browser proof via `@verify-ui`
 
 This is the **style tree** — design tokens, component hierarchy, states — not `@zapier/stubtree`.
@@ -203,7 +208,7 @@ Only when requested or enabled in `.qa/setup-profile.yaml`:
 
 ## Step 9: Living documentation (`@memory-live-doc`)
 
-Ensure the repo has living project memory. Skill: `~/.cursor/skills/memory-live-doc/`.
+Ensure the repo has living project memory. Skill: `~/.claude/skills/memory-live-doc/`.
 
 1. If `.project-memory/checkpoint.json` **exists and validates** → skip; note in setup report
 2. If missing or broken:
@@ -213,8 +218,8 @@ Ensure the repo has living project memory. Skill: `~/.cursor/skills/memory-live-
 4. Run Pages ownership check (never overwrite other sites):
 
    ```bash
-   bash ~/.cursor/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
-   bash ~/.cursor/skills/memory-live-doc/scripts/github-pages-memory.sh status --write-config
+   bash ~/.claude/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
+   bash ~/.claude/skills/memory-live-doc/scripts/github-pages-memory.sh status --write-config
    ```
 
    - `not_enabled` → after first push of `docs/`, optionally `…/github-pages-memory.sh enable --write-config`

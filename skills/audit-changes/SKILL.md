@@ -100,7 +100,7 @@ User may say `depth: quick` (default), `depth: standard`, or `depth: full`.
 
 ## Phase A — Deterministic checks (`@test-gate`)
 
-Invoke **`@test-gate`** with the resolved depth. Do not duplicate lint/tsc/catalog logic here — see `~/.cursor/skills/test-gate/SKILL.md`.
+Invoke **`@test-gate`** with the resolved depth. Do not duplicate lint/tsc/catalog logic here — see `~/.claude/skills/test-gate/SKILL.md`.
 
 **Never claim CLEAN if Phase A / test-gate failed** on standard/full. On quick: test-gate FAIL → **BLOCK**.
 
@@ -119,15 +119,16 @@ Always on scoped files:
 
 **Secure-by-Default Probe (if `AGENTS.md` has a Security Checklist block or `.qa/project.yaml` → `security.checklist: secure-by-default`):**
 
-Run the RG-Probes from `~/.cursor/skills/security-review/references/secure-by-default-checklist.md` against changed paths. Apply only the zutreffende Sektion:
+Run the RG-Probes from `~/.claude/skills/security-review/references/secure-by-default-checklist.md` against changed paths. Apply only the zutreffende Sektion:
 
 | Diff scope | Sektion(en) prüfen |
 |------------|--------------------|
 | Frontend-only | Frontend F-01…F-05 |
-| Backend-only | Backend B-01…B-06 |
+| Backend-only | Backend B-01…B-09 |
 | Fullstack | Frontend + Backend + Practical Habits P-01…P-05 |
+| User/permission admin, bundles/roles, route→permission resolvers | **B-07 / B-08 / B-09 manual gate** (checklist) — RG alone is not PASS |
 
-Probes (diff-scoped):
+Probes (diff-scoped) — canonical list in `secure-by-default-checklist.md` (includes B-07/B-08/B-09 heuristics):
 
 ```bash
 # F-03: Secrets in localStorage
@@ -142,10 +143,13 @@ rg "console\.(log|error)\(.*(password|secret|token|api[_-]?key)" backend --type 
 rg "Set-Cookie" backend --type ts | rg -v "HttpOnly|Secure|SameSite"
 # P-05: Rate limiting disabled
 rg "rateLimit.*disable|skipRateLimit|@ts-ignore.*rate" backend --type ts
+# B-07 / B-08 / B-09 heuristics (then run manual gate)
+rg -n "bundles|user_bundles|assignBundle|roles|filterAssignable" --glob '**/api/**/*' -g '!**/node_modules/**'
+rg -n "resolve.*[Pp]ermission|\.view[\"']" --glob '**/*{permission,auth,middleware}*' -g '!**/node_modules/**'
+rg -n "x-user-id|x-user-email" --glob '**/*.{ts,js}' -g '!**/node_modules/**'
 ```
 
-Each probe with a match → Critical/Important finding (per Severity-Mapping in the checklist). Critical matches (F-03, B-01, B-04, P-04) → **BLOCK**. Missing applicable items → at least **WARN**.
-
+Each probe with a match → Critical/Important finding (per Severity-Mapping in the checklist). Critical matches (F-03, B-01, B-04, B-07, B-08, B-09, P-04) → **BLOCK**. Missing applicable items → at least **WARN**. Catalog-only mitigation for assignment (“edit only on admin bundle”) → **BLOCK** under B-07.
 **AgentShield** (not app code):
 
 ```bash
@@ -201,7 +205,7 @@ Verdict mapping:
 | `.cursor/` changed | AgentShield (required) |
 | `snyk` configured | dependency scan |
 
-Do **not** invoke `@frontend-design` / `@design-taste-frontend` here — those are create-time skills (`@implement`).
+Do **not** invoke `@frontend-design` / `@design-taste-frontend` / `@imagegen-frontend-mobile` here — those are create-time skills (`@implement`).
 
 ## Exit states
 

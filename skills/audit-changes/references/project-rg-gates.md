@@ -6,7 +6,7 @@ Run these **only on changed paths** when `AGENTS.md` or project rules define the
 
 1. Read `AGENTS.md` § Pre-Commit / Non-Negotiables
 2. Read `.cursor/rules/*.mdc` if present
-3. Apply **`@typed-strict`** language matrix for extensions in the diff (`~/.cursor/skills/typed-strict/references/language-matrix.md`)
+3. Apply **`@typed-strict`** language matrix for extensions in the diff (`~/.claude/skills/typed-strict/references/language-matrix.md`)
 4. If nothing found, skip section and note in report
 
 ## Common gates (examples)

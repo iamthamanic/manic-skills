@@ -8,7 +8,7 @@ Used by `@project-setup` (init/audit) and `@ecc-check` Phase A when `.qa/project
 2. Else run:
 
 ```bash
-bash "$HOME/.cursor/skills/typed-strict/scripts/detect-languages.sh" <repo-root>
+bash "$HOME/.claude/skills/typed-strict/scripts/detect-languages.sh" <repo-root>
 ```
 
 3. Union with signals from discovery:

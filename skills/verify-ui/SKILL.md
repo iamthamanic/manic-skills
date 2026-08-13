@@ -24,7 +24,7 @@ This skill is **project-agnostic**. Never hardcode stack, ports, or product name
 
 Do **not** duplicate static code review (`@review-ticket`). Focus on browser behavior, screenshots, and acceptance criteria.
 
-## Global helper skills (ECC, `~/.cursor/skills/`)
+## Global helper skills (ECC, `~/.claude/skills/`)
 
 | Helper | Trigger in verify-ui |
 |--------|----------------------|

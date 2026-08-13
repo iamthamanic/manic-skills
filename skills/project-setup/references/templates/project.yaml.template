@@ -26,7 +26,7 @@ security:
 typedStrict:
   languages: {{TYPED_STRICT_LANGUAGES}}
 
-# @test-gate — deterministic tools/scripts (no AI review). See ~/.cursor/skills/test-gate/
+# @test-gate — deterministic tools/scripts (no AI review). See ~/.claude/skills/test-gate/
 testGate:
   profile: auto                  # auto | next | vite-react | express-prisma | monorepo | …
   depthDefault: standard         # quick | standard | full
@@ -41,6 +41,16 @@ testGate:
     - fallow
     - updateReadme
     - mutation
+
+# @issue-contract — canonical GitHub issue template (global default).
+# Skills resolve .qa/issue-template.md (project override) first, then the global file.
+issueContract:
+  template: global               # "global" | path to project override (e.g. .qa/issue-template.md)
+  labels: [P0, P1, P2, needs-design]
+  maxAcceptanceBullets: 5
+  runtimeAxes: []                # e.g. [Local, Cloud session, Appwrite Functions]
+  securitySection: true
+  locale: {{LOCALE}}
 
 viewports:
   - name: mobile

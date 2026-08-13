@@ -6,7 +6,7 @@ Triggered automatically when `scripts/detect-history-coverage.sh` reports
 This is the VisuDEV-style full timeline: not “last 30 commits only”.
 
 Skill pointer (same folder): treat this file as the **history-backfill subroutine**.
-Optional agent note: you may also open `~/.cursor/skills/memory-live-doc/history-backfill/SKILL.md` for a short card.
+Optional agent note: you may also open `~/.claude/skills/memory-live-doc/history-backfill/SKILL.md` for a short card.
 
 ## When it runs
 
@@ -23,8 +23,8 @@ Mature heuristics (script-owned): ≥40 commits, or ≥2 months span, or ≥20 c
 
 1. Run:
    ```bash
-   bash ~/.cursor/skills/memory-live-doc/scripts/detect-history-coverage.sh
-   bash ~/.cursor/skills/memory-live-doc/scripts/analyze-git-history.sh --write
+   bash ~/.claude/skills/memory-live-doc/scripts/detect-history-coverage.sh
+   bash ~/.claude/skills/memory-live-doc/scripts/analyze-git-history.sh --write
    ```
 2. Read `.project-memory/providers/git-history-analysis.json` (milestone candidates + monthly counts).
 3. **Cluster** candidates into **8–25** material change events spanning `first_commit` → HEAD (eras, not every commit).

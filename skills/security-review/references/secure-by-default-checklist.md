@@ -30,6 +30,9 @@ Diese Checkliste ist **techstack-agnostisch**. Jedes Skill wendet nur die zutref
 | B-04 | SQL-Injection-Prävention | Parameterized Queries oder ORM, niemals Raw-SQL mit User-Input | String-Konkatenation in SQL-Statement, `query(\`…${userInput}\`)` |
 | B-05 | Basis Security Headers | X-Frame-Options, X-Content-Type-Options, HSTS konfiguriert | Helm/Headers fehlen oder `unsafe-inline`/`unsafe-eval` ohne Removal-Plan |
 | B-06 | DDoS-Schutz | CDN oder Cloud-Service mit DDoS-Mitigation | Rate-Limiting deaktiviert „zum Debuggen", kein Edge-Protection-Layer |
+| B-07 | Least-privilege assignment (Grant-/Role-/Bundle-Guard) | Wer Rechte, Rollen, Bundles oder Gruppen zuweist, darf nur das vergeben, was er selbst hält (Superset). Alle Assignment-Pfade prüfen: grants, revokes, **bundles/roles/groups**, Create-User-Defaults | Nur Keys gefiltert, Bundles/Rollen nur Catalog-Whitelist; „mitigated because X.edit only on admin bundle“ ohne Code-Guard |
+| B-08 | Deny-by-default AuthZ-Mapping | Unbekannte Route → deny. Mapped Route: Read ≠ Write; Non-GET/HEAD braucht `.edit`/Write-Key oder explizites Deny | Path fest auf `*.view` für PUT/POST/PATCH/DELETE; Write-Feature hinter Read-Key; Default-Fallback auf breites Read-Recht statt null/403 |
+| B-09 | Trust-boundary identity | Subject (User-ID, Rollen) nur aus Session/JWT/server-derived Trust — nie aus Client-Headern | `x-user-id` / Role-Header vom Client akzeptiert oder unverändert weitergeleitet |
 
 ---
 
@@ -49,9 +52,19 @@ Diese Checkliste ist **techstack-agnostisch**. Jedes Skill wendet nur die zutref
 
 | Checklist-Verstoß | Severity | Skill-Aktion |
 |-------------------|----------|--------------|
-| F-03, B-01, B-04, P-04 (Critical) | **Critical** | `@review-ticket` blockt ACCEPT; `@ecc-check` BLOCKED |
+| F-03, B-01, B-04, B-07, B-08, B-09, P-04 (Critical) | **Critical** | `@review-ticket` blockt ACCEPT; `@ecc-check` BLOCKED |
 | F-01, F-04, F-05, B-02, B-03, B-05, P-01, P-03, P-05 | **Important** | Blockt ACCEPT/READY bis fix |
 | F-02, B-06, P-02 | **Minor** → Important wenn Trust-Boundary betroffen | Note für später oder fix vor PR |
+
+## RBAC / Permission-Admin Diff Gate (B-07 / B-08 / B-09)
+
+Wenn der Diff User-Management, Bundles, Roles, Permission-APIs, Auth-Middleware oder Route→Permission-Resolver berührt, **immer** manuell prüfen (RG allein reicht nicht):
+
+1. **B-07 — Assignment inventory:** Jedes Feld listen, das effective AuthZ ändert (`grants`, `revokes`, `bundles`, `roles`, `groups`, Templates, Create-Defaults). Pro Feld: Actor darf nur ≤ eigene effective permissions vergeben (Superset). Create (POST) und Update (PUT/PATCH) gleich behandeln.
+2. **B-07 — Anti-pattern:** Catalog-Zufall („`users.edit` liegt nur im Admin-Bundle“) ist **keine** Mitigation — Einzel-Grants oder Catalog-Änderungen brechen das.
+3. **B-08 — Method matrix:** Für jeden gemappten Mount: GET/HEAD → `.view` ok; state-changing → `.edit`/Write-Key oder deny. Unbekannter Pfad → `null`/403, **kein** Default auf `overview.view`.
+4. **B-08 — Feature flags:** Schreib-Flags (z. B. UI-Registry writes) dürfen nicht hinter reinen Read-Keys liegen.
+5. **B-09 — Identity:** Subject nur aus Session/JWT/signiertem Server-Trust; Client-Header für User-ID verwerfen.
 
 ## RG-Probes (diff-scoped, von `@audit-changes` / `@ecc-check` ausgeführt)
 
@@ -68,6 +81,14 @@ rg "console\.(log|error)\(.*(password|secret|token|api[_-]?key)" backend --type 
 rg "Set-Cookie" backend --type ts | rg -v "HttpOnly|Secure|SameSite"
 # P-05: Rate limiting disabled
 rg "rateLimit.*disable|skipRateLimit|@ts-ignore.*rate" backend --type ts
+
+# B-07: assignment surfaces (heuristic — always follow with manual Superset check)
+rg -n "bundles|user_bundles|assignBundle|roles|user_roles|filterAssignable" --glob '**/api/**/*' -g '!**/node_modules/**'
+# B-08: permission resolvers / hardcoded .view (heuristic — check Non-GET branches)
+rg -n "resolve.*[Pp]ermission|permissionKey|\.view[\"']" --glob '**/*{permission,auth,middleware}*' -g '!**/node_modules/**'
+# B-09: client-controlled identity headers
+rg -n "x-user-id|x-user-email|req\.headers\[.user" --glob '**/*.{ts,js}' -g '!**/node_modules/**'
 ```
 
-Jede Probe mit Match → Critical/Important Finding, dokumentiert im Review-Report.
+Jede Probe mit Match → Critical/Important Finding, dokumentiert im Review-Report.  
+Bei B-07/B-08/B-09: Match = **Review-Trigger**; Verdict erst nach Manual Gate oben (nicht nur „Whitelist vorhanden“ → PASS).

@@ -23,7 +23,7 @@ Collaborative **pre-implementation** exploration. You are a domain expert adviso
 
 Optional stress-test after recommendation: `@grill-me` (adversarial — different tone).
 
-## Global helper skills (ECC, `~/.cursor/skills/`)
+## Global helper skills (ECC, `~/.claude/skills/`)
 
 Apply **inline** during this skill — do not replace pingpong output with a separate skill run unless the user explicitly attaches one.
 

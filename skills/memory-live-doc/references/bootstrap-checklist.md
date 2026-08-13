@@ -33,7 +33,7 @@ Bootstrap Progress:
 On apply, **always** export a Pages-ready viewer:
 
 ```bash
-bash ~/.cursor/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
+bash ~/.claude/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
 ```
 
 This syncs the Architecture tab Mermaid and resolved theme (see `references/theme-resolution.md`).

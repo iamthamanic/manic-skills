@@ -6,13 +6,13 @@ From the **repo root**:
 
 ```bash
 # Export viewer (theme + architecture + data) after memory apply
-bash ~/.cursor/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
+bash ~/.claude/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
 
 # Detect: memory viewer vs other Pages site
-bash ~/.cursor/skills/memory-live-doc/scripts/github-pages-memory.sh status --write-config
+bash ~/.claude/skills/memory-live-doc/scripts/github-pages-memory.sh status --write-config
 
 # Enable ONLY if status is not_enabled (never overwrites other sites)
-bash ~/.cursor/skills/memory-live-doc/scripts/github-pages-memory.sh enable --write-config
+bash ~/.claude/skills/memory-live-doc/scripts/github-pages-memory.sh enable --write-config
 ```
 
 Policy: skill `references/github-pages-policy.md`.  
@@ -41,7 +41,7 @@ Do **not** change Pages to `/docs` if the repo already publishes `/` or an Actio
 ## Local smoke check
 
 ```bash
-bash ~/.cursor/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
+bash ~/.claude/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
 cd docs/memory-live-doc/viewer
 python3 -m http.server 8765
 # open http://127.0.0.1:8765/

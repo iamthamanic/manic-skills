@@ -12,6 +12,7 @@ Attach inline during phases. Full pipeline table in `SKILL.md` Step 4.
 | Auth, `/api/`, env vars, user input | `@security-review` |
 | New or reshaped UI | `@frontend-design` (via `@implement` §8) |
 | Landing / portfolio / marketing redesign | `@design-taste-frontend` (via `@implement` §8) |
+| Mobile app screen concepts / mockups / flows | `@imagegen-frontend-mobile` (via `@implement` §8; images only) |
 | Label `content` or paths `content/topics/` | `@questolin-content-layer` |
 | Label `infra` / `refactor` in title or body | `@ponytail-audit` (after implement, before verify) |
 | Default implementation discipline | `@ponytail` (via `@implement`) |
@@ -29,7 +30,7 @@ Attach inline during phases. Full pipeline table in `SKILL.md` Step 4.
 |--------|--------|
 | Touched UI files | `@web-design-guidelines` **before** `@verify-ui` |
 | Browser proof | `@verify-ui` |
-| Never here | `@frontend-design` / `@design-taste-frontend` (create-time only) |
+| Never here | `@frontend-design` / `@design-taste-frontend` / `@imagegen-frontend-mobile` (create-time only) |
 
 ## During `design`
 

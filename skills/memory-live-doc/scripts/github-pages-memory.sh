@@ -3,9 +3,9 @@
 # NEVER overwrite an existing Pages site that serves something else.
 #
 # Usage (from repo root):
-#   bash ~/.cursor/skills/memory-live-doc/scripts/github-pages-memory.sh status
-#   bash ~/.cursor/skills/memory-live-doc/scripts/github-pages-memory.sh enable
-#   bash ~/.cursor/skills/memory-live-doc/scripts/github-pages-memory.sh enable --write-config
+#   bash ~/.claude/skills/memory-live-doc/scripts/github-pages-memory.sh status
+#   bash ~/.claude/skills/memory-live-doc/scripts/github-pages-memory.sh enable
+#   bash ~/.claude/skills/memory-live-doc/scripts/github-pages-memory.sh enable --write-config
 #
 # Exit codes:
 #   0 = ok / noop / enabled

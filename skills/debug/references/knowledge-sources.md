@@ -39,7 +39,7 @@ If offline: note in report, continue with grep only.
 
 ## 5. Global debug ledger
 
-`~/.cursor/skills/debug/ledger/*.md` — personal cross-project patterns.
+`~/.claude/skills/debug/ledger/*.md` — personal cross-project patterns.
 
 Format when appending (user consent, no secrets):
 

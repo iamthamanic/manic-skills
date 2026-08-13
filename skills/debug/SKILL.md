@@ -144,7 +144,7 @@ Read [references/knowledge-sources.md](references/knowledge-sources.md). Run **a
 - GitHub issues (`gh issue list --search "..."`) when `gh` available
 - LightRAG (`mcp__lightrag__query` mode `hybrid`) when server up
 - Project `tickets/`, `.qa/edge-cases.md`, `.qa/debug-log.md` if present
-- Global ledger: `~/.cursor/skills/debug/ledger/`
+- Global ledger: `~/.claude/skills/debug/ledger/`
 
 Do not claim root cause without correlating evidence + code location.
 

@@ -36,7 +36,7 @@ Store dates in JSON as ISO `YYYY-MM-DD` (sorting). Viewer UI formats them as **`
 On apply, run:
 
 ```bash
-bash ~/.cursor/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
+bash ~/.claude/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
 ```
 
 Writes:
@@ -59,7 +59,7 @@ docs/memory-live-doc/viewer/data/theme.json
 ## Theme resolution
 
 ```bash
-bash ~/.cursor/skills/memory-live-doc/scripts/resolve-viewer-theme.sh
+bash ~/.claude/skills/memory-live-doc/scripts/resolve-viewer-theme.sh
 ```
 
 Order:
@@ -88,7 +88,7 @@ See `assets/viewer/README.md` and `references/github-pages-policy.md`.
 ## Smoke check
 
 ```bash
-bash ~/.cursor/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
+bash ~/.claude/skills/memory-live-doc/scripts/export-viewer-snapshot.sh
 cd docs/memory-live-doc/viewer && python3 -m http.server 8765
 # open http://127.0.0.1:8765/ — Status, Features, Architecture tabs
 ```

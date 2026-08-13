@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ECC Runner — detect agent-in-progress issues without matching local state.
-# Usage: bash .cursor/skills/ecc-runner/scripts/stale-lock-check.sh
+# Usage: bash .claude/skills/ecc-runner/scripts/stale-lock-check.sh
 
 set -euo pipefail
 

@@ -50,4 +50,4 @@ typedStrict:
   languages: [typescript]
 ```
 
-Run `~/.cursor/skills/typed-strict/scripts/detect-languages.sh` on repo root and **union** results (e.g. add `python` if scripts exist).
+Run `~/.claude/skills/typed-strict/scripts/detect-languages.sh` on repo root and **union** results (e.g. add `python` if scripts exist).

@@ -10,7 +10,7 @@ metadata:
 # Verification Loop Skill
 
 > **Prefer `@test-gate`.** This skill remains as a readable phase checklist.
-> Agents should invoke `~/.cursor/skills/test-gate/SKILL.md` instead of
+> Agents should invoke `~/.claude/skills/test-gate/SKILL.md` instead of
 > re-running ad-hoc npm phases below. For ship readiness use `@ecc-check`
 > (Phase A = `@test-gate`).
 

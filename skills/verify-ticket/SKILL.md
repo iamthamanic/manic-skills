@@ -19,7 +19,7 @@ Technical verification that the ticket is **built and testable**. Not browser UX
 
 This skill **implements** the project-specific subset of `@verification-loop` (build + tests + acceptance + diff secrets). Before PR, run `@ecc-check` for the full gate.
 
-## Global helper skills (ECC, `~/.cursor/skills/`)
+## Global helper skills (ECC, `~/.claude/skills/`)
 
 | Helper | Trigger in verify-ticket |
 |--------|--------------------------|
@@ -49,6 +49,7 @@ This skill **implements** the project-specific subset of `@verification-loop` (b
 |--------|-------|
 | `.qa/acceptance/<slug>.md` | **Primary** — Preconditions + Happy Path (postconditions) + Edge Cases vs diff + tests |
 | Git diff | Scope not wildly exceeding acceptance Intent |
+| Issue `## Scope` (In/Out) | When the source issue follows `@issue-contract`, diff paths must stay within `In:` (flag `Out:` touches as scope violations) |
 | User message | Fallback only if acceptance artifact missing |
 
 If acceptance file is missing but `/implement` was expected, report **FAIL** on process and list gap.
@@ -57,7 +58,7 @@ Flag **scope creep** (unrelated files) and **gaps** (AC checkbox not implemented
 
 ## Checks (`@test-gate`)
 
-Invoke **`@test-gate`** with **`depth: standard`**. Do not hand-roll tsc/lint lists — see `~/.cursor/skills/test-gate/SKILL.md`.
+Invoke **`@test-gate`** with **`depth: standard`**. Do not hand-roll tsc/lint lists — see `~/.claude/skills/test-gate/SKILL.md`.
 
 **Never claim PASS without `@test-gate` PASS.**
 

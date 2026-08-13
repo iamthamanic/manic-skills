@@ -3,7 +3,7 @@
 **Auto-created** on every `@ecc-runner` start via:
 
 ```bash
-bash .cursor/skills/ecc-runner/scripts/bootstrap-labels.sh
+bash .claude/skills/ecc-runner/scripts/bootstrap-labels.sh
 ```
 
 Manual creation in GitHub Settings is optional.
@@ -20,7 +20,14 @@ Manual creation in GitHub Settings is optional.
 | `P1` | `#FBCA04` | Medium priority |
 | `P2` | `#FEF2C0` | Low priority |
 
-## Issue body template (recommended)
+## Issue body template (canonical)
+
+Issue bodies follow **`@issue-contract`** (`~/.claude/skills/issue-contract/references/issue-template.md`,
+or `.qa/issue-template.md` project override). Required sections in order:
+
+`Type → Intent → Goal → Non-Goals → Context → Scope → User Journey → Runtime → Security & Data → Edge Cases → Acceptance → Blockers → Runner`
+
+Minimal contract for runner seeding:
 
 ```markdown
 ## Intent
@@ -30,17 +37,15 @@ Manual creation in GitHub Settings is optional.
 - [ ] …
 - [ ] …
 
-## Notes
-…
-
 ## Blockers
 Depends on #X
 
 ## Runner
 Label: agent-ready when ready for @ecc-runner
+Feature slug: `<slug>`
 ```
 
-`ecc-runner` seeds `.qa/acceptance/<slug>.md` from `## Intent` and `## Acceptance` via `seed-acceptance-from-issue.sh`.
+`ecc-runner` seeds `.qa/acceptance/<slug>.md` from `## Intent` and `## Acceptance` via `seed-acceptance-from-issue.sh`. `## Scope` gates diff-scope in `@verify-ticket` / `@audit-changes`.
 
 ## Workflow
 

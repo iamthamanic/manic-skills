@@ -33,6 +33,7 @@ Inline helpers (do not replace this skill):
 | `@system-design-reference` | Epic infra/data flow/APIs, queues, cache, scale — pattern evidence before slicing |
 | `@project-setup audit` | Missing `.qa/project.yaml` |
 | `@frontend-design` / `@design-taste-frontend` | Step 3–4 — UI-heavy epics only: clarify aesthetic direction (no code, no audit) |
+| `@imagegen-frontend-mobile` | Step 3–4 — mobile app epics: screen concepts / flow direction (images only; not web landings) |
 | `@handoff` | After draft ready if session ends / new agent continues — OS-temp handoff (suggested skills: `@ecc-runner`) |
 
 ## Modes
@@ -74,10 +75,10 @@ Resolve ECC runner scripts:
 
 ```bash
 # Prefer project override, else global
-if [[ -d ".cursor/skills/ecc-runner/scripts" ]]; then
-  export ECC_RUNNER_ROOT=".cursor/skills/ecc-runner"
-elif [[ -d "$HOME/.cursor/skills/ecc-runner/scripts" ]]; then
-  export ECC_RUNNER_ROOT="$HOME/.cursor/skills/ecc-runner"
+if [[ -d ".claude/skills/ecc-runner/scripts" ]]; then
+  export ECC_RUNNER_ROOT=".claude/skills/ecc-runner"
+elif [[ -d "$HOME/.claude/skills/ecc-runner/scripts" ]]; then
+  export ECC_RUNNER_ROOT="$HOME/.claude/skills/ecc-runner"
 fi
 ```
 
@@ -106,7 +107,7 @@ Record reuse targets (adapters, types, UI shells, functions).
 Ask **3–5 questions** with **why you ask**. Focus:
 
 - UI: where in nav / which view / empty-loading-error states
-- UI (when visual): vibe / audience / existing brand vs greenfield (see `@frontend-design`; landing/portfolio → `@design-taste-frontend`) — direction only, do not write UI code here
+- UI (when visual): vibe / audience / existing brand vs greenfield (see `@frontend-design`; landing/portfolio → `@design-taste-frontend`; mobile app screens/flows → `@imagegen-frontend-mobile`) — direction only, do not write UI code here
 - Runtime: local vs cloud-session vs hybrid (see stack profile)
 - Data: SQLite `.scriptony` vs Appwrite collections
 - MVP: what is explicitly deferred to later issues
@@ -144,9 +145,9 @@ Each slice:
 | `labels` | `needs-design` only if UI/architecture still TBD for this slice |
 | `dependsOn` | Prior slice titles or `#N` after create |
 | `featureSlug` | kebab-case for acceptance seeding |
-| Body sections | Intent, User Journey, Problem, Solution, Edge Cases, Acceptance, Runtime, Design link |
+| Body sections | **Canonical set from `@issue-contract`** (`~/.claude/skills/issue-contract/references/issue-template.md` or `.qa/issue-template.md` override): Type, Intent, Goal, Non-Goals, Context, Scope, User Journey, Runtime, Security & Data, Edge Cases, Acceptance, Blockers, Runner |
 
-Body template: [references/issue-body-template.md](references/issue-body-template.md)
+Body template: [references/issue-body-template.md](references/issue-body-template.md) (thin layer over `@issue-contract`; never invent a skill-specific body shape)
 
 **Order:** vertical slices; MVP 0.1 first; no big-bang issue.
 
@@ -170,7 +171,7 @@ Tell user:
 Prerequisites: user explicitly approved; `gh auth status` OK.
 
 ```bash
-bash "$HOME/.cursor/skills/feature-intake/scripts/create-github-issues.sh" \
+bash "$HOME/.claude/skills/feature-intake/scripts/create-github-issues.sh" \
   .qa/intake/<epic-slug>-issues.json
 ```
 

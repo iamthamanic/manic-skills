@@ -1,0 +1,3 @@
+interface:
+  display_name: "Mobile Performance Audit"
+  short_description: "Audit and improve Capacitor Android performance"

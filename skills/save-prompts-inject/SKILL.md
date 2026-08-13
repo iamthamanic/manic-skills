@@ -73,7 +73,7 @@ Fuzzy match: if exact slug missing, list close matches and ask once.
 ### List
 
 ```bash
-~/.cursor/skills/save-prompts-inject/scripts/list-prompts.sh
+~/.claude/skills/save-prompts-inject/scripts/list-prompts.sh
 ```
 
 Optional second arg: workspace root for project prompts.
@@ -109,7 +109,7 @@ Optional second arg: workspace root for project prompts.
 
 | Script | Purpose |
 |--------|---------|
-| `~/.cursor/skills/save-prompts-inject/scripts/list-prompts.sh` | List global (+ optional workspace) prompts |
-| `~/.cursor/skills/save-prompts-inject/scripts/validate-prompt.sh` | Validate one file |
+| `~/.claude/skills/save-prompts-inject/scripts/list-prompts.sh` | List global (+ optional workspace) prompts |
+| `~/.claude/skills/save-prompts-inject/scripts/validate-prompt.sh` | Validate one file |
 
 Run from any directory; scripts use `$HOME/.cursor/prompts` by default.

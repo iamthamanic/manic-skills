@@ -9,15 +9,15 @@ description: >-
 
 # memory-live-doc history-backfill
 
-Parent skill: `~/.cursor/skills/memory-live-doc/SKILL.md`
+Parent skill: `~/.claude/skills/memory-live-doc/SKILL.md`
 
 **Always follow:** [../references/history-backfill.md](../references/history-backfill.md)
 
 ## Quick path
 
 ```bash
-bash ~/.cursor/skills/memory-live-doc/scripts/detect-history-coverage.sh
-bash ~/.cursor/skills/memory-live-doc/scripts/analyze-git-history.sh --write
+bash ~/.claude/skills/memory-live-doc/scripts/detect-history-coverage.sh
+bash ~/.claude/skills/memory-live-doc/scripts/analyze-git-history.sh --write
 ```
 
 Then cluster `milestone_candidates` into 8–20 change events + architecture eras → apply → set `config.history_coverage.status=complete`.

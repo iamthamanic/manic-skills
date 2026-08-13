@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ECC Runner — idempotent GitHub label bootstrap for the current repo.
-# Usage: .cursor/skills/ecc-runner/scripts/bootstrap-labels.sh [owner/repo]
+# Usage: .claude/skills/ecc-runner/scripts/bootstrap-labels.sh [owner/repo]
 
 set -euo pipefail
 

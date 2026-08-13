@@ -25,10 +25,13 @@ Die **Secure-by-Default-Checkliste** (Frontend / Backend / Practical Habits) ist
 
 Die detaillierten OWASP-Muster unten sind die **konkrete Ausprägung** der groben Checklist-Items. Mapping-Beispiele:
 - OWASP „SQL Injection Prevention" → Backend-Item **B-04**
-- OWASP „Authentication & Authorization" → **B-01**, **B-02**, **B-03**
+- OWASP „Authentication & Authorization" → **B-01**, **B-02**, **B-03**, plus **B-07** (assignment least-privilege), **B-08** (deny-by-default route map), **B-09** (trust-boundary identity)
 - OWASP „Sensitive Data Exposure" → Practical Habits **P-02**, Frontend **F-03**
+- Privilege escalation via admin APIs (bundles/roles wider than grants) → **B-07** (Critical)
+- Read-key allowing writes / default `*.view` on Non-GET → **B-08** (Critical)
 
-Bei jedem Review: zuerst zutreffende Tabellen-Sektionen der Secure-by-Default-Checkliste gegen den Diff prüfen, dann die detaillierten OWASP-Muster als Vertiefung anwenden.
+Bei jedem Review: zuerst zutreffende Tabellen-Sektionen der Secure-by-Default-Checkliste gegen den Diff prüfen, dann die detaillierten OWASP-Muster als Vertiefung anwenden.  
+Bei Diffs mit User-/Permission-Admin oder Route→Permission-Resolvern: **B-07 / B-08 / B-09 Manual Gate** in der Checklist zwingend durchlaufen — Catalog-Zufall („edit nur im Admin-Bundle“) zählt **nicht** als Mitigation.
 
 ## Security Checklist
 
@@ -180,6 +183,50 @@ export async function deleteUser(userId: string, requesterId: string) {
 }
 ```
 
+#### Privilege escalation via assignment APIs (B-07) — ALWAYS CHECK
+
+When the diff touches user / role / permission admin APIs:
+
+1. List **every** field that changes effective authz: `grants`, `revokes`, **`bundles`**, `roles`, `groups`, templates, create-user defaults.
+2. For each field: prove the actor cannot grant more than their own effective permission set (Superset / grant-guard).
+3. **FAIL** if bundles/roles are validated only against a catalog whitelist (`BUNDLE_IDS.includes`) without comparing expanded bundle keys to the actor.
+4. **FAIL** if the review claims mitigation via catalog layout alone (e.g. “`users.edit` only exists on the admin bundle”) — grants or catalog edits can add that key alone.
+5. Cover **create (POST)** and **update (PUT/PATCH)** equally; self-assignment (`PUT /users/<own-id>`) is in scope.
+6. Unit/integration tests should include: actor with edit-but-not-full-admin cannot assign admin bundle / full key set.
+
+```typescript
+// FAIL: whitelist only — privilege escalation
+const bundleIds = body.bundles.filter((b) => BUNDLE_IDS.includes(b))
+await replaceUserBundles(userId, bundleIds)
+
+// PASS: same least-privilege rule as grants
+const allowed = filterAssignableBundles(actorEffective, body.bundles)
+// each bundle's permission keys ⊆ actorEffective
+await replaceUserBundles(userId, allowed)
+```
+
+#### Deny-by-default route → permission maps (B-08)
+
+1. Unknown path → deny (`null` / 403), **not** a default like `analytics.overview.view`.
+2. For every mapped mount: `GET`/`HEAD` may use `.view`; state-changing methods need `.edit` / a dedicated write key, or deny.
+3. Feature flags that enable writes (e.g. UI registry writes) must not stay behind read-only keys.
+4. Alias headers for service trust (e.g. `x-api-key` == internal key on a publicly reachable mount) → document intentional vs legacy; prefer a single dedicated internal header.
+
+```typescript
+// FAIL: method ignored → reader can mutate
+if (path.startsWith('/ui')) return 'analytics.overview.view'
+
+// PASS: read vs write
+if (path.startsWith('/ui')) {
+  return isRead ? 'analytics.settings.ui.view' : 'analytics.settings.ui.edit'
+}
+```
+
+#### Trust-boundary identity (B-09)
+
+- Subject (`userId`, roles) must come from session / verified JWT / server-side trust — **never** from client-supplied `x-user-id` (or similar) unless cryptographically bound and verified.
+- **FAIL** if BFF forwards client `x-user-id` unchanged to upstream, or Express trusts it without shared-secret + server-derived id.
+
 #### Row Level Security (Supabase)
 ```sql
 -- Enable RLS on all tables
@@ -202,6 +249,9 @@ CREATE POLICY "Users update own data"
 - [ ] Row Level Security enabled in Supabase
 - [ ] Role-based access control implemented
 - [ ] Session management secure
+- [ ] **B-07:** Bundle/role assignment uses the same least-privilege guard as grants (POST + PUT)
+- [ ] **B-08:** Non-GET cannot succeed with only a `.view` key; unknown routes deny
+- [ ] **B-09:** Identity not taken from client-controlled headers
 
 ### 5. XSS Prevention
 
@@ -492,6 +542,9 @@ Before ANY production deployment:
 - [ ] **CSRF**: Protection enabled
 - [ ] **Authentication**: Proper token handling
 - [ ] **Authorization**: Role checks in place
+- [ ] **B-07 Assignment guard**: Bundles/roles cannot exceed actor’s effective permissions
+- [ ] **B-08 Deny-by-default**: Writes need edit/write keys; unknown routes deny
+- [ ] **B-09 Trust identity**: No client-controlled user-id headers
 - [ ] **Rate Limiting**: Enabled on all endpoints
 - [ ] **HTTPS**: Enforced in production
 - [ ] **Security Headers**: CSP, X-Frame-Options configured

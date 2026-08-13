@@ -25,10 +25,10 @@ echo ""
 # Ensure ECC runner labels exist (P0, P1, needs-design, …)
 RUNNER_ROOT="${ECC_RUNNER_ROOT:-}"
 if [[ -z "${RUNNER_ROOT}" ]]; then
-  if [[ -d ".cursor/skills/ecc-runner/scripts" ]]; then
-    RUNNER_ROOT=".cursor/skills/ecc-runner"
-  elif [[ -d "${HOME}/.cursor/skills/ecc-runner/scripts" ]]; then
-    RUNNER_ROOT="${HOME}/.cursor/skills/ecc-runner"
+  if [[ -d ".claude/skills/ecc-runner/scripts" ]]; then
+    RUNNER_ROOT=".claude/skills/ecc-runner"
+  elif [[ -d "${HOME}/.claude/skills/ecc-runner/scripts" ]]; then
+    RUNNER_ROOT="${HOME}/.claude/skills/ecc-runner"
   fi
 fi
 if [[ -n "${RUNNER_ROOT}" && -x "${RUNNER_ROOT}/scripts/bootstrap-labels.sh" ]]; then

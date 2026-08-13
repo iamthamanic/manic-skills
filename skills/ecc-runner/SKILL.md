@@ -18,15 +18,28 @@ Autonomous GitHub issue orchestrator (global skill). **Default = batch:** run th
 Scripts live under **project override** or **global**:
 
 ```bash
-if [[ -d ".cursor/skills/ecc-runner/scripts" ]]; then
-  export ECC_RUNNER_ROOT=".cursor/skills/ecc-runner"
-elif [[ -d "$HOME/.cursor/skills/ecc-runner/scripts" ]]; then
-  export ECC_RUNNER_ROOT="$HOME/.cursor/skills/ecc-runner"
+if [[ -d ".claude/skills/ecc-runner/scripts" ]]; then
+  export ECC_RUNNER_ROOT=".claude/skills/ecc-runner"
+elif [[ -d "$HOME/.claude/skills/ecc-runner/scripts" ]]; then
+  export ECC_RUNNER_ROOT="$HOME/.claude/skills/ecc-runner"
 fi
 # Example: bash "$ECC_RUNNER_ROOT/scripts/sync-queue-to-state.sh"
 ```
 
 Read `.qa/runner-profile.yaml` for stack-specific helper routing when present.
+
+## Issue body contract
+
+Issues are expected to follow the canonical template from **`@issue-contract`**
+(`~/.claude/skills/issue-contract/references/issue-template.md`, or `.qa/issue-template.md`
+project override). Runner-relevant fields:
+
+- `## Intent` + `## Acceptance` → seeded into `.qa/acceptance/<slug>.md` (unchanged behavior)
+- `## Runner` → `Feature slug:` drives the acceptance filename; labels drive queue sort
+- `## Scope` (In/Out) → diff-scope gate for `@verify-ticket` / `@audit-changes`
+- `## Blockers` → `Depends on #N` gates queue eligibility
+
+If a required section is missing in an older issue, proceed but log the gap in `runs/issue-<N>.md`.
 
 ## Modes
 
@@ -134,7 +147,7 @@ If `stale-lock-check.sh` exits 2 → recover per [commands.md](references/comman
 ## Step 1 — Build queue
 
 ```bash
-bash "${ECC_RUNNER_ROOT:-$HOME/.cursor/skills/ecc-runner}/scripts/sync-queue-to-state.sh"
+bash "${ECC_RUNNER_ROOT:-$HOME/.claude/skills/ecc-runner}/scripts/sync-queue-to-state.sh"
 ```
 
 ## Step 2 — Auto-pick / lock
@@ -147,7 +160,7 @@ Else pick `queue[0]` not in `completedIssues`:
 gh issue edit <N> --add-label agent-in-progress
 gh issue edit <N> --remove-label agent-ready 2>/dev/null || true
 git checkout -b issue/<N>-<feature-slug>   # or checkout existing
-bash "${ECC_RUNNER_ROOT:-$HOME/.cursor/skills/ecc-runner}/scripts/seed-acceptance-from-issue.sh" <N> <feature-slug>
+bash "${ECC_RUNNER_ROOT:-$HOME/.claude/skills/ecc-runner}/scripts/seed-acceptance-from-issue.sh" <N> <feature-slug>
 ```
 
 ## Step 3 — Classify
@@ -172,7 +185,7 @@ Skip `web-design-guidelines` / `verify-ui` if no UI files in diff. Skip `securit
 
 | Phase | Skill | Exit |
 |-------|-------|------|
-| `implement` | `@implement` (incl. `@frontend-design` / `@design-taste-frontend` when UI) | Code + acceptance notes |
+| `implement` | `@implement` (incl. `@frontend-design` / `@design-taste-frontend` when UI; `@imagegen-frontend-mobile` for mobile screen concepts) | Code + acceptance notes |
 | `verify-ticket` | `@verify-ticket` | PASS |
 | `web-design-guidelines` | `@web-design-guidelines` | Findings fixed or accepted; skip if no UI |
 | `verify-ui` | `@verify-ui` | PASS or skipped |
@@ -219,7 +232,7 @@ See [references/reporting.md](references/reporting.md). **Batch = minimal chat; 
 
 ## Full ship loop (merge included)
 
-For **verify → merge → next issue** without manual merge pauses, use **`@ecc-runner-loop`** (`~/.cursor/skills/ecc-runner-loop`). This skill stops at PR open; the loop skill adds mandatory babysit + `@pr-merge-safe merge`.
+For **verify → merge → next issue** without manual merge pauses, use **`@ecc-runner-loop`** (`~/.claude/skills/ecc-runner-loop`). This skill stops at PR open; the loop skill adds mandatory babysit + `@pr-merge-safe merge`.
 
 ## Additional resources
 

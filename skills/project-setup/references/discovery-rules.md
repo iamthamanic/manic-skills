@@ -77,7 +77,7 @@ Priority:
 3. `scripts/run-checks.sh` exists → `npm run checks` or `./scripts/run-checks.sh`
 4. Fallback: `npm run build && npm test` (document in report)
 
-Agents run these via **`@test-gate`** (not ad-hoc). On init, write `testGate` defaults from `~/.cursor/skills/test-gate/references/config-schema.md`. Stack profile: `bash ~/.cursor/skills/test-gate/scripts/detect-stack.sh <root>`.
+Agents run these via **`@test-gate`** (not ad-hoc). On init, write `testGate` defaults from `~/.claude/skills/test-gate/references/config-schema.md`. Stack profile: `bash ~/.claude/skills/test-gate/scripts/detect-stack.sh <root>`.
 
 ## 8. PRD search paths
 
@@ -120,10 +120,10 @@ Programming languages for `@typed-strict` — **not** UI `locale` / `language: d
 2. Else (and always on audit if missing) run:
 
 ```bash
-bash "$HOME/.cursor/skills/typed-strict/scripts/detect-languages.sh" <workspace-or-repo-root>
+bash "$HOME/.claude/skills/typed-strict/scripts/detect-languages.sh" <workspace-or-repo-root>
 ```
 
-3. Merge with stack profile defaults (`~/.cursor/skills/typed-strict/references/stack-detect.md`)
+3. Merge with stack profile defaults (`~/.claude/skills/typed-strict/references/stack-detect.md`)
 4. **Audit:** append newly detected languages; never remove without user OK
 5. Write into `project.yaml`:
 

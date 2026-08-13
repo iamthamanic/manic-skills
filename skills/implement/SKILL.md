@@ -17,7 +17,7 @@ When implementing changes, follow this contract strictly.
 @pingpong-solution  →  @implement  →  @verify-ticket  →  @verify-ui  →  @review-ticket
 ```
 
-## Global helper skills (ECC, `~/.cursor/skills/`)
+## Global helper skills (ECC, `~/.claude/skills/`)
 
 Apply **inline** — follow their checklists while executing this contract.
 
@@ -34,8 +34,9 @@ Apply **inline** — follow their checklists while executing this contract.
 | `@handoff` | Session ending / next agent continues — write OS-temp handoff doc (not workspace); after compact if agent changes |
 | `@frontend-design` | **§8** — new or reshaped UI; distinctive aesthetics, avoid generic AI look |
 | `@design-taste-frontend` | **§8** — landing pages, portfolios, redesigns (narrower than `@frontend-design`) |
+| `@imagegen-frontend-mobile` | **§8** — mobile app screen concepts / mockups / multi-screen flows (images only; iOS/Android/Capacitor) |
 | `@web-design-guidelines` | After UI code — optional static a11y/UX audit before/with `@verify-ui` |
-| `@memory-live-doc` | After **material** code change — draft living docs (or note pipeline will `@memory-live-doc` apply at `@ecc-check`); see `~/.cursor/skills/memory-live-doc/` |
+| `@memory-live-doc` | After **material** code change — draft living docs (or note pipeline will `@memory-live-doc` apply at `@ecc-check`); see `~/.claude/skills/memory-live-doc/` |
 | `@typed-strict` | **Always while coding** — no type-system escape hatches; Boy Scout strip loose typing on every touched file (language matrix, not TS-only) |
 | `@test-gate` | **Before claim-done** — depth=quick (tools/scripts exit codes); full verify still via `@verify-ticket` |
 
@@ -53,7 +54,8 @@ Read [references/acceptance-artifact.md](references/acceptance-artifact.md) and:
 2. Ensure `.qa/acceptance/` exists (and `.qa/project.yaml` if missing — see verify-ui template)
 3. Read `.qa/design/product-roadmap.md` for sprint priority, stufe, and exit criteria
 4. If `.qa/design/<feature-slug>.md` exists (from `@pingpong-solution`), use it as **primary input** for Intent, Happy Path, Edge Cases, and scope
-5. Write or update `.qa/acceptance/<feature-slug>.md` from roadmap + design artifact + chat + `.qa/edge-cases.md` + `AGENTS.md` + styleguide — use **Preconditions** + postcondition-style Happy Path per `@foundations` (Hoare)
+5. If the work comes from a GitHub issue following `@issue-contract`, prefer its `## Intent` / `## Acceptance` / `## Edge Cases` / `## Scope` as seed input (ecc-runner already seeds this; refine, don't contradict)
+6. Write or update `.qa/acceptance/<feature-slug>.md` from roadmap + design artifact + issue body + chat + `.qa/edge-cases.md` + `AGENTS.md` + styleguide — use **Preconditions** + postcondition-style Happy Path per `@foundations` (Hoare)
 6. If `AGENTS.md` contains a **Security Checklist (Secure by Default)** block (or `.qa/project.yaml` → `security.checklist: secure-by-default`): add a **`Security Coverage`** section to the acceptance file listing the applicable checklist items (Frontend F-xx / Backend B-xx / Practical P-xx) for this ticket's scope, and how the implementation satisfies each. Non-applicable items are listed as out-of-scope with a one-line reason.
 7. List the file path in your first progress message so the user can skim Intent/Happy Path
 
@@ -114,13 +116,13 @@ Follow:
 * no unnecessary abstractions
 * no unrelated changes
 * no formatting churn in unrelated files
-* **`@typed-strict`:** no loose typing / type escape hatches; Boy Scout on every edited file (see `~/.cursor/skills/typed-strict/`)
+* **`@typed-strict`:** no loose typing / type escape hatches; Boy Scout on every edited file (see `~/.claude/skills/typed-strict/`)
 
 Do not introduce new dependencies unless they are clearly justified.
 
 ### Ponytail (primary — during `@implement`)
 
-Apply the [Ponytail](https://github.com/DietrichGebert/ponytail) lazy-senior-dev ladder **before writing code**. Attach `@ponytail` (installed at `~/.cursor/skills/ponytail/`).
+Apply the [Ponytail](https://github.com/DietrichGebert/ponytail) lazy-senior-dev ladder **before writing code**. Attach `@ponytail` (installed at `~/.claude/skills/ponytail/`).
 
 **Ladder — stop at the first rung that holds:**
 
@@ -135,9 +137,9 @@ Apply the [Ponytail](https://github.com/DietrichGebert/ponytail) lazy-senior-dev
 
 **Still required:** validation at trust boundaries, error handling that prevents data loss, security, accessibility basics, tests when behavior changes (§7). Mark intentional shortcuts with `// ponytail:` and name the ceiling + upgrade path.
 
-**Security is never Ponytail-able:** The Secure-by-Default Checklist items (AGENTS.md §Security) are **never** subject to Ponytail rung compression. No „one-line shortcut" may skip input validation, authz checks, parameterized queries, secure cookies, or rate limiting. A `// ponytail:` shortcut that violates F-03/B-01/B-04/P-04 is invalid and must be reverted.
+**Security is never Ponytail-able:** The Secure-by-Default Checklist items (AGENTS.md §Security) are **never** subject to Ponytail rung compression. No „one-line shortcut" may skip input validation, authz checks, parameterized queries, secure cookies, or rate limiting. A `// ponytail:` shortcut that violates F-03/B-01/B-04/B-07/B-08/B-09/P-04 is invalid and must be reverted.
 
-**After large diffs:** suggest `@ponytail-review` (installed at `~/.cursor/skills/ponytail-review/`) before claiming done.
+**After large diffs:** suggest `@ponytail-review` (installed at `~/.claude/skills/ponytail-review/`) before claiming done.
 
 ## 4. Ask only for blocking uncertainty
 
@@ -161,7 +163,7 @@ If uncertainty is minor, choose the safest conventional option and document the 
 
 All implementation must be secure by default.
 
-**Secure-by-Default Checklist (verbindlich):** If `AGENTS.md` has a **Security Checklist (Secure by Default)** block, every new endpoint, upload, auth flow, cookie, or user-input path **must** satisfy the applicable table rows (Frontend F-01…F-05, Backend B-01…B-06, Practical Habits P-01…P-05). The full embedded tables live in `AGENTS.md` (no external links). Document coverage in the acceptance file's `Security Coverage` section (§0 step 6). Critical violations (F-03, B-01, B-04, P-04) block the ticket.
+**Secure-by-Default Checklist (verbindlich):** If `AGENTS.md` has a **Security Checklist (Secure by Default)** block, every new endpoint, upload, auth flow, cookie, or user-input path **must** satisfy the applicable table rows (Frontend F-01…F-05, Backend B-01…B-09, Practical Habits P-01…P-05). The full embedded tables live in `AGENTS.md` (no external links). Document coverage in the acceptance file's `Security Coverage` section (§0 step 6). Critical violations (F-03, B-01, B-04, B-07, B-08, B-09, P-04) block the ticket. Permission-admin / route→permission diffs must also pass the B-07/B-08/B-09 manual gate in the checklist (Superset on bundles/roles; Non-GET not behind `.view` only; no client-controlled identity).
 
 Check and handle:
 
@@ -213,7 +215,7 @@ Do not hardcode one validation tool unless the project already uses it.
 
 After implementation, run `@verify-ticket` (or follow `.agents/skills/verify-ticket/SKILL.md` in this repo). If checks cannot be run, explain exactly why.
 
-For **UI/UX changes** (components, layouts, flows, animations), also tell the user to run `@verify-ui` (skill: `~/.cursor/skills/verify-ui/`). Do not claim browser verification passed unless verify-ui was run or the user explicitly skipped it.
+For **UI/UX changes** (components, layouts, flows, animations), also tell the user to run `@verify-ui` (skill: `~/.claude/skills/verify-ui/`). Do not claim browser verification passed unless verify-ui was run or the user explicitly skipped it.
 
 Never claim validation passed unless `npm run checks` actually ran successfully.
 
@@ -237,7 +239,7 @@ If the project has no test setup, do not invent a large new test framework witho
 
 For UI changes, follow the existing design system and product patterns.
 
-**Design helpers (inline):** Apply `@frontend-design` when building or reshaping UI. Prefer `@design-taste-frontend` for landing pages, portfolios, and marketing redesigns. Do not invent a parallel aesthetic when the project styleguide already defines tokens/components.
+**Design helpers (inline):** Apply `@frontend-design` when building or reshaping UI. Prefer `@design-taste-frontend` for landing pages, portfolios, and marketing redesigns. Prefer `@imagegen-frontend-mobile` for mobile app screen concepts, phone mockups, and multi-screen flows (images only — not code). Do not invent a parallel aesthetic when the project styleguide already defines tokens/components.
 
 Check:
 

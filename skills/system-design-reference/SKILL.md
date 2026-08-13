@@ -54,8 +54,8 @@ Global **architecture evidence library** — project-agnostic. Complements `@fou
 Text extract v1 is automatic. For diagram-rich pages, run:
 
 ```bash
-python3 ~/.cursor/skills/system-design-reference/scripts/ingest-pages.py --pages 8-20
-python3 ~/.cursor/skills/system-design-reference/scripts/ingest-pages.py --all
+python3 ~/.claude/skills/system-design-reference/scripts/ingest-pages.py --pages 8-20
+python3 ~/.claude/skills/system-design-reference/scripts/ingest-pages.py --all
 ```
 
 Vision/API enrichment fills **Diagram**, bilingual summaries, and **Trade-offs** tables.

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "application": {
+    "name": "replace-me",
+    "platform": "capacitor-android"
+  },
+  "repositories": {
+    "frontendRole": "mobile-frontend-and-android",
+    "backendRole": "fleet-manager-backend"
+  },
+  "criticalJourneys": [
+    "cold-start",
+    "warm-start",
+    "open-primary-list",
+    "open-detail",
+    "complete-primary-action",
+    "resume-from-background",
+    "sync-pending-work"
+  ],
+  "requiredCapabilities": {
+    "javascriptErrorCapture": true,
+    "nativeCrashCapture": true,
+    "frontendTracing": true,
+    "backendTracing": true,
+    "tracePropagation": true,
+    "macrobenchmark": true,
+    "baselineProfiles": true,
+    "offlineQueue": false,
+    "backgroundLocation": false,
+    "foregroundService": false
+  },
+  "commands": {
+    "lint": "npm run lint",
+    "test": "npm run test",
+    "build": "npm run build",
+    "performanceCheck": "npm run performance:check",
+    "androidLint": "cd android && ./gradlew lint"
+  },
+  "budgets": {
+    "initialJavaScriptGzipBytes": null,
+    "maximumSourceFileBytes": 750000,
+    "maximumAllowedStartupRegressionPercent": 10,
+    "maximumAllowedFrameRegressionPercent": 10,
+    "maximumAllowedEnergyRegressionPercent": 15
+  },
+  "acceptedObservabilityProviders": [
+    "sentry",
+    "grafana-faro",
+    "opentelemetry",
+    "firebase-performance",
+    "firebase-crashlytics"
+  ],
+  "ignoredPaths": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    ".git",
+    "android/.gradle",
+    "android/app/build"
+  ]
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ECC Runner — print open-issue snapshot for queue triage.
-# Usage: .cursor/skills/ecc-runner/scripts/issue-survey.sh [owner/repo]
+# Usage: .claude/skills/ecc-runner/scripts/issue-survey.sh [owner/repo]
 
 set -euo pipefail
 

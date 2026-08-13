@@ -18,7 +18,7 @@ Living project memory: **Git diff + AI interpretation → JSON + Markdown + Merm
 
 Storage root: **`.project-memory/`** (never `.autoguide/`). AutoGuide is out of scope for v1.
 
-Skill root: `~/.cursor/skills/memory-live-doc/`
+Skill root: `~/.claude/skills/memory-live-doc/`
 
 ## Modes
 
@@ -54,13 +54,13 @@ Mature repos must get a **timeline since first commit** (clustered milestones), 
 Run scripts first (deterministic):
 
 ```bash
-bash ~/.cursor/skills/memory-live-doc/scripts/collect-git-context.sh
-bash ~/.cursor/skills/memory-live-doc/scripts/detect-history-coverage.sh
+bash ~/.claude/skills/memory-live-doc/scripts/collect-git-context.sh
+bash ~/.claude/skills/memory-live-doc/scripts/detect-history-coverage.sh
 # if history_action is required|recommended:
-bash ~/.cursor/skills/memory-live-doc/scripts/analyze-git-history.sh --write
-bash ~/.cursor/skills/memory-live-doc/scripts/validate-memory.sh   # after init / before claim healthy
-bash ~/.cursor/skills/memory-live-doc/scripts/github-pages-memory.sh status --write-config  # Pages ownership check
-bash ~/.cursor/skills/memory-live-doc/scripts/export-viewer-snapshot.sh   # after apply: theme + architecture + data
+bash ~/.claude/skills/memory-live-doc/scripts/analyze-git-history.sh --write
+bash ~/.claude/skills/memory-live-doc/scripts/validate-memory.sh   # after init / before claim healthy
+bash ~/.claude/skills/memory-live-doc/scripts/github-pages-memory.sh status --write-config  # Pages ownership check
+bash ~/.claude/skills/memory-live-doc/scripts/export-viewer-snapshot.sh   # after apply: theme + architecture + data
 ```
 
 ## GitHub Pages (safe enable)

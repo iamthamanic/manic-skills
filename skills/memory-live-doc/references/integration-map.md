@@ -2,32 +2,32 @@
 
 Minimal insert points into other **global** skills. **Applied** (do not rewrite those skills wholesale).
 
-## 1. `@implement` (`~/.cursor/skills/implement/SKILL.md`) — applied
+## 1. `@implement` (`~/.claude/skills/implement/SKILL.md`) — applied
 
 After material implementation (near end / before verify handoff):
 
 - Helper table row for `@memory-live-doc`
 - §10 note: draft interactive **or** pipeline applies at ecc-check
 
-## 2. `@ecc-check` (`~/.cursor/skills/ecc-check/SKILL.md`) — applied
+## 2. `@ecc-check` (`~/.claude/skills/ecc-check/SKILL.md`) — applied
 
 Before READY:
 
 - Phase E2: material changes since checkpoint → `@memory-live-doc` with `mode=apply`
 - READY may proceed with docs marked `needs-review`; report doc health
 
-## 3. `@ecc-runner` (`~/.cursor/skills/ecc-runner/SKILL.md` + `references/helper-skills.md`) — applied
+## 3. `@ecc-runner` (`~/.claude/skills/ecc-runner/SKILL.md` + `references/helper-skills.md`) — applied
 
 - Pipeline comment: ecc-check includes memory-live-doc apply for material issues
 - Helper table during ecc-check / docs
 
-## 4. `@commit-push-safe` (`~/.cursor/skills/commit-push-safe/SKILL.md` §5b) — applied
+## 4. `@commit-push-safe` (`~/.claude/skills/commit-push-safe/SKILL.md` §5b) — applied
 
 - Prefer `## Recent changes` from latest `.project-memory/changes/*`
 - Missing memory + material user-facing → `@memory-live-doc apply` before commit
 - Stage `.project-memory/**` + `docs/**` with same commit
 
-## 5. `@project-setup` (`~/.cursor/skills/project-setup/SKILL.md`) — applied
+## 5. `@project-setup` (`~/.claude/skills/project-setup/SKILL.md`) — applied
 
 - Step 3: ensure **Living documentation** section in `AGENTS.md` (skeleton + append on existing)
 - Step 9: if `.project-memory/checkpoint.json` missing → `@memory-live-doc bootstrap`

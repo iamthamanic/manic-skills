@@ -31,7 +31,7 @@ Priority:
 ### Auto-detect + persist
 
 ```bash
-bash "$HOME/.cursor/skills/typed-strict/scripts/detect-languages.sh" <repo-root>
+bash "$HOME/.claude/skills/typed-strict/scripts/detect-languages.sh" <repo-root>
 ```
 
 Algorithm: [references/stack-detect.md](references/stack-detect.md).

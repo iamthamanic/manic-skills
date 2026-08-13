@@ -32,10 +32,10 @@ For one phase / debug → `@ecc-runner step`. For PR-only merge → `@pr-merge-s
 Reuse `@ecc-runner` scripts:
 
 ```bash
-if [[ -d ".cursor/skills/ecc-runner/scripts" ]]; then
-  export ECC_RUNNER_ROOT=".cursor/skills/ecc-runner"
-elif [[ -d "$HOME/.cursor/skills/ecc-runner/scripts" ]]; then
-  export ECC_RUNNER_ROOT="$HOME/.cursor/skills/ecc-runner"
+if [[ -d ".claude/skills/ecc-runner/scripts" ]]; then
+  export ECC_RUNNER_ROOT=".claude/skills/ecc-runner"
+elif [[ -d "$HOME/.claude/skills/ecc-runner/scripts" ]]; then
+  export ECC_RUNNER_ROOT="$HOME/.claude/skills/ecc-runner"
 fi
 ```
 
@@ -82,7 +82,7 @@ setup → research? → design? → grill? → seed acceptance
 → agent-done → sync queue → NEXT issue
 ```
 
-**UI create** stays inside `@implement` (`@frontend-design` / `@design-taste-frontend`). Loop does **not** invent aesthetics at verify/ship time.
+**UI create** stays inside `@implement` (`@frontend-design` / `@design-taste-frontend` / `@imagegen-frontend-mobile` for mobile concepts). Loop does **not** invent aesthetics at verify/ship time.
 
 **Gate:** Do **not** open a PR until `@ecc-check` is **READY** **and** the Secure-by-Default Coverage is PASS (no Critical/Important checklist violations). Do **not** start the next issue until merge is **MERGED**.
 
@@ -174,7 +174,7 @@ Same as `@ecc-runner`, plus:
 |------|--------|
 | Merge blocked (protection, conflicts, human review) | `needs-human`; report; do not skip issue silently |
 | PR open but verify never passed | Do not merge; fix on branch |
-| Secure-by-Default Coverage FAIL (Critical checklist violation: F-03, B-01, B-04, P-04) | `agent-blocked`; fix on branch; do not merge |
+| Secure-by-Default Coverage FAIL (Critical checklist violation: F-03, B-01, B-04, B-07, B-08, B-09, P-04) | `agent-blocked`; fix on branch; do not merge |
 | `main` pull fails after merge | Report; pause loop |
 
 Resume: `ecc-runner-loop continue` or `@ecc-runner-loop`.
@@ -232,4 +232,4 @@ See [references/reporting.md](references/reporting.md). One message at loop end:
 - [references/state-schema.md](references/state-schema.md)
 - [references/session-continuity.md](references/session-continuity.md)
 - [references/merge-gate.example.yaml](references/merge-gate.example.yaml)
-- Parent queue scripts: `~/.cursor/skills/ecc-runner/`
+- Parent queue scripts: `~/.claude/skills/ecc-runner/`

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ECC Runner — seed .qa/acceptance stub from GitHub issue body (## Acceptance / ## Intent).
-# Usage: bash .cursor/skills/ecc-runner/scripts/seed-acceptance-from-issue.sh <issue-number> <feature-slug>
+# Usage: bash .claude/skills/ecc-runner/scripts/seed-acceptance-from-issue.sh <issue-number> <feature-slug>
 
 set -euo pipefail
 

@@ -7,8 +7,8 @@ Publish the interactive viewer at `docs/memory-live-doc/viewer/` **without overw
 ## Script
 
 ```bash
-bash ~/.cursor/skills/memory-live-doc/scripts/github-pages-memory.sh status [--write-config]
-bash ~/.cursor/skills/memory-live-doc/scripts/github-pages-memory.sh enable [--write-config]
+bash ~/.claude/skills/memory-live-doc/scripts/github-pages-memory.sh status [--write-config]
+bash ~/.claude/skills/memory-live-doc/scripts/github-pages-memory.sh enable [--write-config]
 ```
 
 `--write-config` mirrors the JSON report into `.project-memory/config.json` → `.pages`.
