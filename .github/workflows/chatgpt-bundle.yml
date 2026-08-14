@@ -1,0 +1,77 @@
+name: Build ChatGPT Skill Bundle
+
+on:
+  push:
+    branches:
+      - tmp/chatgpt-bundle-20260814
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Export ChatGPT skill packages
+        run: python3 scripts/chatgpt-provider.py export
+
+      - name: Verify package count and contents
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=$(find dist/chatgpt -mindepth 2 -maxdepth 2 -name skill.zip | wc -l | tr -d ' ')
+          echo "skill package count: $count"
+          test "$count" -eq 49
+          python3 - <<'PY'
+          import json
+          import zipfile
+          from pathlib import Path
+
+          root = Path('dist/chatgpt')
+          manifest = json.loads((root / 'manifest.json').read_text(encoding='utf-8'))
+          assert manifest['count'] == 49, manifest['count']
+
+          packages = sorted(root.glob('*/skill.zip'))
+          assert len(packages) == 49, len(packages)
+          for package in packages:
+              with zipfile.ZipFile(package) as archive:
+                  names = archive.namelist()
+                  skill = package.parent.name
+                  assert f'{skill}/SKILL.md' in names, (skill, 'SKILL.md')
+                  assert f'{skill}/agents/openai.yaml' in names, (skill, 'openai.yaml')
+          print('verified 49 ChatGPT skill packages')
+          PY
+
+      - name: Create combined ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p bundle
+          cp dist/chatgpt/manifest.json bundle/manifest.json
+          while IFS= read -r package; do
+            skill=$(basename "$(dirname "$package")")
+            cp "$package" "bundle/${skill}.zip"
+          done < <(find dist/chatgpt -mindepth 2 -maxdepth 2 -name skill.zip | sort)
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile
+
+          bundle = Path('bundle')
+          out = Path('manic-skills-chatgpt-all.zip')
+          with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
+              for p in sorted(bundle.iterdir()):
+                  z.write(p, p.name)
+          print(out, out.stat().st_size)
+          PY
+
+      - name: Upload bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: manic-skills-chatgpt-all
+          path: manic-skills-chatgpt-all.zip
+          if-no-files-found: error
+          retention-days: 1
