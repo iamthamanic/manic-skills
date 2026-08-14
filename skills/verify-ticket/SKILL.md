@@ -14,7 +14,7 @@ Technical verification that the ticket is **built and testable**. Not browser UX
 ## Pipeline position
 
 ```
-@pingpong-solution  →  @implement  →  @verify-ticket  →  @verify-ui  →  @review-ticket
+@pingpong-solution  →  @implement  →  @verify-ticket  →  @composition-gate  →  @verify-ui  →  @review-ticket
 ```
 
 This skill **implements** the project-specific subset of `@verification-loop` (build + tests + acceptance + diff secrets). Before PR, run `@ecc-check` for the full gate.
@@ -56,6 +56,8 @@ If acceptance file is missing but `/implement` was expected, report **FAIL** on 
 
 Flag **scope creep** (unrelated files) and **gaps** (AC checkbox not implemented).
 
+**Side-effect cardinality (P-06):** If the diff enqueues, mails, posts, webhooks, or provisions from a bulk/recipient loop, Happy Path must state **once per event vs once per recipient**. A checkbox like “type X → channel” without cardinality is a **process FAIL** when the producer is bulk. Trace producer → outbox/worker → send — do not verify files in isolation. Full hop-chain gate (including non-outbox paths) is **`@composition-gate`** after this skill; FLAGGED findings there must be fixed before review.
+
 ## Checks (`@test-gate`)
 
 Invoke **`@test-gate`** with **`depth: standard`**. Do not hand-roll tsc/lint lists — see `~/.claude/skills/test-gate/SKILL.md`.
@@ -66,6 +68,7 @@ Invoke **`@test-gate`** with **`depth: standard`**. Do not hand-roll tsc/lint li
 
 - Covered primarily by `@test-gate` (secureByDefault + secrets RG)
 - Extra: no `.env` staged; user input validated if touched
+- Worker/outbox/bulk-send in diff → B-10/P-06 Manual Gate (checklist); do not PASS if fan-out or non-atomic claim is untested
 - Narrative OWASP depth → `@security-review` when auth/UGC/upload in scope
 
 ## Report format
@@ -94,7 +97,7 @@ Keine.
 Pending @verify-ui | N/A (no UI changes)
 
 ## Empfehlung
-Proceed to @verify-ui / @review-ticket | Fix first: …
+Proceed to @composition-gate / @verify-ui / @review-ticket | Fix first: …
 ```
 
 ## When FAIL

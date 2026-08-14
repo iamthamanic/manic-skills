@@ -96,6 +96,7 @@ Out:
 - [ ] <machine-checkable criterion>
 - [ ] <machine-checkable criterion>
 - [ ] Touched files: zero type escape hatches (typed-strict / Boy Scout)
+- [ ] Side-effect jobs (mail/chat/webhook/outbox): cardinality stated (once per event vs once per recipient)
 
 ## Blockers
 Depends on #<issue>   <!-- omit section if none -->

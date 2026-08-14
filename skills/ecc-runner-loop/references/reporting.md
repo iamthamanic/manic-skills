@@ -33,6 +33,7 @@
 ### Hard stop → report immediately
 
 - Verify/review retries exhausted
+- Composition-gate FLAGGED after retry limit
 - `@pr-merge-safe` → NEEDS_HUMAN or BLOCKED
 - Missing secrets / destructive migration
 - Observer loop (3 turns, no `state.json` progress)

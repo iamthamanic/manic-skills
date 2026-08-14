@@ -10,7 +10,7 @@ description: >-
 
 Commit, push to an approved non-main branch, and open a pull request.
 
-**Prerequisite:** Run `@ecc-check` until READY (includes `@test-gate` + `@review-ticket` ACCEPT). Equivalent: `@test-gate` depth=standard PASS + `@review-ticket` ACCEPT.
+**Prerequisite:** Run `@ecc-check` until READY (includes `@test-gate` + `@composition-gate` CLEAR/SKIPPED + `@review-ticket` ACCEPT). Equivalent: `@test-gate` depth=standard PASS + `@composition-gate` CLEAR/SKIPPED (same HEAD SHA) + `@review-ticket` ACCEPT.
 
 Follow this workflow strictly.
 
@@ -71,7 +71,13 @@ If unrelated user changes exist, stop and explain which files are unrelated befo
 
 ## 4. Validate before commit/PR
 
-If `@ecc-check` was not run in this session, run it now (or `@test-gate` depth=standard + `@review-ticket`).
+If `@ecc-check` was not run in this session, run it now (or `@test-gate` depth=standard + `@composition-gate` + `@review-ticket`).
+
+**Composition-gate proof:** Read `.qa/runs/composition-gate-<slug>.md` (and acceptance `## Composition Gate` if present).
+
+- Verdict **CLEAR** or **SKIPPED** and SHA matches current `HEAD` (or WORKTREE matches current uncommitted scope) → accept.
+- Missing, stale SHA, or **FLAGGED** → run `@composition-gate` now. **FLAGGED findings must be fixed** and the gate re-run. Do not commit/push/open a PR until CLEAR or SKIPPED.
+- Skipping without a documented single-hop reason → stop.
 
 Detect validation from `.qa/project.yaml` → `testGate` / `checksCommand` via **`@test-gate`**.
 
@@ -125,7 +131,7 @@ The PR must include:
 - concise title
 - summary of changes
 - **Documentation** — README sections touched, `Recent changes` entry, linked docs
-- validation/checks run (`@ecc-check` / `@test-gate`)
+- validation/checks run (`@ecc-check` / `@test-gate` / `@composition-gate` CLEAR|SKIPPED)
 - test results
 - **Deploy** — migrations, backfill scripts, infra file changes (or "none")
 - deployment relevance
@@ -135,7 +141,7 @@ Use the documented PR target/base branch. Do not open a PR against main unless d
 
 ## 9. Final report
 
-Report: commit hash, branch, PR URL, changed files, checks run, AgentShield grade, README status, blockers.
+Report: commit hash, branch, PR URL, changed files, checks run, composition-gate verdict + SHA, AgentShield grade, README status, blockers.
 
 Suggest next step when PR is open: `@pr-merge-safe` (review only) or `@pr-merge-safe merge` (merge when green).
 

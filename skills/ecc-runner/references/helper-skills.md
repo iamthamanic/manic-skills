@@ -10,6 +10,7 @@ Attach inline during phases. Full pipeline table in `SKILL.md` Step 4.
 | Reuse patterns before new code | `@search-first` |
 | Unfamiliar module / area | `@zoom-out` then `@search-first` |
 | Auth, `/api/`, env vars, user input | `@security-review` |
+| Producer→consumer, bulk+side-effect, override/fallback | `@composition-gate` intent (§3b in `@implement`) — write so the later gate CLEARs |
 | New or reshaped UI | `@frontend-design` (via `@implement` §8) |
 | Landing / portfolio / marketing redesign | `@design-taste-frontend` (via `@implement` §8) |
 | Mobile app screen concepts / mockups / flows | `@imagegen-frontend-mobile` (via `@implement` §8; images only) |
@@ -44,6 +45,7 @@ Attach inline during phases. Full pipeline table in `SKILL.md` Step 4.
 | Signal | Attach |
 |--------|--------|
 | Module boundaries, leaky API, contracts | `@foundations` (tag findings) |
+| Producer→consumer / bulk+side-effect / hop chain | `@composition-gate` **required** unless same-SHA CLEAR/SKIPPED proof exists; FLAGGED → fix, not ACCEPT |
 | Non-trivial diff | `@review-bugbot` |
 | API, auth, secrets | `@review-security` |
 | Always | `@review-ticket` (orchestrates above) |

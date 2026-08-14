@@ -33,6 +33,7 @@ Diese Checkliste ist **techstack-agnostisch**. Jedes Skill wendet nur die zutref
 | B-07 | Least-privilege assignment (Grant-/Role-/Bundle-Guard) | Wer Rechte, Rollen, Bundles oder Gruppen zuweist, darf nur das vergeben, was er selbst hält (Superset). Alle Assignment-Pfade prüfen: grants, revokes, **bundles/roles/groups**, Create-User-Defaults | Nur Keys gefiltert, Bundles/Rollen nur Catalog-Whitelist; „mitigated because X.edit only on admin bundle“ ohne Code-Guard |
 | B-08 | Deny-by-default AuthZ-Mapping | Unbekannte Route → deny. Mapped Route: Read ≠ Write; Non-GET/HEAD braucht `.edit`/Write-Key oder explizites Deny | Path fest auf `*.view` für PUT/POST/PATCH/DELETE; Write-Feature hinter Read-Key; Default-Fallback auf breites Read-Recht statt null/403 |
 | B-09 | Trust-boundary identity | Subject (User-ID, Rollen) nur aus Session/JWT/server-derived Trust — nie aus Client-Headern | `x-user-id` / Role-Header vom Client akzeptiert oder unverändert weitergeleitet |
+| B-10 | Secrets fail-closed | Crypto-/API-Secrets nur aus Env; fehlendes Secret → Start/Write verweigern. Ein öffentlich bekannter Default-Schlüssel ist kein Secret | `process.env.SECRET \|\| 'default-…'`; Fallback „wie bestehender Code / nur Ops“ als Mitigation |
 
 ---
 
@@ -45,6 +46,7 @@ Diese Checkliste ist **techstack-agnostisch**. Jedes Skill wendet nur die zutref
 | P-03 | Secure Cookies | HttpOnly, Secure, SameSite gesetzt | Session-Cookie ohne HttpOnly oder ohne Secure in Prod |
 | P-04 | File-Upload-Sicherheit | Dateityp, Größe prüfen, Malware-Scan | Upload ohne Type/Size-Validierung, Pfad-Traversal möglich |
 | P-05 | Rate Limiting | Auf allen API-Endpoints, besonders Auth | Auth-Endpoint ohne Rate-Limit oder Limit deaktiviert |
+| P-06 | Side-effect jobs (Outbox / Worker / Fan-out) | Externe Side-Effects (Mail, Chat, Webhook, Provisioning) sind genau-so-oft wie das fachliche Ereignis, nicht einmal pro Empfänger-Kopie — außer die Acceptance sagt das explizit. Worker claimen atomar | N identische Sends aus Bulk-Fan-out; `findMany` dann unkonditionales `update`; Poll lädt terminale `failed` und blockiert neue Arbeit; `processing` ohne Recovery; überlappende Poll-Ticks; Tests zementieren Skip/Starvation |
 
 ---
 
@@ -52,8 +54,8 @@ Diese Checkliste ist **techstack-agnostisch**. Jedes Skill wendet nur die zutref
 
 | Checklist-Verstoß | Severity | Skill-Aktion |
 |-------------------|----------|--------------|
-| F-03, B-01, B-04, B-07, B-08, B-09, P-04 (Critical) | **Critical** | `@review-ticket` blockt ACCEPT; `@ecc-check` BLOCKED |
-| F-01, F-04, F-05, B-02, B-03, B-05, P-01, P-03, P-05 | **Important** | Blockt ACCEPT/READY bis fix |
+| F-03, B-01, B-04, B-07, B-08, B-09, B-10, P-04 (Critical) | **Critical** | `@review-ticket` blockt ACCEPT; `@ecc-check` BLOCKED |
+| F-01, F-04, F-05, B-02, B-03, B-05, P-01, P-03, P-05, P-06 | **Important** | Blockt ACCEPT/READY bis fix; P-06 → **Critical** wenn derselbe User-sichtbare Side-Effect mehrfach ausgelöst wird |
 | F-02, B-06, P-02 | **Minor** → Important wenn Trust-Boundary betroffen | Note für später oder fix vor PR |
 
 ## RBAC / Permission-Admin Diff Gate (B-07 / B-08 / B-09)
@@ -65,6 +67,20 @@ Wenn der Diff User-Management, Bundles, Roles, Permission-APIs, Auth-Middleware 
 3. **B-08 — Method matrix:** Für jeden gemappten Mount: GET/HEAD → `.view` ok; state-changing → `.edit`/Write-Key oder deny. Unbekannter Pfad → `null`/403, **kein** Default auf `overview.view`.
 4. **B-08 — Feature flags:** Schreib-Flags (z. B. UI-Registry writes) dürfen nicht hinter reinen Read-Keys liegen.
 5. **B-09 — Identity:** Subject nur aus Session/JWT/signiertem Server-Trust; Client-Header für User-ID verwerfen.
+
+## Side-effect / Worker Diff Gate (B-10 / P-06)
+
+Wenn der Diff Worker, Outbox, Queue, Poller (`setInterval` + Batch), Cron, Webhook-Dispatch, Mail/Chat-Send, `createBulk` + Enqueue/Publish berührt, **immer** manuell prüfen (RG allein reicht nicht — Fan-out sitzt oft über 2–4 Dateien):
+
+1. **B-10 — Fail-closed secrets:** Encrypt/Decrypt/HMAC ohne Env-Secret muss werfen. `process.env.X || 'hardcoded'` ist FAIL. „Existierender Auth-Code macht das schon“ ist **keine** Mitigation für neuen Secret-Storage.
+2. **P-06 — Cardinality:** Ein fachliches Ereignis (Mitteilung, Mail, Webhook, Provision-Job) → so viele externe Sends wie das Ereignis, nicht so viele wie Empfänger-Kopien — außer Happy Path sagt „einmal pro Empfänger“.
+3. **P-06 — Atomic claim:** Lesen + separates `update` ohne `WHERE status noch claimbar` ist FAIL. Nur wer `updateMany`/`UPDATE … WHERE` mit `count === 1` gewinnt, darf senden.
+4. **P-06 — Poll set:** Terminale Failures gehören nicht ins begrenzte Batch (`take: N`). `processing` ohne Timeout/Recovery ist FAIL (Crash verliert die Zeile).
+5. **P-06 — Overlap:** `setInterval` + `void processBatch()` ohne In-Flight-Guard ist FAIL (gilt auch für eine Instanz).
+6. **P-06 — Tests:** Ein Test, der Starvation/Skip/Lost-Update als Erfolg kodiert, ist FAIL. Fehlende Tests für Claim-Race und Multi-Empfänger-Fan-out → mindestens Important.
+7. **P-06 — Inherited pattern:** Copy eines bestehenden Pollers/Workers übernimmt dessen Bugs; der Diff bleibt in Scope.
+
+`@review-bugbot` ist bei diesem Trigger **Pflicht** (nicht skippen). Skip → CHANGES_REQUESTED / BLOCKED (Prozessfehler).
 
 ## RG-Probes (diff-scoped, von `@audit-changes` / `@ecc-check` ausgeführt)
 
@@ -88,7 +104,14 @@ rg -n "bundles|user_bundles|assignBundle|roles|user_roles|filterAssignable" --gl
 rg -n "resolve.*[Pp]ermission|permissionKey|\.view[\"']" --glob '**/*{permission,auth,middleware}*' -g '!**/node_modules/**'
 # B-09: client-controlled identity headers
 rg -n "x-user-id|x-user-email|req\.headers\[.user" --glob '**/*.{ts,js}' -g '!**/node_modules/**'
+# B-10: env secret fallback (hardcoded default) — Match = Critical FAIL
+rg -n "process\.env\.[A-Z0-9_]*(SECRET|KEY|TOKEN|PASSWORD)[A-Z0-9_]*\s*\|\|" --glob '**/*.{ts,js,py,go}' -g '!**/node_modules/**' -g '!**/dist/**'
+# P-06: poll pending+failed together (starvation heuristic — then manual gate)
+rg -n "status:\s*\{\s*in:\s*\['pending',\s*'failed'\]" --glob '**/*.{ts,js}' -g '!**/node_modules/**' -g '!**/*test*'
+# P-06: fire-and-forget batch (overlap heuristic — Match = Review-Trigger, not test-gate FAIL)
+rg -n "void \w+\.processBatch\(" --glob '**/*.{ts,js}' -g '!**/node_modules/**' -g '!**/*test*'
 ```
 
 Jede Probe mit Match → Critical/Important Finding, dokumentiert im Review-Report.  
-Bei B-07/B-08/B-09: Match = **Review-Trigger**; Verdict erst nach Manual Gate oben (nicht nur „Whitelist vorhanden“ → PASS).
+Bei B-07/B-08/B-09/P-06: Match = **Review-Trigger**; Verdict erst nach Manual Gate oben.  
+B-10-Match → **Critical FAIL** (kein Review-Trigger-Aufschub).

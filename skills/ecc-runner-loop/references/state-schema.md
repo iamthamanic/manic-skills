@@ -21,14 +21,14 @@ Uses `@ecc-runner` state (`state.json` at repo root or `.qa/queue/state.json`). 
 All `@ecc-runner` phases plus strict ordering for:
 
 ```
-… → commit → pr → babysit → merge → done
+… → verify-ticket → composition-gate → verify-ui? → review → ecc-check → commit → pr → babysit → merge → done
 ```
 
 `merge` = running `@pr-merge-safe merge` for the active issue PR.
 
 ## Transition rules
 
-- Enter `commit` only when `ecc-check` passed in run log
+- Enter `commit` only when `ecc-check` passed **and** composition-gate proof is CLEAR or SKIPPED for current HEAD
 - Enter `merge` only when `babysit` reports CI green + mergeable
 - Enter `done` only when merge exit state is **MERGED**
 - Clear `activeIssue` only after `done`

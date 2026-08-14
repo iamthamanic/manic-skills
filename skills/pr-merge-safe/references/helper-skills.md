@@ -7,6 +7,7 @@ Attach during review phases. This skill orchestrates; helpers deepen specific ar
 | Phase | Skill | Exit |
 |-------|-------|------|
 | Verify | `@verify-ticket` | PASS |
+| Composition | `@composition-gate` | CLEAR or SKIPPED (same PR head SHA); FLAGGED → fix, do not merge |
 | UI (conditional) | `@verify-ui` | PASS or skipped |
 | Review | `@review-ticket` | ACCEPT |
 | Architecture blockers | [architecture-blockers.md](../../review-ticket/references/architecture-blockers.md) + `.qa/design/architecture-freeze.md` | no hard blockers |
@@ -52,7 +53,7 @@ Skip domain-specific ECC skills (Django, Flutter, healthcare, etc.) unless the p
 ## Prior pipeline (context)
 
 ```
-@implement → @verify-ticket → @verify-ui → @review-ticket → @ecc-check
+@implement → @verify-ticket → @composition-gate → @verify-ui → @review-ticket → @ecc-check
 → @commit-pr-safe → @pr-merge-safe [→ merge]
 ```
 

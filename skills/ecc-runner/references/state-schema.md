@@ -28,7 +28,7 @@ Runtime: `.qa/queue/state.json` (gitignored). Copy from `state.template.json`.
 ## Phases
 
 ```
-idle | setup | research | design | grill | implement | verify-ticket | verify-ui
+idle | setup | research | design | grill | implement | verify-ticket | composition-gate | verify-ui
 | review | verify-loop | security-scan | commit | pr | babysit | prior-art | done | blocked
 ```
 
@@ -38,6 +38,7 @@ idle | setup | research | design | grill | implement | verify-ticket | verify-ui
 {
   "implement": 0,
   "verifyTicket": 0,
+  "compositionGate": 0,
   "verifyUi": 0,
   "review": 0
 }

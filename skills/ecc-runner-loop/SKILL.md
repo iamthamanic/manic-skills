@@ -13,7 +13,7 @@ disable-model-invocation: true
 
 **Ship loop** on top of `@ecc-runner`: same queue/bootstrap/scripts, but **every issue must pass verify → review → ecc-check → PR → babysit → merge** before the next issue starts.
 
-Composes `@ecc-runner` (queue + implement), `@verify-ticket`, `@review-ticket`, `@ecc-check`, `@commit-pr-safe`, `@babysit`, `@pr-merge-safe merge`. Does **not** duplicate their check logic.
+Composes `@ecc-runner` (queue + implement), `@verify-ticket`, `@composition-gate`, `@review-ticket`, `@ecc-check`, `@commit-pr-safe`, `@babysit`, `@pr-merge-safe merge`. Does **not** duplicate their check logic.
 
 ## vs `@ecc-runner`
 
@@ -69,6 +69,7 @@ Still forbidden: `git push --no-verify`, force push, push to `main`, `gh pr merg
 setup → research? → design? → grill? → seed acceptance
 → @implement
 → @verify-ticket          ─┐ fix → re-run until PASS or retry limit
+→ @composition-gate       ─┤  CLEAR or SKIPPED; FLAGGED → fix + re-run
 → @web-design-guidelines? ─┤  (UI diffs only; before verify-ui)
 → @verify-ui?             ─┤
 → @review-ticket          ─┤
@@ -84,7 +85,7 @@ setup → research? → design? → grill? → seed acceptance
 
 **UI create** stays inside `@implement` (`@frontend-design` / `@design-taste-frontend` / `@imagegen-frontend-mobile` for mobile concepts). Loop does **not** invent aesthetics at verify/ship time.
 
-**Gate:** Do **not** open a PR until `@ecc-check` is **READY** **and** the Secure-by-Default Coverage is PASS (no Critical/Important checklist violations). Do **not** start the next issue until merge is **MERGED**.
+**Gate:** Do **not** open a PR until `@ecc-check` is **READY**, **`@composition-gate` is CLEAR or SKIPPED** (same HEAD SHA proof; FLAGGED findings **must be fixed**), **and** the Secure-by-Default Coverage is PASS (no Critical/Important checklist violations). Do **not** start the next issue until merge is **MERGED**.
 
 ## Context continuity (mandatory — not optional)
 
@@ -108,13 +109,13 @@ After compact or handoff prep: **continue the issue loop** (or end the turn only
 
 ### Verify fix-loop (mandatory)
 
-On FAIL at verify / review / ecc-check:
+On FAIL at verify / composition-gate / review / ecc-check:
 
 1. Fix on the issue branch (scoped to acceptance Intent)
 2. Re-run failed phase and downstream phases
 3. Increment `state.json` retries; stop at limits → hard stop + `agent-blocked`
 
-Retries (same as `@ecc-runner`): `implement` 3, `verifyTicket` 2, `verifyUi` 2, `review` 2, `sameRootCause` 2.
+Retries (same as `@ecc-runner`): `implement` 3, `verifyTicket` 2, `compositionGate` 2, `verifyUi` 2, `review` 2, `sameRootCause` 2.
 
 ## Session bootstrap
 
@@ -217,11 +218,11 @@ See [references/reporting.md](references/reporting.md). One message at loop end:
 
 ## Guardrails
 
-- Never skip verify/review/ecc-check to “save time”
+- Never skip verify/review/composition-gate/ecc-check to “save time”
 - Never stop after one issue asking user to merge
 - Never start next issue while prior PR is still open (unless actively babysitting that PR in the same phase)
 - **Never pause the queue for context** — use `@strategic-compact` or `@handoff` (see Context continuity)
-- **`@typed-strict` / `@test-gate`:** inherited via `@implement` → `@verify-ticket` → `@review-ticket` / `@ecc-check` Phase A — FAIL/CHANGES_REQUESTED if touched paths still have type escape hatches or test-gate FAIL
+- **`@typed-strict` / `@test-gate` / `@composition-gate`:** inherited via `@implement` → `@verify-ticket` → `@composition-gate` → `@review-ticket` / `@ecc-check`. FAIL/CHANGES_REQUESTED if type escape hatches remain, test-gate FAIL, or composition-gate is FLAGGED (findings must be fixed).
 - UI/errors Deutsch; commits English
 - Read `AGENTS.md` / `.qa/project.yaml` checks before merge
 

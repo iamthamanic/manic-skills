@@ -8,6 +8,8 @@ Stuck or failed?
 │   └─ freeze + escalate
 ├─ review-ticket CHANGES_REQUESTED (critical)?
 │   └─ implement (blockers) → review again
+├─ composition-gate FLAGGED?
+│   └─ fix hop-chain (cardinality/fallback/race) → re-run @composition-gate until CLEAR
 ├─ AC / scope unclear?
 │   └─ @pingpong-solution → design; optional @grill-me
 ├─ No repo pattern?
@@ -36,6 +38,7 @@ Stuck or failed?
 | Codebase patterns | `@search-first` | `research` |
 | Library/API docs | `@documentation-lookup` | during `implement` |
 | Code quality | `@review-ticket` | `review` |
+| Hop-chain meaning | `@composition-gate` | `composition-gate` (before `review`) |
 | Bugs in diff | `@review-bugbot` | inside `review` |
 | Security in diff | `@review-security` | inside `review` |
 | Long session / many issues | `@strategic-compact` | between issues |

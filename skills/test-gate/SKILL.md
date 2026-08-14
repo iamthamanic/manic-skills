@@ -153,6 +153,8 @@ Parallelize independent checks when safe.
 
 1. **`@typed-strict`** on changed paths — when TS/JS (or configured languages) in scope; FAIL if matches ([typed-strict](../typed-strict/SKILL.md)). Skip with reason on pure non-TS repos unless yaml lists other languages.
 2. **Secure-by-Default RG probes** when `security.checklist: secure-by-default` or AGENTS has Security Checklist — from `~/.claude/skills/security-review/references/secure-by-default-checklist.md`, diff-scoped.
+   - **B-10** (`process.env.*(SECRET|KEY|TOKEN|PASSWORD) ||`) → required **FAIL** if match.
+   - **P-06** heuristics (`pending`+`failed` together, `void processBatch`) → record as **review-trigger**, do **not** FAIL test-gate solely on the fire-and-forget probe (in-flight guard is a review check). `in: ['pending', 'failed']` without attempts filter → **FAIL** (starvation anti-pattern).
 3. **AGENTS Non-Negotiable RGs** when documented — only on touched paths.
 
 ### Step 8 — Report (required format)

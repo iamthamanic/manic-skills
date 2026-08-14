@@ -67,7 +67,7 @@ Inspired by shimwrappercheck registry; commands are stack-resolved (prefer packa
 | `prismaValidate` | standard | `prisma/schema.prisma` | `npx prisma validate` (+ `generate` if AGENTS) |
 | `securityGate` | standard | `backend/scripts/security-gate.sh` or AGENTS | `bash scripts/security-gate.sh --changed` |
 | `typedStrict` | quick | TS/JS in scope (or yaml languages) | invoke `@typed-strict` |
-| `secureByDefault` | quick | checklist active | RG probes from security-review skill |
+| `secureByDefault` | quick | checklist active | RG probes from security-review skill. **B-10** env-fallback match → FAIL. **P-06** `in: ['pending','failed']` → FAIL. `void processBatch` → review-trigger only (not FAIL) |
 | `rgAny` | quick | TS/JS touched + AGENTS forbids any | `rg ": any"|"as any"` on touched |
 | `rgConsole` | quick | backend modules + AGENTS forbids console | `rg "console\.(log\|error\|warn)"` |
 | `rgTailwindArbitrary` | quick | frontend + AGENTS Tailwind rule | `rg 'class[Nn]ame=.*\b[a-z-]+-\[[^\]]+\]'` |

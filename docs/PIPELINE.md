@@ -5,7 +5,7 @@ Die ECC-Skills bilden eine zusammenhängende Pipeline von Feature-Idee bis gemer
 ## Vollständige Pipeline
 
 ```
-@feature-intake  →  @pingpong-solution  →  @implement  →  @verify-ticket  →  @verify-ui  →  @review-ticket  →  @ecc-check  →  @commit-pr-safe
+@feature-intake  →  @pingpong-solution  →  @implement  →  @verify-ticket  →  @composition-gate  →  @verify-ui  →  @review-ticket  →  @ecc-check  →  @commit-pr-safe
                                                                                                                 ↑
                                           @ecc-runner orchestriert das ganze pro Issue (batch mode)
 ```
@@ -60,13 +60,21 @@ Liest `.qa/design` von `pingpong-solution`, auto-generiert `.qa/acceptance/<slug
 
 Trigger: nach `@pingpong-solution`, oder manuell für Features/Bugfixes/Refactors.
 
-Output: Code-Änderungen + `.qa/acceptance/<slug>.md`.
+Output: Code-Änderungen + `.qa/acceptance/<slug>.md`. `@implement` schreibt Hop-Ketten so, dass `@composition-gate` CLEAR wäre.
 
 ### Phase 4 — Verify Ticket: `@verify-ticket`
 
-Technische Verifikation: läuft Project-Checks (`npm run verify`), validiert Diff gegen Acceptance-Kriterien aus `.qa/acceptance/<slug>.md`, bestätigt Build und Tests.
+Technische Verifikation: `@test-gate` depth=standard, validiert Diff gegen Acceptance-Kriterien aus `.qa/acceptance/<slug>.md`, bestätigt Build und Tests.
 
 Trigger: nach `@implement`, `verify ticket`, `validate implementation`.
+
+### Phase 4b — Composition Gate: `@composition-gate`
+
+End-to-end **Bedeutung** über Hops (nicht Types/Lint/Secrets). Rekonstruiert 1–3 fachliche Events, drei Simulationen (N-Akteure, ungültiger Fallback, zwei Konsumenten/Crash). Verdict: `CLEAR` | `SKIPPED` | `FLAGGED` | `BLOCKED`.
+
+**FLAGGED findings must be verified and fixed**, then re-run. Proof: `.qa/runs/composition-gate-<slug>.md` (HEAD SHA). `@commit-pr-safe` / `@pr-merge-safe` / `@ecc-check` führen den Gate aus oder akzeptieren denselben SHA-Beweis.
+
+Trigger: nach `@verify-ticket`, `composition-gate`, `hop chain`, `Pfad-Logik`. Skip nur bei dokumentiertem Single-Hop.
 
 ### Phase 5 — Verify UI: `@verify-ui` (conditional)
 
@@ -76,7 +84,7 @@ Trigger: `verify UI`, `smoke test`, `screenshot proof`, `e2e check`. Wird empfoh
 
 ### Phase 6 — Review: `@review-ticket`
 
-Statische Code-Quality-Review nach `@verify-ticket` und `@verify-ui`: Architektur-Fit, Maintainability, Security-Hotspots, Diff-Scope vs Acceptance. Nutzt `@review-bugbot` und `@review-security` subagents bei Bedarf. Verdict: `ACCEPT` oder `CHANGES_REQUESTED`.
+Statische Code-Quality-Review nach `@verify-ticket`, `@composition-gate` und `@verify-ui`: Architektur-Fit, Maintainability, Security-Hotspots, Diff-Scope vs Acceptance. ACCEPT erfordert composition-gate CLEAR/SKIPPED (gleiche HEAD-SHA). Nutzt `@review-bugbot` und `@review-security` subagents bei Bedarf. Verdict: `ACCEPT` oder `CHANGES_REQUESTED`.
 
 Trigger: `review ticket`, `code review ticket`, `pre-PR review`.
 
@@ -95,8 +103,9 @@ Exit: `CLEAN` / `WARN` / `BLOCK`. Vor PR trotzdem `@ecc-check`.
 Quality-Gate-Loop für das aktuelle Ticket. Läuft Phasen A–F in Reihenfolge:
 
 ```
-Phase A: Deterministic checks (npm run verify)
+Phase A: @test-gate depth=standard
 Phase B: @verify-ticket (optional, wenn acceptance file existiert)
+Phase B2: @composition-gate (CLEAR oder SKIPPED, gleiche HEAD-SHA; FLAGGED → fix)
 Phase C: @review-ticket (bis ACCEPT)
 Phase D: AgentShield (npx ecc-agentshield scan --path .cursor)
 Phase E: @verify-ui (conditional, wenn UI im Diff)
@@ -105,7 +114,7 @@ Phase F: Report READY | BLOCKED
 
 Exit-States: `READY` → nächste Phase (`@commit-pr-safe`), `BLOCKED` → Blocker melden, nicht committen/pushen.
 
-Retry-Limits: Phase A 3 Runden, Phase C 2 Runden, Phase D 2 Runden, gleicher Root-Error 2 Runden → BLOCKED.
+Retry-Limits: Phase A 3 Runden, Phase B2 2 Runden, Phase C 2 Runden, Phase D 2 Runden, gleicher Root-Error 2 Runden → BLOCKED.
 
 Trigger: `ecc-check`, `/ecc-check`, `merge-ready`, `quality gate`. **Vor** jedem Ship.
 
@@ -119,13 +128,13 @@ Trigger: `commit-pr-safe`, `ship PR`, `open PR`, `merge-ready ship` (PR); `commi
 
 ### Phase 9 — Merge: `@pr-merge-safe`
 
-Reviewt offenen PR mit `@verify-ticket`, `@review-ticket`, `@ecc-check`, `@babysit`. Merged, wenn alle Gates passieren und der User explizit `merge` sagt.
+Reviewt offenen PR mit `@verify-ticket`, `@composition-gate` (oder same-SHA Proof), `@review-ticket`, `@ecc-check`, `@babysit`. Merged, wenn alle Gates passieren und der User explizit `merge` sagt. FLAGGED composition findings müssen vorher gefixt werden.
 
 Trigger: `pr-merge-safe`, `/pr-merge-safe`, `review and merge`, `merge PR if green`.
 
 ## Orchestrierung: `@ecc-runner`
 
-Autonomer GitHub-Issue-Runner. Bootstrapped Labels, baut Queue aus offenen Issues, arbeitet jedes Issue mit der vollen Pipeline (implement → verify → review → PR) ab — ohne per-step Prompts.
+Autonomer GitHub-Issue-Runner. Bootstrapped Labels, baut Queue aus offenen Issues, arbeitet jedes Issue mit der vollen Pipeline (implement → verify → composition-gate → review → PR) ab — ohne per-step Prompts.
 
 Modi:
 
@@ -145,6 +154,7 @@ Die Pipeline liest pro Projekt:
 - `.qa/runner-profile.yaml` → `checksSnippet`, Retry-Hints
 - `AGENTS.md` → Branch-Rules, Stack-Defaults
 - `.qa/acceptance/<slug>.md` → Acceptance-Vertrag (von `@implement` auto-generiert)
+- `.qa/runs/composition-gate-<slug>.md` → Composition-Gate Proof (CLEAR/SKIPPED, HEAD SHA)
 - `.qa/design/<slug>.md` → Design-Vertrag (von `@pingpong-solution`)
 
 Default checks command wenn unset: `npm run verify`.

@@ -16,13 +16,14 @@ ECC steht für eine Sammlung zusammenhängender Skills unter `~/.cursor/skills/`
 | `@pingpong-solution` | Pre-Implementation Solution-Ping-Pong, `.qa/design` |
 | `@implement` | Implementation Contract, Acceptance-Auto-Gen, wendet Helper inline an |
 | `@verify-ticket` | Technische Verifikation gegen Acceptance (`@test-gate` + AC) |
+| `@composition-gate` | Hop-Ketten-Bedeutung; CLEAR/SKIPPED/FLAGGED — FLAGGED muss gefixt werden |
 | `@verify-ui` | UI/UX-Verifikation (Playwright, Screenshots) |
-| `@review-ticket` | Code-Quality-Review, `ACCEPT` / `CHANGES_REQUESTED` |
+| `@review-ticket` | Code-Quality-Review, `ACCEPT` / `CHANGES_REQUESTED` (braucht composition-gate CLEAR/SKIPPED) |
 | `@test-gate` | Deterministische Tools/Scripts (Exit-Code) — Phase A von `@ecc-check` |
-| `@ecc-check` | Quality-Gate-Loop (A–F), `READY` / `BLOCKED` (A = `@test-gate`) |
-| `@commit-pr-safe` | Commit + Push + PR auf non-main |
+| `@ecc-check` | Quality-Gate-Loop (A–F inkl. B2 composition-gate), `READY` / `BLOCKED` (A = `@test-gate`) |
+| `@commit-pr-safe` | Commit + Push + PR auf non-main (composition-gate Proof oder Run) |
 | `@commit-push-safe` | Commit + Push ohne PR |
-| `@pr-merge-safe` | PR reviewen + mergen wenn green |
+| `@pr-merge-safe` | PR reviewen + mergen wenn green (Phase 1b = composition-gate) |
 
 ### Fast Lane
 

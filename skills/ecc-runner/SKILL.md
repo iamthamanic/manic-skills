@@ -55,7 +55,7 @@ If a required section is missing in an older issue, proceed but log the gap in `
 
 ```
 setup → research? → design? → grill? → seed acceptance
-→ @implement → @verify-ticket → @web-design-guidelines? → @verify-ui? → @review-ticket
+→ @implement → @verify-ticket → @composition-gate → @web-design-guidelines? → @verify-ui? → @review-ticket
 → @ecc-check (includes @memory-live-doc mode=apply for material issues)
 → security-scan? → commit → pr → babysit?
 → agent-done → next issue
@@ -179,14 +179,15 @@ bash "${ECC_RUNNER_ROOT:-$HOME/.claude/skills/ecc-runner}/scripts/seed-acceptanc
 
 Execute **all applicable phases in one session** in this order:
 
-`setup` → `research`? → `design`? → `grill`? → `implement` → `verify-ticket` → `web-design-guidelines`? → `verify-ui`? → `review` → `ecc-check` → `security-scan`? → `commit` → `pr` → `babysit`? → `done`
+`setup` → `research`? → `design`? → `grill`? → `implement` → `verify-ticket` → `composition-gate` → `web-design-guidelines`? → `verify-ui`? → `review` → `ecc-check` → `security-scan`? → `commit` → `pr` → `babysit`? → `done`
 
 Skip `web-design-guidelines` / `verify-ui` if no UI files in diff. Skip `security-scan` unless API/auth/secrets touched.
 
 | Phase | Skill | Exit |
 |-------|-------|------|
-| `implement` | `@implement` (incl. `@frontend-design` / `@design-taste-frontend` when UI; `@imagegen-frontend-mobile` for mobile screen concepts) | Code + acceptance notes |
+| `implement` | `@implement` (incl. `@frontend-design` / `@design-taste-frontend` when UI; `@imagegen-frontend-mobile` for mobile screen concepts) | Code + acceptance notes; hop-chains written so `@composition-gate` CLEARs |
 | `verify-ticket` | `@verify-ticket` | PASS |
+| `composition-gate` | `@composition-gate` | **CLEAR** or documented **SKIPPED**. **FLAGGED** → fix findings, re-run (not optional) |
 | `web-design-guidelines` | `@web-design-guidelines` | Findings fixed or accepted; skip if no UI |
 | `verify-ui` | `@verify-ui` | PASS or skipped |
 | `review` | `@review-ticket` | ACCEPT |
@@ -204,7 +205,7 @@ After `done`: `sync-queue-to-state.sh` → **immediately** start next issue (no 
 
 ## Step 5 — Self-correction
 
-Retries: `implement` 3, `verifyTicket` 2, `verifyUi` 2, `review` 2, `sameRootCause` 2.
+Retries: `implement` 3, `verifyTicket` 2, `compositionGate` 2, `verifyUi` 2, `review` 2, `sameRootCause` 2.
 
 On FAIL in **batch**: retry phase automatically until limit → then hard stop + report.
 

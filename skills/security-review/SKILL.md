@@ -41,7 +41,10 @@ Bei Diffs mit User-/Permission-Admin oder Route→Permission-Resolvern: **B-07 /
 ```typescript
 const apiKey = "sk-proj-xxxxx"  // Hardcoded secret
 const dbPassword = "password123" // In source code
+const secret = process.env.ENCRYPTION_SECRET || 'default-encryption-secret-change-in-production'
 ```
+
+Copying an existing insecure fallback (“2FA already does this”) is still FAIL for new secret storage (B-10).
 
 #### PASS: ALWAYS Do This
 ```typescript
@@ -57,6 +60,7 @@ if (!apiKey) {
 #### Verification Steps
 - [ ] No hardcoded API keys, tokens, or passwords
 - [ ] All secrets in environment variables
+- [ ] Missing `ENCRYPTION_SECRET` / API keys fail closed (no public default) — B-10
 - [ ] `.env.local` in .gitignore
 - [ ] No secrets in git history
 - [ ] Production secrets in hosting platform (Vercel, Railway)

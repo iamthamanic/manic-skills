@@ -2,7 +2,7 @@
 name: ecc-check
 description: >-
   ECC quality gate loop for the current ticket: @test-gate (deterministic
-  tools/scripts), @review-ticket, AgentShield; fix findings until READY for
+  tools/scripts), @composition-gate, @review-ticket, AgentShield; fix findings until READY for
   @commit-pr-safe or @commit-push-safe. Use when user says ecc-check,
   /ecc-check, ecccheck, merge-ready, quality gate, or before ship/PR.
 disable-model-invocation: true
@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 # ECC Check
 
-Deterministic checks via **`@test-gate`** + ECC code review + AgentShield — **no shimwrappercheck AI review**.
+Deterministic checks via **`@test-gate`** + **`@composition-gate`** + ECC code review + AgentShield — **no shimwrappercheck AI review**.
 
 Replaces `npm run checks` + Shim `VERDICT: ACCEPT` for normal desktop/frontend tickets.
 
@@ -50,7 +50,8 @@ Execute phases **in order**. On FAIL: fix scoped issues → rerun **that phase**
 ```
 Phase A: @test-gate depth=standard (tools/scripts + typed-strict + secureByDefault RGs)
 Phase B: @verify-ticket (acceptance vs diff) — optional if no acceptance file
-Phase C: @review-ticket (+ @review-bugbot if non-trivial diff)
+Phase B2: @composition-gate (CLEAR or SKIPPED same HEAD SHA; FLAGGED → fix + re-run; skip process = BLOCKED)
+Phase C: @review-ticket (+ @review-bugbot if non-trivial **or** worker/outbox/bulk-send in diff — then bugbot is required; skip = BLOCKED)
 Phase D: AgentShield (if .cursor/ exists)
 Phase E: @web-design-guidelines then @verify-ui (if UI paths in diff)
 Phase E2: @memory-live-doc mode=apply (if material changes since checkpoint)
@@ -90,9 +91,19 @@ Optional legacy equivalent (only if test-gate skill unavailable): `checksCommand
 
 Invoke `@verify-ticket` when `.qa/acceptance/*.md` exists.
 
+### Phase B2 — Composition gate
+
+Invoke `@composition-gate` unless a proof file `.qa/runs/composition-gate-<slug>.md` exists for the **current HEAD SHA** with verdict **CLEAR** or **SKIPPED**.
+
+- Missing, stale SHA, or **FLAGGED** → run the skill now.
+- **FLAGGED** findings **must be verified and fixed**, then re-run (max 2 rounds) — do not READY with open flags.
+- Skipping this phase without a documented single-hop skip → **BLOCKED** (process).
+
 ### Phase C — Code review
 
 Invoke `@review-ticket` until **ACCEPT**. Do **not** use Shim AI review.
+
+If the diff touches worker, outbox, queue, poller, cron, webhook/mail/chat send, or `createBulk` + enqueue/publish: `@review-bugbot` is **required**. Skipping it → **BLOCKED** (process). Apply the B-10 / P-06 Manual Gate from the Secure-by-Default checklist.
 
 ### Phase D — AgentShield
 
@@ -130,6 +141,7 @@ If no UI paths → skip Phase E.
 | Phase | Max rounds |
 |-------|------------|
 | A checks | 3 |
+| B2 composition-gate | 2 |
 | C review | 2 |
 | D AgentShield | 2 |
 | Same root error | 2 → BLOCKED |
@@ -145,6 +157,11 @@ Optional log: `.qa/runs/ecc-check-<date>.md`
 - Depth: standard | full
 - Result: PASS | FAIL (embed test-gate matrix)
 - typedStrict / secureByDefault: as reported by @test-gate
+
+### Phase B2 (composition-gate)
+- Verdict: CLEAR | SKIPPED | FLAGGED | BLOCKED
+- HEAD_SHA: …
+- Proof: `.qa/runs/composition-gate-<slug>.md`
 
 ### Phase C (review)
 - Verdict: ACCEPT | CHANGES_REQUESTED

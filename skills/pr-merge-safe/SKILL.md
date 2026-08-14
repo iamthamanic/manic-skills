@@ -12,7 +12,7 @@ disable-model-invocation: true
 
 Global orchestrator: **review an existing PR** → fix loop until green → **merge only on explicit user intent**.
 
-Composes `@verify-ticket`, `@review-ticket`, `@ecc-check`, `@babysit`, and ECC `github-ops` — does **not** duplicate their check logic.
+Composes `@verify-ticket`, `@composition-gate`, `@review-ticket`, `@ecc-check`, `@babysit`, and ECC `github-ops` — does **not** duplicate their check logic.
 
 ## Exit states
 
@@ -64,6 +64,7 @@ Execute phases **in order**. On FAIL in batch-fixable cases: fix scoped issues �
 ```
 Phase 0: Resolve PR + checkout head branch
 Phase 1: @verify-ticket (PR diff vs base, acceptance)
+Phase 1b: @composition-gate (run or accept same-SHA CLEAR/SKIPPED proof; FLAGGED → fix)
 Phase 2: @verify-ui (conditional)
 Phase 3: @review-ticket (+ helpers)
 Phase 4: @ecc-check (READY required)
@@ -98,6 +99,16 @@ Invoke `@verify-ticket` against **PR diff** (`base...head`), not only local unco
 - Scope gate: PR diff must match acceptance **Intent** only (Parnas + Hoare — `@foundations`)
 - Run project `checksCommand` / `checksSnippet` with **PR changed files** in scope
 - FAIL → fix on PR branch, push, retry Phase 1
+
+### Phase 1b — Composition gate
+
+Run `@composition-gate` **or** accept an existing proof:
+
+- Proof path: `.qa/runs/composition-gate-<slug>.md` (and acceptance `## Composition Gate` if present)
+- Accept only if verdict is **CLEAR** or **SKIPPED** and `HEAD_SHA` matches the PR head SHA
+- Missing, stale, or **FLAGGED** → invoke `@composition-gate` now
+- **FLAGGED findings must be verified and fixed** on the PR branch, then re-run until CLEAR/SKIPPED (counts toward review retry budget)
+- Skipping without a documented single-hop reason → **BLOCKED**
 
 ### Phase 2 — UI verification (conditional)
 
@@ -157,6 +168,7 @@ Max **5** babysit rounds; then **BLOCKED** with report.
 Pre-merge checklist:
 
 - [ ] Phases 1–6 passed
+- [ ] `@composition-gate` CLEAR or SKIPPED for PR head SHA
 - [ ] `reviewDecision` not `CHANGES_REQUESTED` (human)
 - [ ] All required checks success
 - [ ] `mergeable: MERGEABLE`
@@ -187,6 +199,7 @@ Forbidden: `--admin`, force push, merge to wrong base.
 | Phase | Max rounds |
 |-------|------------|
 | verify-ticket | 3 |
+| composition-gate | 2 |
 | review-ticket | 2 |
 | ecc-check | per `@ecc-check` |
 | babysit | 5 |
@@ -205,6 +218,10 @@ Head SHA: …
 
 ### Phase 1 (verify-ticket)
 - Result: PASS | FAIL
+
+### Phase 1b (composition-gate)
+- Result: CLEAR | SKIPPED | FLAGGED | BLOCKED
+- Proof SHA: … (must match PR head)
 
 ### Phase 3 (review-ticket)
 - Verdict: ACCEPT | CHANGES_REQUESTED

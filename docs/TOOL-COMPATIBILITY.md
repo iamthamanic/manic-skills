@@ -56,7 +56,8 @@ Pure Markdown-Logik, keine Tool-spezifischen Subagents/Pfade. Funktionieren 1:1 
 | `@foundations` | Pure SE-Referenz |
 | `@feature-intake` | Schreibt `.qa/design/`, `.qa/intake/` |
 | `@pingpong-solution` | Sokratisches Discovery, schreibt `.qa/design/` |
-| `@verify-ticket` | Läuft `npm run verify`, validiert gegen `.qa/acceptance/` |
+| `@verify-ticket` | `@test-gate` + Diff vs `.qa/acceptance/` |
+| `@composition-gate` | Hop-Ketten-Simulationen; Proof `.qa/runs/composition-gate-<slug>.md`; FLAGGED muss gefixt werden |
 | `@verify-ui` | Bootstrapped Playwright bei Bedarf |
 | `@commit-pr-safe` | Git-Workflow, liest AGENTS.md, läuft AgentShield |
 | `@commit-push-safe` | Git-Workflow |
