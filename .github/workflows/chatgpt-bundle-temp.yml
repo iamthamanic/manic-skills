@@ -15,6 +15,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Sanitize ChatGPT-only frontmatter constraints
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          for skill_md in Path('skills').glob('*/SKILL.md'):
+              text = skill_md.read_text(encoding='utf-8')
+              lines = text.splitlines()
+              if not lines or lines[0].strip() != '---':
+                  continue
+              try:
+                  end = next(i for i, line in enumerate(lines[1:], start=1) if line.strip() == '---')
+              except StopIteration:
+                  continue
+              for i in range(1, end):
+                  if lines[i].startswith('description:'):
+                      lines[i] = lines[i].replace('<', '').replace('>', '')
+              suffix = '\n' if text.endswith('\n') else ''
+              skill_md.write_text('\n'.join(lines) + suffix, encoding='utf-8')
+          PY
+
       - name: Export ChatGPT skill packages
         run: python3 scripts/chatgpt-provider.py export
 
