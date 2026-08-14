@@ -15,11 +15,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Sanitize ChatGPT-only frontmatter constraints
+      - name: Normalize ChatGPT-only frontmatter constraints
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
+          import json
           from pathlib import Path
 
           for skill_md in Path('skills').glob('*/SKILL.md'):
@@ -31,11 +32,35 @@ jobs:
                   end = next(i for i, line in enumerate(lines[1:], start=1) if line.strip() == '---')
               except StopIteration:
                   continue
-              for i in range(1, end):
-                  if lines[i].startswith('description:'):
-                      lines[i] = lines[i].replace('<', '').replace('>', '')
+
+              out = [lines[0]]
+              i = 1
+              while i < end:
+                  line = lines[i]
+                  if line.startswith('description:'):
+                      raw = line.split(':', 1)[1].strip()
+                      if raw in {'>', '>-', '>+', '|', '|-', '|+'}:
+                          parts = []
+                          i += 1
+                          while i < end and (lines[i].startswith(' ') or not lines[i].strip()):
+                              stripped = lines[i].strip()
+                              if stripped:
+                                  parts.append(stripped)
+                              i += 1
+                          desc = ' '.join(parts)
+                      else:
+                          desc = raw.strip().strip('"').strip("'")
+                          i += 1
+                      desc = desc.replace('<', '').replace('>', '')
+                      out.append('description: ' + json.dumps(desc, ensure_ascii=False))
+                      continue
+                  out.append(line)
+                  i += 1
+
+              out.append(lines[end])
+              out.extend(lines[end + 1:])
               suffix = '\n' if text.endswith('\n') else ''
-              skill_md.write_text('\n'.join(lines) + suffix, encoding='utf-8')
+              skill_md.write_text('\n'.join(out) + suffix, encoding='utf-8')
           PY
 
       - name: Export ChatGPT skill packages
