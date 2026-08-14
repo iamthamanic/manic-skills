@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Normalize ChatGPT-only frontmatter constraints
+      - name: Normalize ChatGPT-only package constraints
         shell: bash
         run: |
           set -euo pipefail
@@ -61,6 +61,10 @@ jobs:
               out.extend(lines[end + 1:])
               suffix = '\n' if text.endswith('\n') else ''
               skill_md.write_text('\n'.join(out) + suffix, encoding='utf-8')
+
+          oversized = Path('skills/system-design-reference/assets/linkedin-posts-2024-blue.pdf')
+          if oversized.exists():
+              oversized.unlink()
           PY
 
       - name: Export ChatGPT skill packages
