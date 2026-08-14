@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
-# verify.sh — prüft, dass jeder Skill eine gültige SKILL.md mit Frontmatter hat
-# und die Symlinks in allen Tool-Verzeichnissen funktionieren.
-# Supports: Cursor, Windsurf, pi.dev, Claude Code
+# verify.sh — validate shared skills, local provider installs, and ChatGPT exportability.
+# Supports: Cursor, Windsurf, pi.dev, Claude Code, ChatGPT
 set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 
-# Tool skill directories
 CURSOR_DIR="$HOME/.cursor/skills"
 WINDSURF_DIR="$HOME/.codeium/windsurf/skills"
 PI_DIR="$HOME/.pi/agent/skills"
@@ -18,6 +16,7 @@ ok=0
 
 echo "=== Verifying skills in repo ==="
 for skill_dir in "$REPO"/skills/*/; do
+  [[ -d "$skill_dir" ]] || continue
   name="$(basename "$skill_dir")"
   skill_file="$skill_dir/SKILL.md"
 
@@ -27,14 +26,12 @@ for skill_dir in "$REPO"/skills/*/; do
     continue
   fi
 
-  # Check frontmatter start
   if ! head -1 "$skill_file" | grep -q '^---$'; then
     echo "FAIL  $name — SKILL.md does not start with frontmatter (---)"
     ((errors++))
     continue
   fi
 
-  # Check required fields
   has_name=0
   has_desc=0
   while IFS= read -r line; do
@@ -59,7 +56,6 @@ for skill_dir in "$REPO"/skills/*/; do
   ((ok++))
 done
 
-# Helper to verify one tool's installation directory
 verify_tool() {
   local tool_name="$1"
   local target_dir="$2"
@@ -73,30 +69,43 @@ verify_tool() {
   local installed=0
   local broken=0
   for skill_dir in "$REPO"/skills/*/; do
+    [[ -d "$skill_dir" ]] || continue
     name="$(basename "$skill_dir")"
     dest="$target_dir/$name"
     if [[ -L "$dest" ]]; then
       if [[ -d "$dest" ]]; then
         ((installed++))
       else
-        echo "BROKEN symlink  $name → $(readlink "$dest")"
+        echo "BROKEN symlink  $name -> $(readlink "$dest")"
         ((broken++))
       fi
     elif [[ -d "$dest" ]]; then
       echo "non-symlink      $name (copy install)"
       ((installed++))
     else
-      echo "missing          $name (nicht installiert — run install.sh --$tool_name)"
+      echo "missing          $name (not installed — run install.sh --$tool_name)"
     fi
   done
   echo
   echo "$tool_name installed: $installed, broken symlinks: $broken"
+  if [[ $broken -gt 0 ]]; then
+    errors=$((errors + broken))
+  fi
 }
 
-verify_tool "cursor"   "$CURSOR_DIR"
-verify_tool "windsurf"  "$WINDSURF_DIR"
-verify_tool "pi"        "$PI_DIR"
-verify_tool "claude"    "$CLAUDE_DIR"
+verify_tool "cursor" "$CURSOR_DIR"
+verify_tool "windsurf" "$WINDSURF_DIR"
+verify_tool "pi" "$PI_DIR"
+verify_tool "claude" "$CLAUDE_DIR"
+
+echo
+echo "=== Verifying ChatGPT provider exportability ==="
+if python3 "$REPO/scripts/chatgpt-provider.py" verify; then
+  echo "ChatGPT provider verification: PASS"
+else
+  echo "ChatGPT provider verification: FAIL"
+  errors=$((errors + 1))
+fi
 
 echo
 echo "Summary: $ok OK, $warnings warnings, $errors errors"
