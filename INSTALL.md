@@ -1,35 +1,39 @@
 # Installation
 
-Skills funktionieren in **Cursor**, **Windsurf**, **pi.dev** und **Claude Code**. Drei Methoden, je nach Ausgangslage. **Methode A (Symlink)** ist empfohlen, weil `git pull` dann alle Skills in allen Tools aktualisiert.
+Skills funktionieren in **Cursor**, **Windsurf**, **pi.dev**, **Claude Code** und **ChatGPT**. Die ersten vier Provider laden Skills aus lokalen Verzeichnissen; ChatGPT bekommt upload-fertige ZIP-Pakete aus demselben `skills/`-Quellbaum.
 
-## Zielverzeichnisse
+## Provider-Ziele
 
-| Tool | Global (maschinenlokal) | Workspace (projektlokal) |
-|------|-------------------------|--------------------------|
-| Cursor | `~/.cursor/skills/<name>/` | `<workspace>/.cursor/skills/<name>/` |
-| Windsurf | `~/.codeium/windsurf/skills/<name>/` | `<workspace>/.windsurf/skills/<name>/` |
-| pi.dev | `~/.pi/agent/skills/<name>/` (auch `~/.agents/skills/`) | `<workspace>/.pi/skills/<name>/` (auch `<workspace>/.agents/skills/`) |
-| Claude Code | `~/.claude/skills/<name>/` | `<workspace>/.claude/skills/<name>/` |
+| Tool | Strategie | Ziel |
+|------|-----------|------|
+| Cursor | Symlink | `~/.cursor/skills/<name>/` |
+| Windsurf | Symlink | `~/.codeium/windsurf/skills/<name>/` |
+| pi.dev | Symlink | `~/.pi/agent/skills/<name>/` (auch `~/.agents/skills/`) |
+| Claude Code | Symlink | `~/.claude/skills/<name>/` |
+| ChatGPT | Export | `dist/chatgpt/<name>/skill.zip` |
 
-Dieses Repo installiert Skills in die **globalen** Verzeichnisse — sie gelten für alle Projekte auf der Maschine. Für projektlokale Skills kopiere die jeweiligen Ordner nach `<workspace>/.<tool>/skills/`.
+ChatGPT hat bewusst **kein erfundenes lokales Skill-Verzeichnis**. Der Provider-Adapter erzeugt stattdessen pro Skill ein validiertes Upload-Paket. Details: [`docs/CHATGPT.md`](docs/CHATGPT.md).
 
-## Methode A — Symlink (empfohlen)
+## Methode A — Provider-Installer
 
-Repo klonen und `install.sh` ausführen. Das Skript legt für jeden Skill-Ordner einen Symlink vom Tool-Verzeichnis → `<repo>/skills/<name>` an.
+Repo klonen und `install.sh` ausführen.
 
-**Ein einzelnes Tool:**
+**Ein einzelner Provider:**
 
 ```bash
 mkdir -p ~/repos
 git clone https://github.com/iamthamanic/manic-skills ~/repos/manic-skills
 
-bash ~/repos/manic-skills/scripts/install.sh --cursor    # nur Cursor
-bash ~/repos/manic-skills/scripts/install.sh --windsurf  # nur Windsurf
-bash ~/repos/manic-skills/scripts/install.sh --pi        # nur pi.dev
-bash ~/repos/manic-skills/scripts/install.sh --claude    # nur Claude Code
+bash ~/repos/manic-skills/scripts/install.sh --cursor
+bash ~/repos/manic-skills/scripts/install.sh --windsurf
+bash ~/repos/manic-skills/scripts/install.sh --pi
+bash ~/repos/manic-skills/scripts/install.sh --claude
+bash ~/repos/manic-skills/scripts/install.sh --chatgpt
 ```
 
-**Alle vier Tools parallel:**
+Ohne Argument installiert `install.sh` weiterhin nur in Cursor (rückwärtskompatibel).
+
+**Alle fünf Provider parallel:**
 
 ```bash
 mkdir -p ~/repos
@@ -37,27 +41,72 @@ git clone https://github.com/iamthamanic/manic-skills ~/repos/manic-skills
 bash ~/repos/manic-skills/scripts/install.sh --all
 ```
 
-Ohne Argument installiert `install.sh` defaultmäßig nur in Cursor (rückwärtskompatibel).
+Für Cursor/Windsurf/pi.dev/Claude Code legt das Skript Symlinks an. Für ChatGPT erzeugt es:
 
-Voraussetzung: das Zielverzeichnis existiert noch nicht oder enthält keine gleichnamigen Ordner, die keine Symlinks sind. Das Skript überschreibt keine echten Ordner — es warnt und überspringt sie. Vorhandene Symlinks werden aktualisiert (`ln -sfn`).
+```text
+dist/chatgpt/
+  manifest.json
+  <skill>/
+    skill.zip
+```
 
-Updates:
+Die ChatGPT-ZIPs anschließend in ChatGPT über **Skills → Create → Upload from your computer** hochladen.
+
+## ChatGPT direkt exportieren
+
+Alle Skills:
+
+```bash
+python3 ~/repos/manic-skills/scripts/chatgpt-provider.py export
+```
+
+Nur ausgewählte Skills:
+
+```bash
+python3 ~/repos/manic-skills/scripts/chatgpt-provider.py export --skill api-design
+python3 ~/repos/manic-skills/scripts/chatgpt-provider.py export --skill api-design --skill security-review
+```
+
+Nur validieren, ohne Export-Artefakte zu behalten:
+
+```bash
+python3 ~/repos/manic-skills/scripts/chatgpt-provider.py verify
+```
+
+Der Adapter normalisiert die exportierte `SKILL.md` auf `name` + `description`, erzeugt bei Bedarf `agents/openai.yaml`, erhält vorhandene OpenAI-Metadaten, prüft Symlinks und das 25-MiB-Limit und schreibt SHA-256-Hashes in `manifest.json`.
+
+## Updates
+
+Lokale Provider:
 
 ```bash
 cd ~/repos/manic-skills
 git pull
-# Symlinks zeigen automatisch auf die neuen Dateien — fertig, in allen Tools.
+# Symlinks zeigen automatisch auf die neuen Dateien.
 ```
 
-Deinstallation:
+ChatGPT:
 
 ```bash
-bash ~/repos/manic-skills/scripts/install.sh --remove          # alle Tools
-bash ~/repos/manic-skills/scripts/install.sh --remove --cursor  # nur Cursor
-bash ~/repos/manic-skills/scripts/install.sh --remove --all     # alle Tools
+cd ~/repos/manic-skills
+git pull
+bash scripts/install.sh --chatgpt
 ```
 
-## Methode B — Copy
+Danach die aktualisierten ZIPs erneut in ChatGPT hochladen. Der Repo-Export kann die Skills vorbereiten, aber nicht automatisch in einen ChatGPT-Account installieren.
+
+## Deinstallation / Cleanup
+
+```bash
+bash ~/repos/manic-skills/scripts/install.sh --remove
+bash ~/repos/manic-skills/scripts/install.sh --remove --cursor
+bash ~/repos/manic-skills/scripts/install.sh --remove --chatgpt
+bash ~/repos/manic-skills/scripts/install.sh --remove --all
+```
+
+Bei ChatGPT entfernt `--remove --chatgpt` nur die lokal generierten Export-Artefakte unter `dist/chatgpt/`; bereits im ChatGPT-Account hochgeladene Skills werden dadurch nicht gelöscht.
+
+## Methode B — Copy für lokale Provider
 
 Wenn du keine Symlinks willst:
 
@@ -81,9 +130,9 @@ mkdir -p ~/.claude/skills
 cp -R ~/repos/manic-skills/skills/* ~/.claude/skills/
 ```
 
-Nachteil: Updates musst du manuell syncen — `cp -R` überschreibt bei jedem `git pull`.
+Nachteil: Updates musst du manuell syncen. ChatGPT nutzt weiterhin den Exporter, nicht Copy/Symlink.
 
-## Methode C — Direkt in ein Tool-Verzeichnis klonen
+## Methode C — Direkt in ein lokales Tool-Verzeichnis klonen
 
 Wenn das Zielverzeichnis noch leer ist:
 
@@ -104,11 +153,11 @@ mkdir -p ~/.claude
 git clone https://github.com/iamthamanic/manic-skills ~/.claude/skills
 ```
 
-Das Repo wird selbst zum Skill-Ordner. Nachteil: du kannst dann keine Skills haben, die nicht im Repo sind. Für das jeweils andere Tool musst du Methode A oder B verwenden.
+Diese Methode gilt nicht für ChatGPT.
 
 ## Methode D — pi.dev Settings (ohne Symlink)
 
-pi.dev kann Skills aus beliebigen Verzeichnissen laden, über Settings-Konfiguration:
+pi.dev kann Skills aus beliebigen Verzeichnissen laden:
 
 ```json
 // ~/.pi/settings.json
@@ -119,7 +168,7 @@ pi.dev kann Skills aus beliebigen Verzeichnissen laden, über Settings-Konfigura
 }
 ```
 
-Oder um Skills aus anderen Tools zu nutzen:
+Oder um Skills aus anderen lokalen Tools zu nutzen:
 
 ```json
 {
@@ -131,32 +180,33 @@ Oder um Skills aus anderen Tools zu nutzen:
 }
 ```
 
-Vorteil: kein Symlink nötig, pi.dev lädt direkt aus dem Repo. Nachteil: nur pi.dev-spezifisch, andere Tools brauchen weiterhin ihre eigenen Installationen.
-
 ## Voraussetzungen
 
-- **Cursor**, **Windsurf**, **pi.dev** und/oder **Claude Code** installiert
-- **Bash** (macOS/Linux). Für Windows: Git Bash oder WSL.
-- Kein Account-Wechsel nötig — Skills sind maschinenlokal, nicht an den Tool-Account gebunden.
+- Cursor, Windsurf, pi.dev und/oder Claude Code für die jeweiligen lokalen Provider
+- Python 3 für den ChatGPT-Provider
+- Bash (macOS/Linux). Für Windows: Git Bash oder WSL.
 
 ## Verifikation
-
-Nach der Installation:
 
 ```bash
 bash ~/repos/manic-skills/scripts/verify.sh
 ```
 
-Prüft, dass jeder Skill-Ordner eine `SKILL.md` mit gültigem Frontmatter (`name`, `description`) hat und alle Symlinks in **allen vier** Tool-Verzeichnissen funktionieren. Nicht installierte Tools werden übersprungen mit einem Hinweis.
+Prüft:
+
+- jeden Skill-Ordner auf `SKILL.md` + erforderliches Frontmatter,
+- Symlinks/Copy-Installationen der vier lokalen Provider,
+- die Exportierbarkeit aller Skills für ChatGPT.
 
 ## Troubleshooting
 
 | Symptom | Ursache | Fix |
 |---------|---------|-----|
-| Skill taucht in Tool nicht auf | Symlink kaputt oder Frontmatter invalid | `verify.sh` laufen lassen; Skill im Tool via `/skills` bzw. `/skill:name` prüfen |
-| `install.sh` überspringt Ordner | Echter Ordner (kein Symlink) existiert bereits | Backup: `mv ~/.cursor/skills/<name> ~/.cursor/skills/<name>.bak`, dann `install.sh` erneut |
-| Nach `git pull` sind Skills weg | Repo wurde an anderer Stelle geklont, Symlinks zeigen auf alte Pfade | `install.sh` erneut ausführen (aktualisiert Symlinks via `ln -sfn`) |
-| `disable-model-invocation: true` Skills werden in Windsurf automatisch vorgeschlagen | Windsurf kennt dieses Feld nicht und ignoriert es | Skill manuell aufrufen — siehe [`docs/TOOL-COMPATIBILITY.md`](docs/TOOL-COMPATIBILITY.md) |
-| `@review-ticket` schlägt in Nicht-Cursor-Tools fehl | Ruft `@review-bugbot`/`@review-security` auf (Cursor-subagents) | Subagent-Aufrufe manuell durch Tool-eigenen Review ersetzen — siehe `docs/TOOL-COMPATIBILITY.md` |
-| `@save-prompts-inject` speichert nach `~/.cursor/prompts/` | Skill hat Cursor-Pfad hardcoded | Pfad anpassen oder Symlink: `ln -sfn ~/.pi/agent/prompts ~/.cursor/prompts` |
-| pi.dev findet Skills nicht | Falsches Verzeichnis oder Settings nicht konfiguriert | `install.sh --pi` verwenden oder `~/.pi/settings.json` mit `skills`-Array konfigurieren |
+| Skill taucht in lokalem Tool nicht auf | Symlink kaputt oder Frontmatter invalid | `verify.sh` laufen lassen |
+| `install.sh` überspringt Ordner | Echter Ordner statt Symlink existiert | Ordner sichern/verschieben, dann Installer erneut ausführen |
+| Nach `git pull` sind lokale Skills weg | Symlinks zeigen auf alten Repo-Pfad | `install.sh` erneut ausführen |
+| ChatGPT-Export schlägt fehl | Ungültiges Frontmatter, Symlink im Skill oder ZIP >25 MiB | `python3 scripts/chatgpt-provider.py verify` ausführen und gemeldeten Skill korrigieren |
+| ChatGPT-Skill fehlt nach Export | Export installiert nicht in den Account | `dist/chatgpt/<skill>/skill.zip` in ChatGPT hochladen |
+| `disable-model-invocation: true` wird in ChatGPT nicht übernommen | Feld ist provider-spezifisch | ChatGPT-Exporter entfernt fremde Frontmatter-Felder absichtlich |
+| `@review-ticket` schlägt in Nicht-Cursor-Tools fehl | Cursor-spezifische Subagents | Tool-eigenen Review verwenden; siehe `docs/TOOL-COMPATIBILITY.md` |
+| `@save-prompts-inject` nutzt Cursor-Pfad | Skill hat Cursor-Pfad hardcoded | Provider-spezifischen Pfad/Workflow verwenden |
