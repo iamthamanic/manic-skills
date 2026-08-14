@@ -24,6 +24,9 @@ pnpm-lock.yaml
 # Node (falls jemand versehentlich npm im Repo ausführt)
 node_modules/
 
+# Generated provider artifacts
+dist/chatgpt/
+
 # Lokale Sync-Artefakte
 .sync-manifest.json
 .cursor-managed-skills-manifest.json
