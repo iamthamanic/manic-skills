@@ -41,6 +41,6 @@
 
 ### Do **not** treat as pause / do **not** report
 
-- Context full / long session → `@strategic-compact` or `@handoff` (see [session-continuity.md](session-continuity.md)); keep `paused: false`
+- Context full / long session → handoff + user `/compact` / `@strategic-compact` or `@handoff` (see [session-continuity.md](session-continuity.md)); keep `paused: false`
 - Merge succeeded — continue to next issue
 - Starting next issue after compact

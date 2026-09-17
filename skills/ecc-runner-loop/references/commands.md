@@ -28,5 +28,5 @@
 | One phase debug | `@ecc-runner step` |
 | Merge single existing PR | `@pr-merge-safe merge` |
 | CI on open PR | `@babysit` |
-| Same-session context shrink | `@strategic-compact` (between issues; **never** pause queue) |
+| Same-session context shrink | Handoff + user `/compact` / `@strategic-compact` (between issues; **never** `paused: true` for compact) |
 | New agent mid-queue | `@handoff` (`paused: false`) |

@@ -2,9 +2,21 @@
 
 ## Goal
 
-Keep the ship loop running across a long queue. Context management must **not** look like a user-facing pause.
+Keep the ship loop recoverable across a long queue without fake “paused for compact” hard stops. Prefer explicit user `/compact` (or a fresh chat + handoff) over unreliable auto-compact.
 
-## When to compact (same session)
+## AGENTS.md policy (project wins)
+
+If `AGENTS.md` has **Context compact & long queues (mandatory)** (written by `@project-setup` / AGENTS skeleton), that section **overrides** looser defaults below.
+
+After every shipped issue in an N>1 queue:
+
+1. Update the handoff file with last merged issue/PR/SHA and next issue # + title (`paused: false` unless a true hard stop).
+2. **Stop the turn** — tell the user to run `/compact` (or open a fresh chat and `@ecc-runner-loop continue` with the handoff). Use `@strategic-compact` for when/how guidance.
+3. Do **not** claim the next issue in the same turn. Resume only after the user continues post-compact (or in the new chat with handoff loaded).
+
+**Never compact mid-implementation** of the current issue.
+
+## When AGENTS compact policy is absent
 
 After issue complete (merge + sync), before starting the next issue, if **any**:
 
@@ -12,9 +24,9 @@ After issue complete (merge + sync), before starting the next issue, if **any**:
 - ≥ 3 issues merged in this agent session
 - Large reads / many tool calls / responses getting weaker (context pressure)
 
-**Do:** Invoke `@strategic-compact` (or ask the user to `/compact` only if the skill requires a manual compact step — then **resume the loop in the same turn series** without setting `paused: true`).
+**Do:** Invoke `@strategic-compact` and/or ask the user to `/compact`. Prefer ending the turn for `/compact` over continuing mid-pressure.
 
-**Do not:** Write a “Loop — paused” report. **Do not** set `lastError` to “session compact”.
+**Do not:** Write a “Loop — paused” report. **Do not** set `lastError` to “session compact”. Waiting for `/compact` is **not** `paused: true`.
 
 ## When to handoff (new agent / session)
 
@@ -43,10 +55,12 @@ lastError: "session compact pause after CR-0xx"
 # chat: "Resume: @ecc-runner-loop continue"
 ```
 
+Also ban: claiming the next issue in the **same turn** right after a ship when AGENTS compact policy is present.
+
 Correct equivalent:
 
 ```text
 paused: false
-# @strategic-compact then implement next issue
-# OR @handoff with paused: false for the next agent
+# handoff updated → end turn → user /compact → @ecc-runner-loop continue
+# OR @handoff with paused: false for the next agent / fresh chat
 ```

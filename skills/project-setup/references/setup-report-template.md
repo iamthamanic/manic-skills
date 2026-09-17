@@ -25,14 +25,14 @@ Use this template for Step 10 output.
 | File | Action | Notes |
 |------|--------|-------|
 | docs/PRD.md | created \| updated \| skipped \| partial | … |
-| AGENTS.md | … | Living documentation section: yes \| appended \| already present |
+| AGENTS.md | … | Living docs / Security / Context compact / composition-gate: yes \| appended \| already present |
 | README.md | … | … |
 | .qa/project.yaml | … | typedStrict: written \| appended \| ok |
 | .qa/edge-cases.md | … | … |
 | docs/UI_STYLEGUIDE.md | … | … |
 | package.json checks script | … | … |
 | `.project-memory/` | created \| skipped \| draft pending | `@memory-live-doc` |
-| `docs/memory-live-doc/viewer/` | … | … |
+| `docs/memory-live-doc/` | … | local `/memory-live-doc/` |
 
 ## PRD Validation
 
@@ -47,7 +47,8 @@ Use this template for Step 10 output.
 
 - Mode: bootstrap \| skipped \| draft pending OK
 - `needs-review` count: N
-- Viewer: `docs/memory-live-doc/viewer/`
+- Viewer: `docs/memory-live-doc/` → `http://127.0.0.1:8765/memory-live-doc/`
+- Pages: opt-in only (`enabled: false` unless user asked)
 
 ## Manual follow-up
 

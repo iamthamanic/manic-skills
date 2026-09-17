@@ -90,7 +90,7 @@ Pflicht-Sektionen in Reihenfolge: `Type → Intent → Goal → Non-Goals → Co
 
 Diese Checkliste ist **techstack-agnostisch** und für alle Agents verbindlich. Vollständige Quelle mit Severity-Mapping und RG-Probes: `~/.claude/skills/security-review/references/secure-by-default-checklist.md` (Inhalte eingebettet, keine externe Links).
 
-Jede Feature-Implementierung muss die zutreffenden Sektionen abhaken. `@implement` dokumentiert die Coverage in der Acceptance-Datei, `@audit-changes`/`@ecc-check` führen diff-scoped Probes aus, `@review-ticket` prüft die Coverage im Verdict.
+Jede Feature-Implementierung muss die zutreffenden Sektionen abhaken. `@implement` dokumentiert die Coverage in der Acceptance-Datei, `@audit-changes`/`@ecc-check` führen diff-scoped Probes aus, `@review-ticket` prüft die Coverage im Verdict. Hop-Ketten (Producer→Consumer, Bulk+Side-Effect) zusätzlich über `@composition-gate` — FLAGGED muss gefixt werden.
 
 ### Frontend Security
 
@@ -115,6 +115,7 @@ Jede Feature-Implementierung muss die zutreffenden Sektionen abhaken. `@implemen
 | B-07 | Least-privilege assignment | Bundles/Rollen nur Whitelist; Actor kann mehr vergeben als er hält |
 | B-08 | Deny-by-default AuthZ map | Non-GET hinter `*.view`; unbekannter Pfad → Default-Read statt deny |
 | B-09 | Trust-boundary identity | User-ID/Rollen aus Client-Headern |
+| B-10 | Secrets fail-closed | `process.env.SECRET \|\| 'default-…'`; bestehender unsicherer Fallback zählt nicht als Fix |
 
 ### Practical Security Habits
 
@@ -125,15 +126,16 @@ Jede Feature-Implementierung muss die zutreffenden Sektionen abhaken. `@implemen
 | P-03 | Secure Cookies | Session-Cookie ohne HttpOnly oder ohne Secure in Prod |
 | P-04 | File-Upload-Sicherheit | Upload ohne Type/Size-Validierung, Pfad-Traversal möglich |
 | P-05 | Rate Limiting | Auth-Endpoint ohne Rate-Limit oder Limit deaktiviert |
+| P-06 | Side-effect jobs / Outbox / Fan-out | N identische externe Sends; nicht-atomarer Worker-Claim; Queue-Starvation durch terminale `failed`; `processing` ohne Recovery |
 
-Critical-Verstöße (F-03, B-01, B-04, B-07, B-08, B-09, P-04) blocken PR/READY. Important-Verstöße blocken ACCEPT/READY bis fix.
+Critical-Verstöße (F-03, B-01, B-04, B-07, B-08, B-09, B-10, P-04) blocken PR/READY. Important-Verstöße (inkl. P-06) blocken ACCEPT/READY bis fix. Worker/Outbox/Bulk-Send im Diff: `@review-bugbot` Pflicht; Skip = Prozess-BLOCK.
 
 ---
 
 ## QA Pipeline
 
 ```
-@pingpong-solution  →  @implement  →  @verify-ui
+@pingpong-solution  →  @implement  →  @verify-ticket  →  @composition-gate  →  @verify-ui  →  @review-ticket
 ```
 
 - Design artifacts: `.qa/design/`
@@ -141,6 +143,7 @@ Critical-Verstöße (F-03, B-01, B-04, B-07, B-08, B-09, P-04) blocken PR/READY.
 - Project config: `.qa/project.yaml`
 - Issue template: `@issue-contract` (global canonical; project override via `.qa/issue-template.md`, values via `.qa/project.yaml` → `issueContract`)
 - Living docs: `@memory-live-doc` (see below; also via `@ecc-check` / `@commit-push-safe`)
+- Composition: `@composition-gate` — hop-chain meaning (cardinality, fallback, concurrent consumers). **FLAGGED findings must be fixed** before review ACCEPT / ecc-check READY / PR. `@implement` must write paths so this gate CLEARs. `@commit-pr-safe` / `@pr-merge-safe` run the gate or accept a same-SHA proof.
 
 ### Ponytail (lazy senior dev) — optional
 
@@ -158,13 +161,32 @@ Reference: [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
 
 ---
 
+## Development Workflow
+
+### Context compact & long queues (mandatory)
+
+Auto-compact is **unreliable** (often mid-ticket, drops paths/partial state). Do **not** wait for the window to hard-fail.
+
+**After every shipped issue** in a multi-ticket loop (`@ecc-runner-loop` or any N>1 queue):
+
+1. Update the handoff file (path from loop prompt / `@handoff`, else OS temp) with: last merged issue/PR/SHA, next issue number + title. Set `paused: false` only if continuing immediately after compact in the same chat.
+2. **Stop the turn** and tell the user to run `/compact` (or open a fresh chat and `@… continue` with the handoff). Prefer `@strategic-compact` for when/how to compact. Do **not** claim the next issue in the same turn.
+3. Resume the next ticket only **after** the user continues post-compact (or in the new chat with handoff loaded).
+
+**Never compact mid-implementation** of the current issue (verify → PR → merge must stay in one context).
+
+**Never** treat leftover CI poll / babysit timeouts as blockers; only open PRs and current default-branch HEAD matter.
+
+---
+
 ## Living documentation
 
 After material changes, run `@memory-live-doc` (or rely on `@implement` / `@ecc-check` / `@commit-push-safe` / `@project-setup` integration).
 
 - Do not invent features in docs without evidence.
 - Storage: `.project-memory/` (bilingual DE+EN JSON; human docs under `docs/` + `docs/en/`).
-- Interactive viewer: `docs/memory-live-doc/viewer/` (GitHub Pages).
+- Interactive viewer: `docs/memory-live-doc/` (local `/memory-live-doc/`; GitHub Pages/Sites opt-in only).
+- Open locally: `@memory-live-doc serve` → `http://127.0.0.1:8765/memory-live-doc/`.
 - First setup: `@project-setup` Step 9 or `@memory-live-doc bootstrap`.
 
 ---

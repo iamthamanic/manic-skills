@@ -11,14 +11,14 @@ disable-model-invocation: true
 
 # Project Setup
 
-Orchestrates project bootstrap so repos are ready for `@pingpong-solution` → `@implement` → `@verify-ui`.
+Orchestrates project bootstrap so repos are ready for `@pingpong-solution` → `@implement` → `@verify-ticket` → `@composition-gate` → `@verify-ui`.
 
 **Does not write feature code.** Creates/configures project identity, QA scaffolding, and quality gates.
 
 ## Pipeline position
 
 ```
-/project-setup  →  (@memory-live-doc bootstrap if needed)  →  @pingpong-solution  →  @implement  →  @verify-ui
+/project-setup  →  (@memory-live-doc bootstrap if needed)  →  @pingpong-solution  →  @implement  →  @verify-ticket  →  @composition-gate  →  @verify-ui
 ```
 
 ## Modes
@@ -39,7 +39,7 @@ Project Setup Progress:
 - [ ] Step 0: Resolve mode (init | audit) + load overrides
 - [ ] Step 1: Discovery (workspace root, app root, stack, locale)
 - [ ] Step 2: PRD check or scaffold
-- [ ] Step 3: AGENTS.md (include Living documentation section)
+- [ ] Step 3: AGENTS.md (Living docs + Security + Context compact + QA pipeline)
 - [ ] Step 4: README.md
 - [ ] Step 5: .qa/ (project.yaml, edge-cases, templates)
 - [ ] Step 6: UI styleguide (frontend only)
@@ -108,13 +108,15 @@ Do not invent detailed product requirements without user input.
 
 ## Step 3: AGENTS.md
 
-1. If `AGENTS.md` exists → validate has: project summary, stack, architecture boundaries, language rules, validation commands, **Security Checklist block**; report gaps
-2. If missing → use [references/templates/AGENTS.skeleton.md](references/templates/AGENTS.skeleton.md) (includes the **Security Checklist (Secure by Default)** block — full embedded tables, no external links)
+1. If `AGENTS.md` exists → validate has: project summary, stack, architecture boundaries, language rules, validation commands, **Security Checklist block**, **Context compact & long queues**; report gaps
+2. If missing → use [references/templates/AGENTS.skeleton.md](references/templates/AGENTS.skeleton.md) (includes Security Checklist, Context compact & long queues, Living documentation — full embedded tables, no external links)
 3. Fill placeholders from Discovery Summary + PRD + stack profile
 4. Ensure a **Living documentation** section exists (from skeleton). If `AGENTS.md` already exists without it → **append** the section from the skeleton (do not overwrite other content). In audit mode, ask before appending if the file is rich and the user might prefer a different wording.
 5. Ensure the **Security Checklist (Secure by Default)** section exists. If `AGENTS.md` already exists without it → **append** the block from [references/templates/AGENTS.skeleton.md](references/templates/AGENTS.skeleton.md) (Frontend / Backend / Practical Habits tables). Never link to external sources — contents stay embedded in `AGENTS.md`. In audit mode, ask before appending if the file is rich.
-6. If `enablePonytail: true` (profile or user request): append **„Ponytail (lazy senior dev)“** subsection from [references/templates/AGENTS.skeleton.md](references/templates/AGENTS.skeleton.md) under QA Pipeline — link [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail); do not paste the full upstream skill
-7. Never replace a rich existing AGENTS.md wholesale in audit mode
+6. Ensure **QA Pipeline** mentions `@composition-gate` after `@implement` / `@verify-ticket` (flagged hop-chain findings must be fixed before review/PR). If missing → append a one-line bullet from the skeleton. In audit mode, ask before appending if the file is rich.
+7. Ensure **Context compact & long queues (mandatory)** exists under Development Workflow (or equivalent). If missing → **append** the block from [references/templates/AGENTS.skeleton.md](references/templates/AGENTS.skeleton.md). Match by heading containing `Context compact` / `long queues`. Policy: after every shipped issue in an N>1 queue → update handoff → **stop the turn** → user `/compact` (or fresh chat + handoff) → do **not** claim the next issue in the same turn; never compact mid-implementation. In audit mode, ask before appending if the file is rich.
+8. If `enablePonytail: true` (profile or user request): append **„Ponytail (lazy senior dev)“** subsection from [references/templates/AGENTS.skeleton.md](references/templates/AGENTS.skeleton.md) under QA Pipeline — link [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail); do not paste the full upstream skill
+9. Never replace a rich existing AGENTS.md wholesale in audit mode
 
 ---
 
@@ -169,8 +171,8 @@ Skip when stack is `api-only` or no frontend detected.
 2. If missing → [references/templates/UI_STYLEGUIDE.skeleton.md](references/templates/UI_STYLEGUIDE.skeleton.md) at `docs/UI_STYLEGUIDE.md` (or profile path)
 3. Pre-fill stack-appropriate notes (Tailwind vs CSS modules) from stack profile
 4. In the styleguide (or setup report), note design quality refs for later pipeline use — do **not** run these skills here:
-   - Create: `@frontend-design` (general UI); `@design-taste-frontend` (landing/portfolio); `@imagegen-frontend-mobile` (mobile app screens/flows — images only)
-   - Audit: `@web-design-guidelines` (a11y/UX checklist); browser proof via `@verify-ui`
+   - Create: `@frontend-design` (general UI); `@design-taste-frontend` (landing/portfolio); `@ux-design-laws` (flows/task completion — mandatory with UI); `@imagegen-frontend-mobile` (mobile app screens/flows — images only)
+   - Audit: `@web-design-guidelines` (a11y/UX checklist); `@ux-design-laws` (verify-time pass); browser proof via `@verify-ui`
 
 This is the **style tree** — design tokens, component hierarchy, states — not `@zapier/stubtree`.
 
@@ -241,7 +243,7 @@ Include:
 - Created / updated / skipped files
 - PRD validation result
 - Living docs / `@memory-live-doc` result
-- Next steps: edit PRD + AGENTS, review `.project-memory` `needs-review` items, then `@pingpong-solution` for first feature
+- Next steps: edit PRD + AGENTS, review `.project-memory` `needs-review` items, then `@pingpong-solution` for first feature. Pipeline after implement: `@verify-ticket` → `@composition-gate` (FLAGGED must be fixed) → `@verify-ui` → `@review-ticket`.
 
 ---
 
