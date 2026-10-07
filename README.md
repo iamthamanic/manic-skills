@@ -106,6 +106,14 @@ Vollständige Tabelle aller Skills. **Basis**: ECC (Quality-Gate-Suite), Ponytai
 | `@ecccheck` ⚠️ | **deprecated** → `@ecc-check` | Nicht verwenden. | — | — | — | — |
 | `@prepare-deploy-pr` ⚠️ | **deprecated** → `@commit-pr-safe` | Nicht verwenden. | — | — | — | — |
 
+| `@conversation-to-prd` | Gespräch/Notizen/Repo-Kontext → implementierungsreife PRD | ✅ | ✅ | ✅ | ✅ |
+| `@marketing-psychology` | Psychologische Prinzipien und Mental Models für Marketing | ✅ | ✅ | ✅ | ✅ |
+| `@meta-ads-strategy` | Meta Ads planen, auditieren und optimieren | ✅ | ✅ | ✅ | ✅ |
+| `@retargeting-funnel` | Retargeting nach Intent, Recency und Exclusions strukturieren | ✅ | ✅ | ✅ | ✅ |
+| `@pricing-strategy` | Pricing-Modell, Value Metric, Packaging und Rollout | ✅ | ✅ | ✅ | ✅ |
+| `@presentation-from-chat` | Chat/Notizen → presentation-ready Deck-Spec | ✅ | ✅ | ✅ | ✅ |
+| `@generate-german-traffic-safety-images` | Plausible deutsche Halteverbots-/Verkehrssicherungsbilder | ⚠️ | ⚠️ | ⚠️ | ⚠️ |
+
 **Legende:** ✅ voll kompatibel · ⚠️ funktionsfähig mit Einschränkung (Subagent-Abhängigkeit, Cursor-Pfad, oder `disable-model-invocation` ignoriert) — siehe [`docs/TOOL-COMPATIBILITY.md`](docs/TOOL-COMPATIBILITY.md).
 
 ## Pipeline
