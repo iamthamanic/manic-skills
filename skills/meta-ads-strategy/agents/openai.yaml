@@ -1,0 +1,13 @@
+interface:
+  display_name: Meta Ads Strategy
+  short_description: Plan and audit Meta Ads structure, tracking, audiences, creative,
+    budgets, and performance.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
