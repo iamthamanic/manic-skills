@@ -1,0 +1,12 @@
+interface:
+  display_name: Marketing Psychology
+  short_description: Apply behavioral science and mental models to marketing decisions.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
