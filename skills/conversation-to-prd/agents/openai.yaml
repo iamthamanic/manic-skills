@@ -1,0 +1,14 @@
+interface:
+  display_name: Conversation to PRD
+  short_description: Turn conversations into implementation-ready PRDs
+  default_prompt: Use $conversation-to-prd to turn this conversation into an implementation-ready
+    PRD.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
