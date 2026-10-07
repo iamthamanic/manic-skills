@@ -1,0 +1,12 @@
+interface:
+  display_name: Presentation from Chat
+  short_description: Turns chat context into a presentation-ready deck spec
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
