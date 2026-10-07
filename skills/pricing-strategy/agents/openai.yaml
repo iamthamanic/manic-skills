@@ -1,0 +1,13 @@
+interface:
+  display_name: Pricing Strategy
+  short_description: Design and audit evidence-backed pricing, packaging, tiers, and
+    rollout.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
