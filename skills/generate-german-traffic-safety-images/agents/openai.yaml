@@ -1,0 +1,14 @@
+interface:
+  display_name: Deutsche Verkehrssicherungsbilder
+  short_description: Realistische Halteverbots- und Baustellenszenen
+  default_prompt: Nutze $generate-german-traffic-safety-images und erstelle eine fotorealistische
+    deutsche Halteverbotszone.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
