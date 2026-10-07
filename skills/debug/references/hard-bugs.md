@@ -30,6 +30,8 @@ Escalate if any of:
 - Two+ fix attempts already failed (user or prior agent)
 - Multi-component boundary unclear (CI → build → app, API → DB)
 
+**Performance regressions:** after a red-capable timing loop exists (or while building it), attach **`@test-performance-speed`** for critical-path attribution, evidence-backed root cause, and optimization options with trade-offs. Do not propose memoization/caching/indexes/architecture rewrites without a measured bottleneck. Load/scale modes only if the user/issue explicitly asks. Then return here → `@implement` with a narrowed fix.
+
 Otherwise stay on the main `@debug` checklist.
 
 ---
@@ -69,7 +71,7 @@ After the loop is red:
 2. Each must predict: “If X is cause, then changing Y makes it disappear / Z makes it worse.”
 3. Show the list to the user when cheap; proceed if AFK.
 4. Instrument **one variable at a time**, mapped to a prediction. Tag logs `[DEBUG-<shortid>]` for cleanup.
-5. Perf: measure baseline first (timing/profiler/query plan), then bisect — don’t spam logs.
+5. Perf: measure baseline first (timing/profiler/query plan), then bisect — don’t spam logs. Prefer `@test-performance-speed` for full journey/critical-path work.
 
 Optional: `@zoom-out` once for module/caller map before deep instrumentation.
 

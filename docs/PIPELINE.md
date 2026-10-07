@@ -5,10 +5,12 @@ Die ECC-Skills bilden eine zusammenhängende Pipeline von Feature-Idee bis gemer
 ## Vollständige Pipeline
 
 ```
-@feature-intake  →  @pingpong-solution  →  @implement  →  @verify-ticket  →  @composition-gate  →  @verify-ui  →  @review-ticket  →  @ecc-check  →  @commit-pr-safe
+@feature-intake  →  @pingpong-solution  →  [@test-performance-speed?]  →  @implement  →  @verify-ticket  →  @composition-gate  →  @verify-ui  →  @review-ticket  →  @ecc-check  →  @commit-pr-safe
                                                                                                                 ↑
                                           @ecc-runner orchestriert das ganze pro Issue (batch mode)
 ```
+
+`@test-performance-speed?` — nur bei Perf-Signals / Label `performance` (messen bevor opt-Fixes). Kein Merge-Gate; Load/Scale nur explizit. Routing: `ecc-runner/references/helper-skills.md`.
 
 ## Fast Lane (ohne volle Pipeline)
 
@@ -56,6 +58,7 @@ Liest `.qa/design` von `pingpong-solution`, auto-generiert `.qa/acceptance/<slug
 - `@search-first` — vor neuen Utils/Deps/Abstractions
 - `@documentation-lookup` — bei neuen Library/API/MCP-Integrations
 - `@security-review` — bei Auth, UGC, Storage, P2P, Secrets
+- `@test-performance-speed` — bei slow/lag/p95/bottleneck / Label `performance` (**messen vor Opt-Fixes**; kein Default-Gate)
 - `@strategic-compact` — bei großem Diff / langer Session
 
 Trigger: nach `@pingpong-solution`, oder manuell für Features/Bugfixes/Refactors.

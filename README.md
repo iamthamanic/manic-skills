@@ -86,6 +86,8 @@ Vollständige Tabelle aller Skills. **Basis**: ECC (Quality-Gate-Suite), Ponytai
 | `@ecc-runner-loop` | Issue-Queue + Merge-Loop | **Situation:** Issues bis merged durchziehen. **Was passiert:** Composed Runner mit composition-gate, ecc-check, PR-merge. **FLAGGED muss gefixt werden.** **Beispiel:** `@ecc-runner-loop` → implement→verify→composition-gate→review→PR→merge. | ✅ | ⚠️ | ⚠️ | ⚠️ |
 | `@memory-live-doc` | Living bilingual Project Memory | **Situation:** Materialer Diff, Docs aktuell halten. **Was passiert:** Aktualisiert `.project-memory/` aus Git-Diff. **Beispiel:** `@memory-live-doc` mode=apply nach Feature. | ✅ | ✅ | ✅ | ✅ |
 | `@debug` | Reproduce-first Debugging | **Situation:** Bug/Console-Error. **Was passiert:** Evidenz vor Fix (Iron Law). **Beispiel:** `@debug` → repro → root cause → fix. | ✅ | ✅ | ✅ | ✅ |
+| `@test-performance-speed` | Performance-Engineering (Journeys, Bottlenecks, Trade-offs) | **Situation:** App fühlt sich langsam an, Button/Aktion dauert, p95/jank, Label `performance`, oder explizit scale/load/data. **Was passiert:** Critical-Path messen → Bottleneck beweisen → Root Cause → Options mit Impact/Risiken; Load nur explizit. **Kein** Lighthouse-only-Skill, **kein** Default-Merge-Gate. **Beispiel:** `@test-performance-speed` → Character open p50 2.3s → 40% SQL → Options A/B → Validation Plan. | ✅ | ✅ | ✅ | ✅ |
+| `@mobile-performance-audit` | Capacitor Android + Web Performance Audit | **Situation:** Mobile Shell, Startup, Sync/Upload. **Was passiert:** Checklist + Evidence für Capacitor/Web. Enger als `@test-performance-speed` (Journeys/Backend/Scale). | ✅ | ✅ | ✅ | ✅ |
 | `@frontend-design` / `@design-taste-frontend` | Intentional UI / Anti-slop Design | **Situation:** Neue UI oder Redesign. **Was passiert:** Design-Constraints, keine Generic-AI-Looks. **Beispiel:** `@frontend-design` vor Component-Build. | ✅ | ✅ | ✅ | ✅ |
 | `@web-design-guidelines` | Static a11y/UX Checklist | **Situation:** UI geändert, vor Browser-Proof. **Was passiert:** Web Interface Guidelines Audit. **Beispiel:** vor `@verify-ui`. | ✅ | ✅ | ✅ | ✅ |
 | `@find-skills` | Skills.sh Discovery | **Situation:** Gibt es schon einen Skill dafür? **Was passiert:** `npx skills find` + Qualitätsfilter. **Beispiel:** `@find-skills` "quality gate". | ✅ | ✅ | ✅ | ✅ |
@@ -121,10 +123,12 @@ Vollständige Tabelle aller Skills. **Basis**: ECC (Quality-Gate-Suite), Ponytai
 Die ECC-Skills bilden eine zusammenhängende Pipeline. `@ecc-runner` orchestriert sie pro Issue autonom; die einzelnen Skills kannst du auch manuell aufrufen.
 
 ```
-@feature-intake  →  @pingpong-solution  →  @implement  →  @verify-ticket  →  @composition-gate  →  @verify-ui  →  @review-ticket  →  @ecc-check  →  @commit-pr-safe
+@feature-intake  →  @pingpong-solution  →  [@test-performance-speed?]  →  @implement  →  @verify-ticket  →  @composition-gate  →  @verify-ui  →  @review-ticket  →  @ecc-check  →  @commit-pr-safe
                                                                                                                 ↑
                                           @ecc-runner orchestriert das ganze pro Issue (batch mode)
 ```
+
+`@test-performance-speed?` nur bei Perf-Signals / Label `performance` (vor großen Opt-Fixes) — kein Merge-Gate; Load/Scale nur explizit.
 
 **Fast Lane** (wenn du die Pipeline überspringst): `@audit-changes` während der Arbeit → `@ecc-check` vor PR/Ship.
 
@@ -136,7 +140,7 @@ Siehe [`docs/PIPELINE.md`](docs/PIPELINE.md) für die detaillierte Phasen-Beschr
 |-------|--------|--------------|
 | **ECC** | `audit-changes`, `ecc-check`, `ecc-runner`, `ecc-runner-loop`, `feature-intake`, `issue-contract`, `test-gate`, `composition-gate`, `pingpong-solution`, `implement`, `foundations`, `verify-ticket`, `verify-ui`, `review-ticket`, `commit-pr-safe`, `commit-push-safe`, `pr-merge-safe`, `verification-loop`, `ecccheck` (deprecated), `prepare-deploy-pr` (deprecated) | Engineering-Disziplin-Suite: Fast-Lane-Audit, deterministische Checks, Hop-Ketten-Gate, kanonisches Issue-Template, Acceptance-Verträge, Code-Review-Gate, AgentShield, sicheres Ship. Pro-Projekt-Konfiguration in `.qa/project.yaml`, `.qa/runner-profile.yaml`, `AGENTS.md`. |
 | **Ponytail** | `ponytail`, `ponytail-review`, `ponytail-audit`, `ponytail-debt`, `ponytail-gain`, `ponytail-help` | YAGNI/Minimalismus-Werkzeuge: lazy-senior-dev-Modus, Over-Engineering-Review, Repo-Audit, Debt-Tracking, Impact-Scoreboard. |
-| **Standalone** | `project-setup`, `mine-stars`, `search-first`, `documentation-lookup`, `security-review`, `strategic-compact`, `save-prompts-inject` | Unabhängige Einzel-Skills ohne Pipeline-Abhängigkeit. |
+| **Standalone** | `project-setup`, `mine-stars`, `search-first`, `documentation-lookup`, `security-review`, `strategic-compact`, `save-prompts-inject`, `debug`, `test-performance-speed`, `mobile-performance-audit` | Unabhängige Einzel-Skills; Perf/Debug werden von `@ecc-runner` / `@implement` signal-gesteuert angehängt (kein Default-Merge-Gate). |
 
 ## Verzeichnisstruktur
 

@@ -144,6 +144,7 @@ Critical-Verstöße (F-03, B-01, B-04, B-07, B-08, B-09, B-10, P-04) blocken PR/
 - Issue template: `@issue-contract` (global canonical; project override via `.qa/issue-template.md`, values via `.qa/project.yaml` → `issueContract`)
 - Living docs: `@memory-live-doc` (see below; also via `@ecc-check` / `@commit-push-safe`)
 - Composition: `@composition-gate` — hop-chain meaning (cardinality, fallback, concurrent consumers). **FLAGGED findings must be fixed** before review ACCEPT / ecc-check READY / PR. `@implement` must write paths so this gate CLEARs. `@commit-pr-safe` / `@pr-merge-safe` run the gate or accept a same-SHA proof.
+- Performance (optional diagnostic): `@test-performance-speed` when an issue is slow/laggy/p95/bottleneck or labeled `performance` — measure critical paths and prove bottlenecks **before** optimizing. Not a default merge gate; load/scale only when explicitly requested. Capacitor mobile shell audits may use `@mobile-performance-audit`.
 
 ### Ponytail (lazy senior dev) — optional
 

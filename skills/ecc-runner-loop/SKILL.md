@@ -3,9 +3,9 @@ name: ecc-runner-loop
 description: >-
   Full autonomous issue queue: implement, mandatory verify/review/ecc-check fix
   loops, PR, CI babysit, and merge — then next issue until queue empty. Between
-  issues follow AGENTS.md Context compact (handoff → user /compact → continue);
-  never pause the queue with paused:true for compact. Use when user wants
-  hands-off ship (ecc-runner-loop, /ecc-runner-loop, ecc runner loop,
+  issues follow AGENTS.md Context compact (handoff → auto-compact → next issue
+  same turn); never pause the queue with paused:true for compact. Use when user
+  wants hands-off ship (ecc-runner-loop, /ecc-runner-loop, ecc runner loop,
   issues komplett abarbeiten, merge and continue, alles durchziehen bis fertig).
 disable-model-invocation: true
 ---
@@ -68,6 +68,7 @@ Still forbidden: `git push --no-verify`, force push, push to `main`, `gh pr merg
 
 ```
 setup → research? → design? → grill? → seed acceptance
+→ @test-performance-speed?  (only if perf signals / label `performance` — measure before big opts; not a merge gate)
 → @implement
 → @verify-ticket          ─┐ fix → re-run until PASS or retry limit
 → @composition-gate       ─┤  CLEAR or SKIPPED; FLAGGED → fix + re-run
@@ -87,6 +88,8 @@ setup → research? → design? → grill? → seed acceptance
 
 **UI create** stays inside `@implement` (`@frontend-design` / `@design-taste-frontend` / `@ux-design-laws` / `@imagegen-frontend-mobile` for mobile concepts). Loop does **not** invent aesthetics at verify/ship time — but **does** re-check `@ux-design-laws` + `@web-design-guidelines` on UI diffs.
 
+**Performance:** Routing lives in `@ecc-runner` → [helper-skills.md](../ecc-runner/references/helper-skills.md) (“During performance diagnose”). Attach `@test-performance-speed` only on matching issues; never as a default gate; never auto load-test production.
+
 **Gate:** Do **not** open a PR until `@ecc-check` is **READY**, **`@composition-gate` is CLEAR or SKIPPED** (same HEAD SHA proof; FLAGGED findings **must be fixed**), **and** the Secure-by-Default Coverage is PASS (no Critical/Important checklist violations). Do **not** start the next issue until merge is **MERGED**.
 
 ## Context continuity (mandatory — not optional)
@@ -95,23 +98,22 @@ setup → research? → design? → grill? → seed acceptance
 
 Default when that section is present (N>1 queue, after merge + sync):
 
-1. Update handoff (last merged issue/PR/SHA, next issue # + title).
-2. **Stop the turn** — tell the user to `/compact` (or fresh chat + `@ecc-runner-loop continue` with handoff). Prefer `@strategic-compact` for timing/guidance.
-3. Do **not** claim the next issue in the same turn. Resume only after the user continues post-compact.
+1. Update handoff (last merged issue/PR/SHA, next issue # + title); `paused: false`.
+2. **Auto-compact in-session** (handoff = sole resume brief) — do **not** stop for user `/compact`.
+3. **Immediately** claim the next queue issue in the same turn.
 
-Never set `paused: true` for “context compact”, “session too long”, or “please continue” — waiting for user `/compact` is **not** a queue pause (`paused` stays `false`; turn simply ends).
+Never set `paused: true` for “context compact”, “session too long”, or “please continue”.
 
 | Situation | Action | `paused` |
 |-----------|--------|----------|
-| After every shipped issue (N>1 queue) + AGENTS compact policy | Handoff update → **end turn** → user `/compact` → resume on continue | stays `false` |
-| AGENTS compact policy **absent** + context growing | **`@strategic-compact`** between issues; then continue only if skill/session allows without mid-ticket loss | stays `false` |
-| Cursor session must end / agent swap | **`@handoff`** (next issue, branch, phase, `state.json`, last PR); next agent `@ecc-runner-loop continue` | stays `false` |
-| Hard stop (`needs-human`, merge blocked, retries exhausted) | **`@handoff`** + user report; set `paused: true` only for true hard stops / user `pause` | `true` only then |
+| After every shipped issue (N>1 queue) + AGENTS compact policy | Handoff + auto-compact → **next issue same turn** | stays `false` |
+| Context critically exhausted / agent swap | **`@handoff`** then end turn; next `@ecc-runner-loop continue` | stays `false` |
+| Hard stop (`needs-human`, merge blocked, retries exhausted) | **`@handoff`** + user report; `paused: true` only then | `true` only then |
 
 **Never compact mid-implementation** (verify → PR → merge stay in one context).
 
 **Forbidden:**
-- Claiming the next issue in the same turn after a ship when AGENTS compact policy is present
+- Stopping for user `/compact` between tickets when AGENTS says auto-continue
 - `state.json` → `paused: true` + `lastError: session compact…`
 - Relying on auto-compact mid-ticket
 
@@ -207,8 +209,8 @@ German triggers: `alles durchziehen`, `issues komplett abarbeiten`, `merge und w
 4. `gh issue comment` with PR + merge SHA
 5. `agent-done`, remove `agent-in-progress`
 6. `sync-queue-to-state.sh`
-7. **Context gate (AGENTS compact policy preferred):** if queue remaining → update handoff → **end turn** and ask user for `/compact` (or `@handoff` + fresh chat). If AGENTS compact section is absent and pressure is low, may continue; otherwise `@strategic-compact` / `/compact` first — **do not** set `paused: true`
-8. **Next issue only after post-compact continue** (same chat after user continues, or new chat with handoff) — never claim the next issue in the same turn when AGENTS compact policy is present
+7. **Context gate (AGENTS compact policy):** if queue remaining → update handoff → **auto-compact in-session** → **immediately claim next issue same turn**. Do **not** ask user for `/compact`. Only end turn if platform hard-fails (handoff `paused: false`).
+8. **Next issue in the same turn** after handoff + auto-compact — never wait for a user continue prompt between tickets.
 
 ## Reporting
 
@@ -229,7 +231,7 @@ See [references/reporting.md](references/reporting.md). One message at loop end:
 - Never skip verify/review/composition-gate/ecc-check to “save time”
 - Never stop after one issue asking user to merge
 - Never start next issue while prior PR is still open (unless actively babysitting that PR in the same phase)
-- **Never pause the queue for context** (`paused: true`) — use handoff + user `/compact` / `@strategic-compact` or `@handoff` (see Context continuity)
+- **Never pause the queue for context** (`paused: true`) — handoff + auto-compact → next issue (see Context continuity / AGENTS.md)
 - **`@typed-strict` / `@test-gate` / `@composition-gate`:** inherited via `@implement` → `@verify-ticket` → `@composition-gate` → `@review-ticket` / `@ecc-check`. FAIL/CHANGES_REQUESTED if type escape hatches remain, test-gate FAIL, or composition-gate is FLAGGED (findings must be fixed).
 - UI/errors Deutsch; commits English
 - Read `AGENTS.md` / `.qa/project.yaml` checks before merge

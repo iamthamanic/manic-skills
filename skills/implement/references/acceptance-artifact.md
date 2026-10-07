@@ -2,7 +2,7 @@
 
 Every `/implement` run **must** create or update `.qa/acceptance/<feature-slug>.md` **before writing code**.
 
-This file is the contract for `@verify-ui` and `@verify-ticket`. The user never copies templates manually.
+This file is the contract for `@verify-ui`, `@verify-ticket`, and `@composition-gate`. The user never copies templates manually.
 
 ## When to skip (rare)
 
@@ -76,6 +76,13 @@ Create `.qa/acceptance/` if missing. Ensure `.qa/project.yaml` exists (copy from
 <!-- filled after coding -->
 - Files touched: …
 - Unit tests: …
+
+## Composition Gate
+<!-- filled by @composition-gate; FLAGGED must be fixed before review/PR -->
+- HEAD_SHA: …
+- Verdict: CLEAR | SKIPPED | pending
+- Proof: `.qa/runs/composition-gate-<slug>.md`
+- Skip reason: n/a | …
 ```
 
 ## Content sources (read before writing)
@@ -97,6 +104,7 @@ Include in acceptance file under Intent: `Roadmap: <ID> (Stufe A|B|C) — <sprin
 ## Quality rules
 
 - Every Happy Path item must be **observable in browser or test output** (Hoare postcondition)
+- Side-effect jobs (mail, chat, webhook, outbox, provision): Happy Path must state **cardinality** (once per event vs once per recipient). “X → channel/email” without “once” is incomplete. `@implement` must code that cardinality so `@composition-gate` CLEARs (N-actors / fail-closed fallback / no duplicate consumers).
 - Preconditions section required for non-trivial features; skip with reason for trivial fixes
 - Avoid vague items ("works correctly") — use "Feuer-Angriff zeigt Burst ~900ms"
 - Include at least one Regression item for UI changes

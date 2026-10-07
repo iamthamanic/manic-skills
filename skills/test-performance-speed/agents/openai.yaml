@@ -1,0 +1,3 @@
+interface:
+  display_name: "Performance Speed Investigation"
+  short_description: "Measure journeys, prove bottlenecks, compare optimization trade-offs"

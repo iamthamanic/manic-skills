@@ -33,6 +33,7 @@ create_label "agent-blocked" "D93F0B" "ecc-runner escalated; needs human or desi
 create_label "agent-done" "1D76DB" "Completed by ecc-runner"
 create_label "needs-design" "C5DEF5" "Run pingpong-solution before implement"
 create_label "needs-human" "B60205" "Never auto-pick by ecc-runner"
+create_label "performance" "5319E7" "Run @test-performance-speed before optimizing"
 create_label "P0" "B60205" "Highest priority in ecc-runner queue"
 create_label "P1" "FBCA04" "Medium priority in ecc-runner queue"
 create_label "P2" "FEF2C0" "Low priority in ecc-runner queue"

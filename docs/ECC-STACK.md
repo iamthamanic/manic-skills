@@ -104,4 +104,5 @@ Default: `@test-gate` mit `checksCommand` oder Auto-Detect; oft `npm run verify`
 |--------|-------------------|
 | **Ponytail** | `@implement` wendet die Ponytail-Ladder inline an; `@ponytail-review` ergänzt `@review-ticket` um Over-Engineering-Perspektive |
 | **Standalone-Skills** | `@search-first`, `@documentation-lookup`, `@security-review`, `@strategic-compact` sind Helper, die `@implement` inline aufruft |
+| **Performance / Debug** | `@test-performance-speed` (Journeys/Bottlenecks/Trade-offs; optional vor Opt-Fixes), `@mobile-performance-audit` (Capacitor), `@debug` (reproduce-first) — signal-gesteuert via `ecc-runner` helper-skills, **kein** Pflicht-Gate |
 | **Offizielle Cursor-Skills** | `@review-bugbot`, `@review-security` (subagents) werden von `@review-ticket` aufgerufen; `@babysit` ist Teil der ECC-Pipeline nach PR |

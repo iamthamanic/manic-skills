@@ -11,12 +11,24 @@ Attach inline during phases. Full pipeline table in `SKILL.md` Step 4.
 | Unfamiliar module / area | `@zoom-out` then `@search-first` |
 | Auth, `/api/`, env vars, user input | `@security-review` |
 | Producer→consumer, bulk+side-effect, override/fallback | `@composition-gate` intent (§3b in `@implement`) — write so the later gate CLEARs |
-| New or reshaped UI | `@frontend-design` (via `@implement` §8) |
-| Landing / portfolio / marketing redesign | `@design-taste-frontend` (via `@implement` §8) |
-| Mobile app screen concepts / mockups / flows | `@imagegen-frontend-mobile` (via `@implement` §8; images only) |
+| New or reshaped UI | `@frontend-design` + `@ux-design-laws` (via `@implement` §8) |
+| Landing / portfolio / marketing redesign | `@design-taste-frontend` + `@ux-design-laws` (via `@implement` §8) |
+| Mobile app screen concepts / mockups / flows | `@imagegen-frontend-mobile` (via `@implement` §8; images only) — still apply `@ux-design-laws` to flow structure |
 | Label `content` or paths `content/topics/` | `@questolin-content-layer` |
 | Label `infra` / `refactor` in title or body | `@ponytail-audit` (after implement, before verify) |
 | Default implementation discipline | `@ponytail` (via `@implement`) |
+
+## During performance diagnose (optional — not a merge gate)
+
+Run **before** large optimization diffs when signals match. Measure → attribute → options; then narrow Acceptance and `@implement` one lever. Never auto-start load/scale unless the issue explicitly asks.
+
+| Signal | Attach |
+|--------|--------|
+| Title/body: slow, lag, jank, p95, bottleneck, “feels sluggish”, cold start | `@test-performance-speed` (Interaction / Runtime / Backend as needed) |
+| Label `performance` | `@test-performance-speed` before speculative opts |
+| Explicit scale / concurrent users / capacity / soak | `@test-performance-speed` Mode D (load) — staging/local only |
+| Data/complexity growth (large repo, huge graph, 100k rows) | `@test-performance-speed` Mode E |
+| Mobile Capacitor shell + startup/sync audit | `@mobile-performance-audit` (narrower; keep `@test-performance-speed` for journey bottlenecks) |
 
 ## During `research` / codebase map
 
@@ -29,9 +41,9 @@ Attach inline during phases. Full pipeline table in `SKILL.md` Step 4.
 
 | Signal | Attach |
 |--------|--------|
-| Touched UI files | `@web-design-guidelines` **before** `@verify-ui` |
+| Touched UI files | `@web-design-guidelines` + `@ux-design-laws` **before** `@verify-ui` |
 | Browser proof | `@verify-ui` |
-| Never here | `@frontend-design` / `@design-taste-frontend` / `@imagegen-frontend-mobile` (create-time only) |
+| Never here | `@frontend-design` / `@design-taste-frontend` / `@imagegen-frontend-mobile` (create-time only; `@ux-design-laws` **is** allowed at verify-time) |
 
 ## During `design`
 

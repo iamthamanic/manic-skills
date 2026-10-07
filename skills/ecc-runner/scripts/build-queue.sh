@@ -60,7 +60,7 @@ while IFS= read -r row; do
     fi
   done
 
-  if [[ "${skip}" == false ]] && echo "${body}" | grep -qi '\[human-only\]'; then
+  if [[ "${skip}" == false ]] && { echo "${body}" | grep -qi '\[human-only\]' || echo "${title}" | grep -qi '\[human-only\]'; }; then
     skip=true
     reason="human-only"
   fi

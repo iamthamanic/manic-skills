@@ -14,7 +14,7 @@ When implementing changes, follow this contract strictly.
 ## Pipeline position
 
 ```
-@pingpong-solution  →  @implement  →  @verify-ticket  →  @verify-ui  →  @review-ticket
+@pingpong-solution  →  @implement  →  @verify-ticket  →  @composition-gate  →  @verify-ui  →  @review-ticket
 ```
 
 ## Global helper skills (ECC, `~/.claude/skills/`)
@@ -29,18 +29,21 @@ Apply **inline** — follow their checklists while executing this contract.
 | `@documentation-lookup` | New library/API/MCP integration — read current docs before coding |
 | `@security-review` | **§5** — auth, UGC, storage, P2P, secrets, user input, Card Forge content |
 | `@debug` | User reports bug / console error mid-ticket — reproduce + evidence before guessing a fix (Iron Law; hard bugs → `debug/references/hard-bugs.md`) |
+| `@test-performance-speed` | Perf / lag / slow interaction / p95 / bottleneck / label `performance` — **measure and attribute before optimizing**; not a default per-ticket gate; load/scale only if explicitly requested |
 | `@system-design-reference` | **§2–3** — new infra layer (cache, queue, gateway, events) before coding; cite pattern trade-offs |
 | `@strategic-compact` | Large diff / long session — compact after acceptance written, before bulk coding |
 | `@handoff` | Session ending / next agent continues — write OS-temp handoff doc (not workspace); after compact if agent changes |
 | `@frontend-design` | **§8** — new or reshaped UI; distinctive aesthetics, avoid generic AI look |
 | `@design-taste-frontend` | **§8** — landing pages, portfolios, redesigns (narrower than `@frontend-design`) |
+| `@ux-design-laws` | **§8** — **always with UI** — task completion, feedback, errors, progress, defaults (Hick/Fitts/Jakob/…); pair with aesthetics helpers |
 | `@imagegen-frontend-mobile` | **§8** — mobile app screen concepts / mockups / multi-screen flows (images only; iOS/Android/Capacitor) |
 | `@web-design-guidelines` | After UI code — optional static a11y/UX audit before/with `@verify-ui` |
 | `@memory-live-doc` | After **material** code change — draft living docs (or note pipeline will `@memory-live-doc` apply at `@ecc-check`); see `~/.claude/skills/memory-live-doc/` |
 | `@typed-strict` | **Always while coding** — no type-system escape hatches; Boy Scout strip loose typing on every touched file (language matrix, not TS-only) |
 | `@test-gate` | **Before claim-done** — depth=quick (tools/scripts exit codes); full verify still via `@verify-ticket` |
+| `@composition-gate` | **While coding (intent)** — write producer→consumer paths so the later gate CLEARs; do not ship a hop chain that fails N-actors / invalid-fallback / concurrent-consumer simulations |
 
-After **§11**: always **`@verify-ticket`** (runs `@test-gate` standard); if UI changed, recommend **`@web-design-guidelines`** (static) then **`@verify-ui`** (browser) before review. Pre-PR full gate: **`@ecc-check`** (Phase A = `@test-gate`).
+After **§11**: always **`@verify-ticket`** (runs `@test-gate` standard) then **`@composition-gate`** (CLEAR or documented SKIPPED; FLAGGED findings **must be fixed** and the gate re-run). If UI changed, recommend **`@web-design-guidelines`** + **`@ux-design-laws`** check (static) then **`@verify-ui`** (browser) before review. Pre-PR full gate: **`@ecc-check`** (Phase A = `@test-gate`; composition-gate proof required).
 
 **Multi-PR splits:** follow `AGENTS.md` §5.6 — rebase feature branch on `develop` first; exclude deploy/infra paths unless deploy ticket; use `@split-to-prs` for planning.
 
@@ -120,6 +123,21 @@ Follow:
 
 Do not introduce new dependencies unless they are clearly justified.
 
+### 3b. Composition intent (`@composition-gate`)
+
+Implement so **`@composition-gate` would CLEAR** on this diff. Do not wait for the later gate to discover hop-chain bugs.
+
+When the change produces records that another module consumes, bulk-creates then side-effects, or adds override/fallback/dual fields:
+
+* State Happy Path **cardinality** (once per event vs once per recipient) before coding.
+* One source of truth per fact — do not let later hops read a different field for the same meaning.
+* Invalid override/config **fails closed** or keeps the type default — never silently retarget (other channel, other tenant, other market).
+* Bulk producer + shared destination (channel, email, webhook) → **one** external side-effect per event unless acceptance says otherwise.
+* Claim work atomically; recover `processing`; do not let terminal failures occupy a limited poll batch.
+* Tests lock the **composed** invariant (including N actors), not an accidental contract.
+
+If a path would fail the three simulations in `@composition-gate` (N-actors, invalid/missing, two consumers/crash), **do not write it**. Flagged composition findings found after coding **must be fixed** in this ticket before verify/review.
+
 ### Ponytail (primary — during `@implement`)
 
 Apply the [Ponytail](https://github.com/DietrichGebert/ponytail) lazy-senior-dev ladder **before writing code**. Attach `@ponytail` (installed at `~/.claude/skills/ponytail/`).
@@ -135,7 +153,7 @@ Apply the [Ponytail](https://github.com/DietrichGebert/ponytail) lazy-senior-dev
 
 **Conflict rule:** `AGENTS.md`, PRD, and design artifact **win** over Ponytail. Never use Ponytail to bypass architecture layers, security, tests, or accessibility. The **Secure-by-Default Checklist** (Frontend/Backend/Practical Habits in `AGENTS.md`) is explicitly non-negotiable — no rung may skip a Critical or Important checklist item. **Secure-by-Default Checklist items (Frontend F-xx, Backend B-xx, Practical P-xx) are never abkürzbar via Ponytail** — they are mandatory regardless of rung.
 
-**Still required:** validation at trust boundaries, error handling that prevents data loss, security, accessibility basics, tests when behavior changes (§7). Mark intentional shortcuts with `// ponytail:` and name the ceiling + upgrade path.
+**Still required:** validation at trust boundaries, error handling that prevents data loss, security, accessibility basics, tests when behavior changes (§7), **composition invariants** (§3b — `@composition-gate` must CLEAR). Mark intentional shortcuts with `// ponytail:` and name the ceiling + upgrade path.
 
 **Security is never Ponytail-able:** The Secure-by-Default Checklist items (AGENTS.md §Security) are **never** subject to Ponytail rung compression. No „one-line shortcut" may skip input validation, authz checks, parameterized queries, secure cookies, or rate limiting. A `// ponytail:` shortcut that violates F-03/B-01/B-04/B-07/B-08/B-09/P-04 is invalid and must be reverted.
 
@@ -163,7 +181,7 @@ If uncertainty is minor, choose the safest conventional option and document the 
 
 All implementation must be secure by default.
 
-**Secure-by-Default Checklist (verbindlich):** If `AGENTS.md` has a **Security Checklist (Secure by Default)** block, every new endpoint, upload, auth flow, cookie, or user-input path **must** satisfy the applicable table rows (Frontend F-01…F-05, Backend B-01…B-09, Practical Habits P-01…P-05). The full embedded tables live in `AGENTS.md` (no external links). Document coverage in the acceptance file's `Security Coverage` section (§0 step 6). Critical violations (F-03, B-01, B-04, B-07, B-08, B-09, P-04) block the ticket. Permission-admin / route→permission diffs must also pass the B-07/B-08/B-09 manual gate in the checklist (Superset on bundles/roles; Non-GET not behind `.view` only; no client-controlled identity).
+**Secure-by-Default Checklist (verbindlich):** If `AGENTS.md` has a **Security Checklist (Secure by Default)** block, every new endpoint, upload, auth flow, cookie, user-input path, **crypto/secret storage**, or **background worker/outbox/bulk-send** **must** satisfy the applicable table rows (Frontend F-01…F-05, Backend B-01…B-10, Practical Habits P-01…P-06). The full embedded tables live in `AGENTS.md` (no external links). Document coverage in the acceptance file's `Security Coverage` section (§0 step 6). Critical violations (F-03, B-01, B-04, B-07, B-08, B-09, B-10, P-04) block the ticket. Worker/outbox diffs must also pass the B-10/P-06 manual gate (fail-closed secrets; atomic claim; no fan-out duplicates; no terminal-failed starvation). Permission-admin / route→permission diffs must also pass the B-07/B-08/B-09 manual gate in the checklist (Superset on bundles/roles; Non-GET not behind `.view` only; no client-controlled identity).
 
 Check and handle:
 
@@ -239,7 +257,9 @@ If the project has no test setup, do not invent a large new test framework witho
 
 For UI changes, follow the existing design system and product patterns.
 
-**Design helpers (inline):** Apply `@frontend-design` when building or reshaping UI. Prefer `@design-taste-frontend` for landing pages, portfolios, and marketing redesigns. Prefer `@imagegen-frontend-mobile` for mobile app screen concepts, phone mockups, and multi-screen flows (images only — not code). Do not invent a parallel aesthetic when the project styleguide already defines tokens/components.
+**Design helpers (inline):**
+* **Look:** Apply `@frontend-design` when building or reshaping UI. Prefer `@design-taste-frontend` for landing pages, portfolios, and marketing redesigns. Prefer `@imagegen-frontend-mobile` for mobile app screen concepts, phone mockups, and multi-screen flows (images only — not code). Do not invent a parallel aesthetic when the project styleguide already defines tokens/components.
+* **Behavior (mandatory for any UI):** Apply `@ux-design-laws` while designing flows, screens, forms, and interactive states — one purpose per screen, large targets, familiar patterns, immediate feedback, primary action emphasis, sensible defaults, proactive error prevention, recoverable errors, visible progress, memorable completion. Follow its Implementation Requirements checklist before claiming UI done.
 
 Check:
 
@@ -255,10 +275,11 @@ Check:
 * no layout shifts where avoidable
 * no inconsistent copy or terminology
 * no hidden broken states
+* `@ux-design-laws` Implementation Requirements (primary goal → shortest path → obvious next action → feedback → error prevention → preserve work → clear completion)
 
 Do not introduce custom UI patterns when an existing component or pattern already exists.
 
-After UI code: optionally run `@web-design-guidelines` on touched files, then recommend `@verify-ui` for browser proof.
+After UI code: optionally run `@web-design-guidelines` + a quick `@ux-design-laws` pass on touched flows, then recommend `@verify-ui` for browser proof.
 
 ## 9. Data and migration requirements
 
@@ -293,9 +314,10 @@ Do not add obvious comments that merely repeat the code.
 
 ## 11. Final response after implementation
 
-After implementing, run `@verify-ticket` before claiming the ticket is done. For UI changes, run or recommend `@verify-ui` before `@review-ticket`. Then provide:
+After implementing, run `@verify-ticket` then **`@composition-gate`** before claiming the ticket is done. Composition verdict must be **CLEAR** or documented **SKIPPED**. **FLAGGED** → fix and re-run; do not hand a flagged hop-chain to review. For UI changes, run or recommend `@verify-ui` before `@review-ticket`. Then provide:
 
 * acceptance artifact path (`.qa/acceptance/<slug>.md`) or SKIPPED reason
+* composition-gate verdict (CLEAR / SKIPPED / FLAGGED) + proof path
 * concise summary of what changed
 * files changed
 * validation commands run (exact `npm run checks` command from verify-ticket)

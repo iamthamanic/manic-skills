@@ -102,7 +102,7 @@ Out:
 Depends on #<issue>   <!-- omit section if none -->
 
 ## Runner
-Labels: P0 | P1 | P2 (+ needs-design if UI/architecture open)
+Labels: P0 | P1 | P2 (+ needs-design if UI/architecture open; + performance if lag/slow/p95 — run @test-performance-speed before opts)
 Feature slug: `<kebab-case-slug>`
 Design: `.qa/design/<slug>.md`   <!-- omit line if none -->
 ```
