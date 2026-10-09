@@ -113,6 +113,7 @@ Vollständige Tabelle aller Skills. **Basis**: ECC (Quality-Gate-Suite), Ponytai
 | `@meta-ads-strategy` | Meta Ads planen, auditieren und optimieren | ✅ | ✅ | ✅ | ✅ |
 | `@retargeting-funnel` | Retargeting nach Intent, Recency und Exclusions strukturieren | ✅ | ✅ | ✅ | ✅ |
 | `@pricing-strategy` | Pricing-Modell, Value Metric, Packaging und Rollout | ✅ | ✅ | ✅ | ✅ |
+| `@retention-graph-audit` | Short-form Retention-Kurven diagnostizieren (Hook/Cliff/Value/Healthy) | ✅ | ✅ | ✅ | ✅ |
 | `@presentation-from-chat` | Chat/Notizen → presentation-ready Deck-Spec | ✅ | ✅ | ✅ | ✅ |
 | `@generate-german-traffic-safety-images` | Plausible deutsche Halteverbots-/Verkehrssicherungsbilder | ⚠️ | ⚠️ | ⚠️ | ⚠️ |
 

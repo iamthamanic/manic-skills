@@ -1,0 +1,13 @@
+interface:
+  display_name: Retention Graph Audit
+  short_description: Diagnose short-form retention curves into hook, cliff, value,
+    or healthy patterns with concrete edit fixes.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
