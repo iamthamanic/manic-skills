@@ -1,0 +1,10 @@
+interface:
+  display_name: App Retention Engineering
+  short_description: Design measurable app retention, churn scoring, and responsible reminders.
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

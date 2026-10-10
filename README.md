@@ -114,6 +114,7 @@ Vollständige Tabelle aller Skills. **Basis**: ECC (Quality-Gate-Suite), Ponytai
 | `@retargeting-funnel` | Retargeting nach Intent, Recency und Exclusions strukturieren | ✅ | ✅ | ✅ | ✅ |
 | `@pricing-strategy` | Pricing-Modell, Value Metric, Packaging und Rollout | ✅ | ✅ | ✅ | ✅ |
 | `@retention-graph-audit` | Short-form Retention-Kurven diagnostizieren (Hook/Cliff/Value/Healthy) | ✅ | ✅ | ✅ | ✅ |
+| `@app-retention-engineering` | App-Retention (D1/D7/D30), Churn-Risiko, personalisierte Erinnerungen, Datenschutz und Holdout-Experimente | ✅ | ✅ | ✅ | ✅ |
 | `@presentation-from-chat` | Chat/Notizen → presentation-ready Deck-Spec | ✅ | ✅ | ✅ | ✅ |
 | `@generate-german-traffic-safety-images` | Plausible deutsche Halteverbots-/Verkehrssicherungsbilder | ⚠️ | ⚠️ | ⚠️ | ⚠️ |
 
