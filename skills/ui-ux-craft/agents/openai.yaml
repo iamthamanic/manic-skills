@@ -1,0 +1,12 @@
+interface:
+  display_name: UI/UX Craft
+  short_description: Orchestrate distinctive UI/UX from research to verified implementation
+  default_prompt: Use $ui-ux-craft to discover context, research relevant component catalogs,
+    write a chat design-spec, implement, and verify UI/UX quality.
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

@@ -186,7 +186,7 @@ Skip `web-design-guidelines` / `ux-design-laws` / `verify-ui` if no UI files in 
 
 | Phase | Skill | Exit |
 |-------|-------|------|
-| `implement` | `@implement` (incl. `@frontend-design` / `@design-taste-frontend` / `@ux-design-laws` when UI; `@imagegen-frontend-mobile` for mobile screen concepts) | Code + acceptance notes; hop-chains written so `@composition-gate` CLEARs |
+| `implement` | `@implement` (incl. `@ui-ux-craft` / `@frontend-design` / `@design-taste-frontend` / `@ux-design-laws` when UI; `@imagegen-frontend-mobile` for mobile screen concepts) | Code + acceptance notes; hop-chains written so `@composition-gate` CLEARs |
 | `verify-ticket` | `@verify-ticket` | PASS |
 | `composition-gate` | `@composition-gate` | **CLEAR** or documented **SKIPPED**. **FLAGGED** → fix findings, re-run (not optional) |
 | `web-design-guidelines` | `@web-design-guidelines` | Findings fixed or accepted; skip if no UI |

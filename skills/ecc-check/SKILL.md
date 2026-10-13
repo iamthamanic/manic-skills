@@ -120,7 +120,7 @@ If diff touches UI paths (`src/components`, `pages`, `hooks`, layouts, styles, e
 1. `@web-design-guidelines` on touched UI files (static a11y/UX checklist)
 2. `@verify-ui` (browser proof) — or document skip
 
-Do **not** run `@frontend-design` / `@design-taste-frontend` / `@imagegen-frontend-mobile` here — create-time only (`@implement`).
+Do **not** run `@ui-ux-craft` / `@frontend-design` / `@design-taste-frontend` / `@imagegen-frontend-mobile` here — create-time only (`@implement`).
 
 If no UI paths → skip Phase E.
 

@@ -86,7 +86,7 @@ setup → research? → design? → grill? → seed acceptance
 → agent-done → sync queue → NEXT issue
 ```
 
-**UI create** stays inside `@implement` (`@frontend-design` / `@design-taste-frontend` / `@ux-design-laws` / `@imagegen-frontend-mobile` for mobile concepts). Loop does **not** invent aesthetics at verify/ship time — but **does** re-check `@ux-design-laws` + `@web-design-guidelines` on UI diffs.
+**UI create** stays inside `@implement` (`@ui-ux-craft` orchestrator + `@frontend-design` / `@design-taste-frontend` / `@ux-design-laws` / `@imagegen-frontend-mobile` for mobile concepts). Loop does **not** invent aesthetics at verify/ship time — but **does** re-check `@ux-design-laws` + `@web-design-guidelines` on UI diffs.
 
 **Performance:** Routing lives in `@ecc-runner` → [helper-skills.md](../ecc-runner/references/helper-skills.md) (“During performance diagnose”). Attach `@test-performance-speed` only on matching issues; never as a default gate; never auto load-test production.
 

@@ -58,6 +58,7 @@ Liest `.qa/design` von `pingpong-solution`, auto-generiert `.qa/acceptance/<slug
 - `@search-first` — vor neuen Utils/Deps/Abstractions
 - `@documentation-lookup` — bei neuen Library/API/MCP-Integrations
 - `@security-review` — bei Auth, UGC, Storage, P2P, Secrets
+- `@ui-ux-craft` — neue/reshaped UI (Discovery → Chat-Design-Spec → Build → Motion/a11y/QA; komponiert `@frontend-design` / `@design-taste-frontend`)
 - `@test-performance-speed` — bei slow/lag/p95/bottleneck / Label `performance` (**messen vor Opt-Fixes**; kein Default-Gate)
 - `@strategic-compact` — bei großem Diff / langer Session
 

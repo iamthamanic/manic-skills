@@ -172,7 +172,7 @@ Skip when stack is `api-only` or no frontend detected.
 2. If missing → [references/templates/UI_STYLEGUIDE.skeleton.md](references/templates/UI_STYLEGUIDE.skeleton.md) at `docs/UI_STYLEGUIDE.md` (or profile path)
 3. Pre-fill stack-appropriate notes (Tailwind vs CSS modules) from stack profile
 4. In the styleguide (or setup report), note design quality refs for later pipeline use — do **not** run these skills here:
-   - Create: `@frontend-design` (general UI); `@design-taste-frontend` (landing/portfolio); `@ux-design-laws` (flows/task completion — mandatory with UI); `@imagegen-frontend-mobile` (mobile app screens/flows — images only)
+   - Create: `@ui-ux-craft` (UI/UX orchestrator — preferred entry); `@frontend-design` (general UI); `@design-taste-frontend` (landing/portfolio); `@ux-design-laws` (flows/task completion — mandatory with UI; craft falls back if absent); `@imagegen-frontend-mobile` (mobile app screens/flows — images only)
    - Audit: `@web-design-guidelines` (a11y/UX checklist); `@ux-design-laws` (verify-time pass); browser proof via `@verify-ui`
 
 This is the **style tree** — design tokens, component hierarchy, states — not `@zapier/stubtree`.

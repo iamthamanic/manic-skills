@@ -33,7 +33,8 @@ Apply **inline** — follow their checklists while executing this contract.
 | `@system-design-reference` | **§2–3** — new infra layer (cache, queue, gateway, events) before coding; cite pattern trade-offs |
 | `@strategic-compact` | Large diff / long session — compact after acceptance written, before bulk coding |
 | `@handoff` | Session ending / next agent continues — write OS-temp handoff doc (not workspace); after compact if agent changes |
-| `@frontend-design` | **§8** — new or reshaped UI; distinctive aesthetics, avoid generic AI look |
+| `@ui-ux-craft` | **§8** — UI/UX orchestrator (discovery → reference catalogs → chat design-spec → implement → motion/a11y/QA); composes design helpers below |
+| `@frontend-design` | **§8** — new or reshaped UI; distinctive aesthetics, avoid generic AI look (via `@ui-ux-craft` Phase C when both available) |
 | `@design-taste-frontend` | **§8** — landing pages, portfolios, redesigns (narrower than `@frontend-design`) |
 | `@ux-design-laws` | **§8** — **always with UI** — task completion, feedback, errors, progress, defaults (Hick/Fitts/Jakob/…); pair with aesthetics helpers |
 | `@imagegen-frontend-mobile` | **§8** — mobile app screen concepts / mockups / multi-screen flows (images only; iOS/Android/Capacitor) |
@@ -258,8 +259,9 @@ If the project has no test setup, do not invent a large new test framework witho
 For UI changes, follow the existing design system and product patterns.
 
 **Design helpers (inline):**
-* **Look:** Apply `@frontend-design` when building or reshaping UI. Prefer `@design-taste-frontend` for landing pages, portfolios, and marketing redesigns. Prefer `@imagegen-frontend-mobile` for mobile app screen concepts, phone mockups, and multi-screen flows (images only — not code). Do not invent a parallel aesthetic when the project styleguide already defines tokens/components.
-* **Behavior (mandatory for any UI):** Apply `@ux-design-laws` while designing flows, screens, forms, and interactive states — one purpose per screen, large targets, familiar patterns, immediate feedback, primary action emphasis, sensible defaults, proactive error prevention, recoverable errors, visible progress, memorable completion. Follow its Implementation Requirements checklist before claiming UI done.
+* **Orchestrate:** Apply `@ui-ux-craft` for any new/reshaped UI — chat design-spec then implement without waiting for approval; reference catalogs, motion, licensing, and visual QA. See `ui-ux-craft/references/skill-routing.md`.
+* **Look:** Apply `@frontend-design` when building or reshaping UI (via craft Phase C). Prefer `@design-taste-frontend` for landing pages, portfolios, and marketing redesigns. Prefer `@imagegen-frontend-mobile` for mobile app screen concepts, phone mockups, and multi-screen flows (images only — not code). Do not invent a parallel aesthetic when the project styleguide already defines tokens/components.
+* **Behavior (mandatory for any UI):** Apply `@ux-design-laws` while designing flows, screens, forms, and interactive states — or `ui-ux-craft` → `references/ux-engineering.md` if laws skill is absent — one purpose per screen, large targets, familiar patterns, immediate feedback, primary action emphasis, sensible defaults, proactive error prevention, recoverable errors, visible progress, memorable completion.
 
 Check:
 

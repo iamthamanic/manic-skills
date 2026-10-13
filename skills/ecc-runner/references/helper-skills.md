@@ -11,8 +11,8 @@ Attach inline during phases. Full pipeline table in `SKILL.md` Step 4.
 | Unfamiliar module / area | `@zoom-out` then `@search-first` |
 | Auth, `/api/`, env vars, user input | `@security-review` |
 | Producer→consumer, bulk+side-effect, override/fallback | `@composition-gate` intent (§3b in `@implement`) — write so the later gate CLEARs |
-| New or reshaped UI | `@frontend-design` + `@ux-design-laws` (via `@implement` §8) |
-| Landing / portfolio / marketing redesign | `@design-taste-frontend` + `@ux-design-laws` (via `@implement` §8) |
+| New or reshaped UI | `@ui-ux-craft` (orchestrator) + `@frontend-design` + `@ux-design-laws` (via `@implement` §8; craft falls back if laws missing) |
+| Landing / portfolio / marketing redesign | `@ui-ux-craft` + `@design-taste-frontend` + `@ux-design-laws` (via `@implement` §8) |
 | Mobile app screen concepts / mockups / flows | `@imagegen-frontend-mobile` (via `@implement` §8; images only) — still apply `@ux-design-laws` to flow structure |
 | Label `content` or paths `content/topics/` | `@questolin-content-layer` |
 | Label `infra` / `refactor` in title or body | `@ponytail-audit` (after implement, before verify) |
@@ -43,7 +43,7 @@ Run **before** large optimization diffs when signals match. Measure → attribut
 |--------|--------|
 | Touched UI files | `@web-design-guidelines` + `@ux-design-laws` **before** `@verify-ui` |
 | Browser proof | `@verify-ui` |
-| Never here | `@frontend-design` / `@design-taste-frontend` / `@imagegen-frontend-mobile` (create-time only; `@ux-design-laws` **is** allowed at verify-time) |
+| Never here | `@ui-ux-craft` full create loop / `@frontend-design` / `@design-taste-frontend` / `@imagegen-frontend-mobile` (create-time only; `@ux-design-laws` **is** allowed at verify-time) |
 
 ## During `design`
 
