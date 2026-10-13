@@ -24,16 +24,31 @@ This skill is **project-agnostic**. Never hardcode stack, ports, or product name
 
 Do **not** duplicate static code review (`@review-ticket`). Focus on browser behavior, screenshots, and acceptance criteria.
 
-## Global helper skills (ECC, `~/.claude/skills/`)
+## Global helper skills (ECC / manic-skills)
 
 | Helper | Trigger in verify-ui |
 |--------|----------------------|
-| `@web-design-guidelines` | Prefer **before** browser runs when UI files changed — static a11y/UX checklist (also run by `@ecc-check` Phase E / `@audit-changes`) |
+| `@web-design-guidelines` | Prefer **before** browser runs when UI files changed — static a11y/UX + Adaptive soft check (also `@ecc-check` Phase E / `@audit-changes`) |
+| `@ux-design-laws` | Spot-check task completion + adaptive bullets with guidelines (verify-time pass — **not** redesign) |
+| `@ui-ux-craft` quality gates | **Optional soft checklist only** — read `ui-ux-craft/references/quality-gates.md` Pass 1–3 criteria; **never** run the full craft create workflow here |
 | `@debug` | Step 6/8 FAIL or flaky — root cause (console, network, Playwright trace) before another `@implement` |
 | `@security-review` | Auth flows, forms, user-generated content in UI — after Step 6 if relevant |
 | `@verification-loop` | Only if Step 4 checks failed — fix via `@implement`, do not claim UI PASS |
 
-**Prerequisite order when UI in scope:** `@web-design-guidelines` (static) → this skill (browser). Do not invent aesthetics here (`@frontend-design` is create-time).
+**Prerequisite order when UI in scope:** `@web-design-guidelines` (+ `@ux-design-laws` spot-check) → this skill (browser).
+
+### Why not run full `@ui-ux-craft` here?
+
+`@ui-ux-craft` is the **create-time orchestrator** (discovery → reference catalogs → chat design-spec → implement → motion/license). `@verify-ui` answers: **does the already-built UI work in the browser?**
+
+| Do | Don't |
+|----|--------|
+| Browser/e2e + screenshots vs acceptance | Re-run craft Phases A–E (would re-spec / rewrite UI mid-verify) |
+| Spot-check with `@ux-design-laws` | Invent new aesthetics (`@frontend-design` / craft Phase C) |
+| Optionally map FAIL findings to craft `quality-gates.md` criteria | Nest craft → implement → verify-ui recursion |
+| On material UX FAIL → hand back to `@implement` + `@ui-ux-craft` | “Fix by redesigning” inside verify-ui |
+
+Create-time: `@implement` §8 → `@ui-ux-craft`. Verify-time: this skill.
 
 ## Workflow checklist
 

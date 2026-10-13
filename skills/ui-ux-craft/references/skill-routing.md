@@ -6,7 +6,7 @@
 |-------|---------------------|----------------------------|
 | Visual direction | `@frontend-design` | [design-direction.md](design-direction.md) |
 | Landing / portfolio anti-slop | `@design-taste-frontend` | [design-direction.md](design-direction.md) marketing bias |
-| UX laws / task completion | `@ux-design-laws` (may live only in Claude global skills) | [ux-engineering.md](ux-engineering.md) |
+| UX laws / task completion | `@ux-design-laws` (manic-skills) | [ux-engineering.md](ux-engineering.md) |
 | Mobile screen **concepts** (images) | `@imagegen-frontend-mobile` | Describe layouts; do not fake screenshots |
 | Static guidelines / Adaptive soft | `@web-design-guidelines` | Pass 2 checklist in [quality-gates.md](quality-gates.md) |
 | Browser proof | `@verify-ui` | Manual Pass 1–3 + mark UNVERIFIED |
@@ -27,7 +27,7 @@
 
 During `@ecc-runner` / `@ecc-runner-loop` **implement** phase: attach `@ui-ux-craft` for new/reshaped UI (alongside or instead of calling design helpers ad hoc).
 
-During **verify** phase: do **not** re-run full craft aesthetics — use guidelines + verify-ui only.
+During **verify** phase: do **not** re-run full craft (A–E). Use `@web-design-guidelines` + `@ux-design-laws` spot-check + `@verify-ui`. `@verify-ui` may **read** [quality-gates.md](quality-gates.md) as a soft checklist — it must **not** invoke craft’s create loop.
 
 ## Anti-recursion
 
